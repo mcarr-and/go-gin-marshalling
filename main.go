@@ -2,10 +2,11 @@ package main
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type album struct {
@@ -55,7 +56,7 @@ func postAlbums(c *gin.Context) {
 		if errors.As(err, &ve) {
 			out := make([]ErrorMsg, len(ve))
 			for i, fe := range ve {
-				out[i] = ErrorMsg{fe.Field(), getErrorMsg(fe)}
+				out[i] = ErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": out})
 		}

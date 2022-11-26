@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +40,7 @@ func Test_PostBadJson(t *testing.T) {
 		if errors.As(err, &ve) {
 			fmt.Println(ve)
 		}
-		assert.Failf(t, "unmarshalling ErrorMessage Error", ve.Error())
+		assert.Failf(t, "unmarshalling error message from server problem", ve.Error())
 	}
 
 	assert.Equal(t, 1, len(serverError.Errors))
