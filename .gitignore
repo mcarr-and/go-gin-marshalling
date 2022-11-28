@@ -18,3 +18,4 @@
 
 # binary file
 go-gin-example
+coverage.*

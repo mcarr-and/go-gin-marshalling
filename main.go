@@ -9,34 +9,49 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type album struct {
+type Album struct {
 	ID     string  `json:"id"`
 	Title  string  `json:"title" binding:"required"`
 	Artist string  `json:"artist"`
 	Price  float64 `json:"price"`
 }
 
-type ErrorMsg struct {
+type BindingErrorMsg struct {
 	Field   string `json:"field" validate:"required"`
 	Message string `json:"message" validate:"required"`
 }
 
-type Error struct {
-	Errors []*ErrorMsg `json:"errors" validate:"required"`
+type ServerError struct {
+	BindingErrors []*BindingErrorMsg `json:"errors"`
+	Message       string             `json:"message"`
 }
 
-var albums = []album{
+var albums = []Album{
 	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
 	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
 	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
-func listAlbums() []album {
+func listAlbums() []Album {
 	return albums
 }
 
 func getAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, albums)
+	c.JSON(http.StatusOK, albums)
+}
+
+func getAlbumByID(c *gin.Context) {
+	id := c.Param("id")
+
+	for _, album := range albums {
+		if album.ID == id {
+			c.JSON(http.StatusOK, album)
+			return
+		}
+	}
+	serverError := ServerError{Message: "album not found"}
+	c.JSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+	return
 }
 
 func getErrorMsg(fe validator.FieldError) string {
@@ -45,37 +60,24 @@ func getErrorMsg(fe validator.FieldError) string {
 		return "This field is Required"
 	}
 	return "Unknown Error"
-
 }
 
 func postAlbums(c *gin.Context) {
-	var newAlbum album
+	var newAlbum Album
 
 	if err := c.ShouldBindJSON(&newAlbum); err != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
-			out := make([]ErrorMsg, len(ve))
+			bindingErrorMessages := make([]BindingErrorMsg, len(ve))
 			for i, fe := range ve {
-				out[i] = ErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
+				bindingErrorMessages[i] = BindingErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
 			}
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": out})
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 		}
 		return
 	}
 	albums = append(albums, newAlbum)
-	c.IndentedJSON(http.StatusCreated, newAlbum)
-}
-
-func getAlbumByID(c *gin.Context) {
-	id := c.Param("id")
-
-	for _, a := range albums {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
-	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+	c.JSON(http.StatusCreated, newAlbum)
 }
 
 func setupRouter() *gin.Engine {
