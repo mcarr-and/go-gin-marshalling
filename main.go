@@ -54,14 +54,6 @@ func getAlbumByID(c *gin.Context) {
 	return
 }
 
-func getErrorMsg(fe validator.FieldError) string {
-	switch fe.Tag() {
-	case "required":
-		return "This field is Required"
-	}
-	return "Unknown Error"
-}
-
 func postAlbums(c *gin.Context) {
 	var newAlbum Album
 
@@ -78,6 +70,14 @@ func postAlbums(c *gin.Context) {
 	}
 	albums = append(albums, newAlbum)
 	c.JSON(http.StatusCreated, newAlbum)
+}
+
+func getErrorMsg(fe validator.FieldError) string {
+	switch fe.Tag() {
+	case "required":
+		return "This field is Required"
+	}
+	return "Unknown Error"
 }
 
 func setupRouter() *gin.Engine {
