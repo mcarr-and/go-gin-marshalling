@@ -74,8 +74,8 @@ func Test_postAlbum(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 
-	albumBody := `{"ID": "10", "Title": "War Pigs", "Artist": "Black Sabbath", "Price": 56.99}`
-	expectedAlbum := Album{ID: "10", Title: "War Pigs", Artist: "Black Sabbath", Price: 56.99}
+	albumBody := `{"ID": "10", "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
+	expectedAlbum := Album{ID: "10", Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 
 	router.ServeHTTP(w, req)
@@ -164,8 +164,8 @@ func BenchmarkGetAlbumById_BadRequest(b *testing.B) {
 
 func BenchmarkPostAlbum(b *testing.B) {
 	router := setupRouter()
-	album := `{"ID": "10", "Title": "War Pigs", "Artist": "Black Sabbath", "Price": 56.99}`
-	expectedAlbum := Album{ID: "10", Title: "War Pigs", Artist: "Black Sabbath", Price: 56.99}
+	album := `{"ID": "10", "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
+	expectedAlbum := Album{ID: "10", Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
 	w := httptest.NewRecorder()
 
 	for i := 0; i < b.N; i++ {
