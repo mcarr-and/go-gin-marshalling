@@ -1,4 +1,4 @@
-module example/web-service-gin
+module example/go-gin-example
 
 go 1.19
 

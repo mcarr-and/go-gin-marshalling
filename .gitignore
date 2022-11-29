@@ -17,4 +17,4 @@
 *.iml
 
 # binary file
-web-service-gin
+go-gin-example
