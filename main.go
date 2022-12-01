@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"example/go-gin-example/models"
 	"log"
 	"net/http"
 
@@ -9,35 +10,18 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type Album struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title" binding:"required"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
-}
-
-type BindingErrorMsg struct {
-	Field   string `json:"field" validate:"required"`
-	Message string `json:"message" validate:"required"`
-}
-
-type ServerError struct {
-	BindingErrors []*BindingErrorMsg `json:"errors"`
-	Message       string             `json:"message"`
-}
-
-var albums = []Album{
+var albums = []models.Album{
 	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
 	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
 	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
-func listAlbums() []Album {
+func listAlbums() []models.Album {
 	return albums
 }
 
 func resetAlbums() {
-	albums = []Album{
+	albums = []models.Album{
 		{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
 		{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
 		{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
@@ -57,19 +41,19 @@ func getAlbumByID(c *gin.Context) {
 			return
 		}
 	}
-	serverError := ServerError{Message: "album not found"}
+	serverError := models.ServerError{Message: "album not found"}
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
 func postAlbum(c *gin.Context) {
-	var newAlbum Album
+	var newAlbum models.Album
 
 	if err := c.ShouldBindJSON(&newAlbum); err != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
-			bindingErrorMessages := make([]BindingErrorMsg, len(ve))
+			bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
 			for i, fe := range ve {
-				bindingErrorMessages[i] = BindingErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
+				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			return
