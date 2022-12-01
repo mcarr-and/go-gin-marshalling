@@ -15,6 +15,9 @@ Project is a music store with an in-memory database.
 * Benchmark tests for throughput for all unit tests
 
 ## TODO
+* Opentelemetry  
+* Swagger
+* Prometheus or Jaeger? 
 * Adding CI server integration
 * Fuzz testing
 * Use a database as a data store

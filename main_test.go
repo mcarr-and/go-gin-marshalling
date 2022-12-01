@@ -73,6 +73,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 }
 
 func Test_postAlbum(t *testing.T) {
+	resetAlbums()
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var album Album
@@ -95,11 +96,11 @@ func Test_postAlbum(t *testing.T) {
 }
 
 func Test_postAlbum_BadRequest_BadJSON(t *testing.T) {
+	resetAlbums()
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	album := `{"XID": "10", "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf"}`
 	var serverError ServerError
-	assert.Equal(t, len(listAlbums()), 3)
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(w, req)
 	body := w.Body.Bytes()
