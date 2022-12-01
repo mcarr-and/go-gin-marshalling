@@ -32,6 +32,12 @@ var albums = []Album{
 	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
+var serverAlbums = []Album{
+	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+}
+
 func listAlbums() []Album {
 	return albums
 }
@@ -64,8 +70,8 @@ func postAlbum(c *gin.Context) {
 				bindingErrorMessages[i] = BindingErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
+			return
 		}
-		return
 	}
 	albums = append(albums, newAlbum)
 	c.JSON(http.StatusCreated, newAlbum)
@@ -84,12 +90,13 @@ func setupRouter() *gin.Engine {
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
-
+	albums = serverAlbums
 	return router
 }
 
 func main() {
 	router := setupRouter()
+
 	err := router.Run("localhost:8080")
 	if err != nil {
 		log.Fatal("Could not start server on port 8080")

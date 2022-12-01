@@ -34,4 +34,4 @@ Go Gin testing: https://semaphoreci.com/community/tutorials/test-driven-developm
 
 Test benchmarking: https://blog.logrocket.com/benchmarking-golang-improve-function-performance/
 
-Gin Examples: https://github.com/gin-gonic/examples
+Gin Examples: https://gin-gonic.com/docs/examples/
