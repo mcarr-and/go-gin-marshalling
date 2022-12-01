@@ -50,11 +50,10 @@ func getAlbumByID(c *gin.Context) {
 		}
 	}
 	serverError := ServerError{Message: "album not found"}
-	c.JSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
-	return
+	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
-func postAlbums(c *gin.Context) {
+func postAlbum(c *gin.Context) {
 	var newAlbum Album
 
 	if err := c.ShouldBindJSON(&newAlbum); err != nil {
@@ -84,7 +83,7 @@ func setupRouter() *gin.Engine {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
-	router.POST("/albums", postAlbums)
+	router.POST("/albums", postAlbum)
 
 	return router
 }

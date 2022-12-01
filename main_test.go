@@ -30,7 +30,7 @@ func Test_getAllAlbums(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	if err := json.Unmarshal(w.Body.Bytes(), &albums); err != nil {
-		assert.Failf(t, "json unmarshal fail", "fail to unmarshall Albums")
+		assert.Fail(t, "json unmarshal fail", "should be []Albums ", albums)
 	}
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -47,7 +47,7 @@ func Test_getAlbumById(t *testing.T) {
 
 	body := w.Body.Bytes()
 	if err := json.Unmarshal(body, &album); err != nil {
-		assert.Failf(t, "json unmarshal fail", "fail to unmarshall Albums %v", string(body))
+		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
 	}
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -63,8 +63,9 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/albums/5666", nil)
 	router.ServeHTTP(w, req)
 
-	if err := json.Unmarshal(w.Body.Bytes(), &serverError); err != nil {
-		assert.Empty(t, err, "json marshaling failed")
+	body := w.Body.Bytes()
+	if err := json.Unmarshal(body, &serverError); err != nil {
+		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", string(body))
 	}
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
@@ -80,23 +81,25 @@ func Test_postAlbum(t *testing.T) {
 	expectedAlbum := Album{ID: "10", Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 
+	assert.Equal(t, len(listAlbums()), 3)
 	router.ServeHTTP(w, req)
 	body := w.Body.Bytes()
 
 	if err := json.Unmarshal(body, &album); err != nil {
-		assert.Empty(t, err, "json marshaling failed", string(body))
+		assert.Fail(t, "json unmarshalling fail", "Should be an Album ", string(body))
 	}
 
 	assert.Equal(t, http.StatusCreated, w.Code)
 	assert.Equal(t, album, expectedAlbum)
+	assert.Equal(t, len(listAlbums()), 4)
 }
 
-func Test_PostAlbum_BadRequest_BadJSON(t *testing.T) {
+func Test_postAlbum_BadRequest_BadJSON(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	album := `{"XID": "10", "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf"}`
 	var serverError ServerError
-
+	assert.Equal(t, len(listAlbums()), 3)
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(w, req)
 	body := w.Body.Bytes()
@@ -104,15 +107,16 @@ func Test_PostAlbum_BadRequest_BadJSON(t *testing.T) {
 	if err := json.Unmarshal(body, &serverError); err != nil {
 		var ve validator.ValidationErrors
 		errors.As(err, &ve)
-		assert.Failf(t, "did not get error message from server", ve.Error())
+		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
 	}
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.Equal(t, 1, len(serverError.BindingErrors))
 	assert.Equal(t, "Title", serverError.BindingErrors[0].Field)
 	assert.Equal(t, "This field is Required", serverError.BindingErrors[0].Message)
+	assert.Equal(t, len(listAlbums()), 3)
 }
 
-func BenchmarkGetAllAlbums(b *testing.B) {
+func Benchmark_getAllAlbums(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var albums []Album
@@ -120,15 +124,17 @@ func BenchmarkGetAllAlbums(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(w, req)
-		if err := json.Unmarshal(w.Body.Bytes(), &albums); err != nil {
-			assert.Fail(b, "should bind JSON to []Albums", "GetAlbum", err)
+		body := w.Body.Bytes()
+		if err := json.Unmarshal(body, &albums); err != nil {
+			assert.Fail(b, "json unmarshalling fail", "should be []Album ", string(body))
 		}
 		assert.Equal(b, http.StatusOK, w.Code)
+		assert.Equal(b, listAlbums(), albums)
 		w.Body.Reset() //get requests need resets else the returned body is concatenated
 	}
 }
 
-func BenchmarkGetAlbumById(b *testing.B) {
+func Benchmark_getAlbumById(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var album Album
@@ -136,8 +142,9 @@ func BenchmarkGetAlbumById(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(w, req)
-		if err := json.Unmarshal(w.Body.Bytes(), &album); err != nil {
-			assert.Fail(b, "should bind to JSON to Album", "GetAlbum", err)
+		body := w.Body.Bytes()
+		if err := json.Unmarshal(body, &album); err != nil {
+			assert.Fail(b, "json unmarshalling fail", "should be Album ", string(body))
 		}
 		assert.Equal(b, http.StatusOK, w.Code)
 		assert.Equal(b, listAlbums()[1].Title, album.Title)
@@ -145,7 +152,7 @@ func BenchmarkGetAlbumById(b *testing.B) {
 	}
 }
 
-func BenchmarkGetAlbumById_BadRequest(b *testing.B) {
+func Benchmark_getAlbumById_BadRequest(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var serverError ServerError
@@ -153,8 +160,9 @@ func BenchmarkGetAlbumById_BadRequest(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(w, req)
-		if err := json.Unmarshal(w.Body.Bytes(), &serverError); err != nil {
-			assert.Fail(b, "should not fail binding", "GetAlbumById", err)
+		body := w.Body.Bytes()
+		if err := json.Unmarshal(body, &serverError); err != nil {
+			assert.Fail(b, "json unmarshalling fail", "should be ServerError ", string(body))
 		}
 		assert.Equal(b, http.StatusBadRequest, w.Code)
 		assert.Equal(b, "album not found", serverError.Message)
@@ -162,26 +170,26 @@ func BenchmarkGetAlbumById_BadRequest(b *testing.B) {
 	}
 }
 
-func BenchmarkPostAlbum(b *testing.B) {
+func Benchmark_postAlbum(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	albumJson := `{"ID": "10", "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
 	expectedAlbum := Album{ID: "10", Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
+	var albumReturned Album
 
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(w, req)
-		assert.Equal(b, http.StatusCreated, w.Code)
 		bodyReturned := w.Body.Bytes()
-		var albumReturned Album
 		if err := json.Unmarshal(bodyReturned, &albumReturned); err != nil {
-			assert.Fail(b, "binding JSON returned failure", albumJson, err.Error(), string(bodyReturned), albumReturned)
+			assert.Fail(b, "json unmarshalling fail", "should be Album ", string(bodyReturned))
 		}
+		assert.Equal(b, http.StatusCreated, w.Code)
 		assert.Equal(b, albumReturned, expectedAlbum)
 	}
 }
 
-func BenchmarkPostAlbum_BadRequest_BadJson(b *testing.B) {
+func Benchmark_postAlbum_BadRequest_BadJson(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var returnedError ServerError
@@ -193,7 +201,7 @@ func BenchmarkPostAlbum_BadRequest_BadJson(b *testing.B) {
 		router.ServeHTTP(w, req)
 		bodyReturned := w.Body.Bytes()
 		if err := json.Unmarshal(bodyReturned, &returnedError); err != nil {
-			assert.Fail(b, "binding JSON returned failure", err.Error(), string(bodyReturned), returnedError.Message, returnedError.BindingErrors[0])
+			assert.Fail(b, "json unmarshalling fail", "Should be ServerError ", string(bodyReturned))
 		}
 		assert.Equal(b, http.StatusBadRequest, w.Code)
 		assert.Equal(b, 1, len(returnedError.BindingErrors))
