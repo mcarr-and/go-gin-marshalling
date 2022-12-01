@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"example/go-gin-example/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +25,7 @@ func TestMain(m *testing.M) {
 func Test_getAllAlbums(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var albums []Album
+	var albums []models.Album
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
 
 	router.ServeHTTP(w, req)
@@ -40,7 +41,7 @@ func Test_getAllAlbums(t *testing.T) {
 func Test_getAlbumById(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var album Album
+	var album models.Album
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/2", nil)
 	router.ServeHTTP(w, req)
@@ -58,7 +59,7 @@ func Test_getAlbumById(t *testing.T) {
 func Test_getAlbumById_NotFound(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var serverError ServerError
+	var serverError models.ServerError
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/5666", nil)
 	router.ServeHTTP(w, req)
@@ -76,10 +77,10 @@ func Test_postAlbum(t *testing.T) {
 	resetAlbums()
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var album Album
+	var album models.Album
 
 	albumBody := `{"ID": "10", "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
-	expectedAlbum := Album{ID: "10", Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
+	expectedAlbum := models.Album{ID: "10", Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 
 	assert.Equal(t, len(listAlbums()), 3)
@@ -100,7 +101,7 @@ func Test_postAlbum_BadRequest_BadJSON(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	album := `{"XID": "10", "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf"}`
-	var serverError ServerError
+	var serverError models.ServerError
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(w, req)
 	body := w.Body.Bytes()
@@ -119,7 +120,7 @@ func Test_postAlbum_BadRequest_BadJSON(t *testing.T) {
 func Benchmark_getAllAlbums(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var albums []Album
+	var albums []models.Album
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
 
 	for i := 0; i < b.N; i++ {
@@ -135,7 +136,7 @@ func Benchmark_getAllAlbums(b *testing.B) {
 func Benchmark_getAlbumById(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var album Album
+	var album models.Album
 	req, _ := http.NewRequest(http.MethodGet, "/albums/2", nil)
 
 	for i := 0; i < b.N; i++ {
@@ -151,7 +152,7 @@ func Benchmark_getAlbumById(b *testing.B) {
 func Benchmark_getAlbumById_BadRequest(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var serverError ServerError
+	var serverError models.ServerError
 	req, _ := http.NewRequest(http.MethodGet, "/albums/5666", nil)
 
 	for i := 0; i < b.N; i++ {
@@ -169,7 +170,7 @@ func Benchmark_postAlbum(b *testing.B) {
 	w := httptest.NewRecorder()
 	albumJson := `{"ID": "10", "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
-	var albumReturned Album
+	var albumReturned models.Album
 
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(w, req)
@@ -184,7 +185,7 @@ func Benchmark_postAlbum(b *testing.B) {
 func Benchmark_postAlbum_BadRequest_BadJson(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var returnedError ServerError
+	var returnedError models.ServerError
 	albumJson := `{"XID": "10", "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf"}`
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
 
