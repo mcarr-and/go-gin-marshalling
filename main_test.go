@@ -184,16 +184,20 @@ func BenchmarkPostAlbum(b *testing.B) {
 func BenchmarkPostAlbum_BadRequest_BadJson(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	var serverError ServerError
+	var returnedError ServerError
+	expectedServerError := ServerError{BindingErrors: []*BindingErrorMsg{{Field: "Title", Message: "This field is Required"}}}
 	albumJson := `{"XID": "10", "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf"}`
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
 
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(w, req)
 		bodyReturned := w.Body.Bytes()
-		if err := json.Unmarshal(bodyReturned, &serverError); err != nil {
-			assert.Fail(b, "binding JSON returned failure", err.Error(), string(bodyReturned), serverError.Message, serverError.BindingErrors[0])
+		if err := json.Unmarshal(bodyReturned, &returnedError); err != nil {
+			assert.Fail(b, "binding JSON returned failure", err.Error(), string(bodyReturned), returnedError.Message, returnedError.BindingErrors[0])
 		}
 		assert.Equal(b, http.StatusBadRequest, w.Code)
+		assert.Equal(b, 1, len(returnedError.BindingErrors))
+		assert.Equal(b, returnedError, expectedServerError)
+		assert.Equal(b, expectedServerError.BindingErrors[0], returnedError.BindingErrors[0])
 	}
 }
