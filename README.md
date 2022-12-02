@@ -39,8 +39,10 @@ Project is a music store with an in-memory database.
 
 ## Project includes:
 
-* WIP - Opentelemetry via Jaeger 
-* Unit testing sending and receiving JSON
+* WIP
+  * Opentelemetry via Jaeger
+  
+* Unit testing sending and receiving JSON to Gin
   * Get all albums
   * Get album by ID
   * Get album by ID that is not found
