@@ -1,8 +1,10 @@
-Test project to understand the 
+Test project to understand the  [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework)
 
-[Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework)
+Project is a backend service that music store with an in-memory database.
 
-Project is a music store with an in-memory database.
+Using Jaeger tracing for observability https://www.jaegertracing.io/
+
+
 ## 0. Expected tooling to run this project
 
 1. Go
@@ -24,8 +26,33 @@ Project is a music store with an in-memory database.
 ```bash
   make start;
 ```
+## 2. Run Tests
 
-## 2. Stop server & Jaeger 
+
+### (Either) PostMan collection for tests
+
+1.Import the Postman collection into your Postman to run the tests. 
+
+[Postman Collection](test/Album-Store.postman_collection.json)
+
+2. Run tests
+
+Postman Collection
+   
+### (Or) Run a few Curl commands 
+
+`curl http://localhost:9080/albums/1`
+
+`curl http://localhost:9080/albums/666`
+
+`curl http://localhost:9080/albums`
+
+
+## 3. See the Spans for the album-store
+
+[View Jaeger spans for the tests that you have run album-store](http://localhost:16686/search?limit=20&lookback=1h&maxDuration&minDuration&service=album-store)
+
+## 4. Stop server & Jaeger 
 
 1. Stop Server
 

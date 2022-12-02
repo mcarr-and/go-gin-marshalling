@@ -157,7 +157,7 @@ func main() {
 	router := setupRouter()
 
 	if errRun := router.Run("localhost:9080"); errRun != nil {
-		log.Fatal("Could not start server on port 8080")
+		log.Fatal("Could not start server on port 9080")
 		return
 	}
 }

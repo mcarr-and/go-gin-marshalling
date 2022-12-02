@@ -31,6 +31,7 @@ jaeger-stop:
 	docker start $(shell docker ps -qa -f "name=jaeger" -f "label=jaeger-all-in-one" );
 
 start:
+	go mod tidy
 	go run main.go;
 
 coverage:

@@ -1,0 +1,127 @@
+{
+	"info": {
+		"_postman_id": "d64dfb93-ef36-46af-9cd7-34e17a521c2b",
+		"name": "Album-Store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Albums - Success",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/albums",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"albums"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Album by Id. Success",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/albums/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"albums",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get - Album by id - Error - Album with id 667 does not exist",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/albums/667",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"albums",
+						"667"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post - Create album. Success",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ID\": \"10\",\n    \"Title\": \"Blue Train\",\n    \"Artistx\": \"John Coltrane\",\n    \"Price\": 56.99,\n    \"X\": \"asdf\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/albums/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"albums",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post - Create album - Error invalid body",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"XID\": \"10\",\n    \"Titlexx\": \"Blue Train\",\n    \"Artistx\": \"John Coltrane\",\n    \"Price\": 56.99,\n    \"X\": \"asdf\"\n}å",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9080/albums/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"albums",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
