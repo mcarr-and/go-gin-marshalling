@@ -28,7 +28,7 @@ jaeger-start:
 	docker start $(shell docker ps -qa -f "name=jaeger" -f "label=jaeger-all-in-one" );
 
 jaeger-stop:
-	docker start $(shell docker ps -qa -f "name=jaeger" -f "label=jaeger-all-in-one" );
+	docker stop $(shell docker ps -qa -f "name=jaeger" -f "label=jaeger-all-in-one" );
 
 start:
 	go mod tidy

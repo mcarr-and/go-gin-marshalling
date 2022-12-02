@@ -38,6 +38,9 @@ func resetAlbums() {
 }
 
 func getAlbums(c *gin.Context) {
+	span := trace.SpanFromContext(c.Request.Context())
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+	defer span.End()
 	c.JSON(http.StatusOK, albums)
 }
 
@@ -51,10 +54,12 @@ func getAlbumByID(c *gin.Context) {
 	for _, album := range albums {
 		if album.ID == id {
 			c.JSON(http.StatusOK, album)
+			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 			return
 		}
 	}
 	serverError := models.ServerError{Message: "album not found"}
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
@@ -73,11 +78,13 @@ func postAlbum(c *gin.Context) {
 				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
+			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 			//span.SetAttributes(attribute.Key("binding.errors").StringSlice(bindingErrorMessages))//todo Add errors to slice
 			return
 		}
 	}
 	albums = append(albums, newAlbum)
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
