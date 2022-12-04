@@ -6,8 +6,14 @@ build:
 test:
 	go test -v
 
-benchmark:
+test-benchmark:
 	go test -bench=. -count 2 -run=^# -benchmem
+
+docker-build:
+	docker build -t go-gin-example:0.1 .
+
+docker-run:
+	docker run -d -p 9080:9080 --name go-gin-example go-gin-example:0.1
 
 jaeger-install:
 	 docker run -d --name jaeger --label jaeger-all-in-one \

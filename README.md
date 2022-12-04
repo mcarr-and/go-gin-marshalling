@@ -76,6 +76,7 @@ Postman Collection
   * Post to create new album
   * Post album without all the required JSON fields to be a valid object to Gin & V10
 * Benchmark tests for throughput for all unit tests
+* Docker
 
 ## TODO
 * Prometheus export data collection
@@ -105,3 +106,5 @@ Gin Examples: https://gin-gonic.com/docs/examples/
 Opentelemetry and Gin https://signoz.io/opentelemetry/go/
 
 Opentelemetry with Jaeger https://github.com/open-telemetry/opentelemetry-go/tree/main/example/jaeger
+
+OpenTelemetry using Otel-collector https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo

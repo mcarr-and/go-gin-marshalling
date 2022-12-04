@@ -179,8 +179,8 @@ func main() {
 }
 
 func getEnvironmentValue(searchValue, defaultValue string) string {
-	envValue := os.Getenv(searchValue)
-	if envValue == "" {
+	envValue, err := os.LookupEnv(searchValue)
+	if err {
 		return defaultValue
 	}
 	return envValue
