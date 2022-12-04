@@ -10,61 +10,49 @@ Using Jaeger tracing for observability https://www.jaegertracing.io/
 1. Go
 2. Docker 
 
-## 1. Start All Expected Services 
+## 1. Start All Observability & Log Viewing Services
 
 The following will start 
 * OpenTelemetry collector
 * Jaeger
 * Zipkin
-* Prometheus 
-
+* Prometheus
  
 ```bash
    make docker-compose-start 
 ```
 
-## 2. Start Server
+## 2. Start go-gin-example Go/Gin Server
 
 ```bash
   make start;
 ```
 
-## 3. Run Tests
+[View Albums in browser](http://localhost:9080/albums)
 
-
-### (Either) PostMan collection for tests
-
-1.Import the Postman collection into your Postman to run the tests. 
+## 3. Run Some Tests
 
 [Postman Collection](test/Album-Store.postman_collection.json)
-
-2. Run tests
-
-Postman Collection
-   
-### (Or) Run a few Curl commands 
 
 ```bash
   make local-run-tests;
 ```
 
-## 4. View the Data in the systems
+## 4. View the events in the different Services
 
-[Jaeger](http://localhost:16686/search?limit=20&service=album-store)
+[View Jaeger](http://localhost:16686/search?limit=20&service=album-store)
 
-[Zipkin](http://localhost:9411/zipkin/)
+[View Zipkin](http://localhost:9411/zipkin/)
 
-[Prometheus](http://localhost:9090/graph?g0.expr=%7Bjob%3D~%22.%2B%22%7D%20&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
+[View Prometheus](http://localhost:9090/graph?g0.expr=%7Bjob%3D~%22.%2B%22%7D%20&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
 
-[View Albums](http://localhost:9080/albums)
+## 5. Stop go-gin-example server & Services  
 
-## 5. Stop server & Jaeger 
-
-1. Stop Server
+### 1. Stop Server
 
 `Ctr + C` in the terminal window where go is running. 
 
-2. Stop Jaeger
+### 2. Stop Observability and Log Viewing Services
 
 ```bash
   make docker-comose-stop;
@@ -83,14 +71,15 @@ Postman Collection
     * Post album without all the required JSON fields to be a valid object to Gin & V10
   * Benchmark tests for throughput for all unit tests
 * Docker build
-* Docker-Compose to use local tooling  
+* Docker-Compose to use local tooling:  
   * Jaeger
   * Zipkin 
   * Prometheus 
 
 ## TODO
-* Prometheus export health endpoint
-* Swagger
+* Create Prometheus export health endpoint
+* Create status endpoint that says if service is up or down.
+* Display OpenAPI 2.0 docs for endpoints
 * Use a database as a data store
 * Database migration tooling via scripts
 * Fuzz testing 
