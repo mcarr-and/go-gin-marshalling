@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"example/go-gin-example/models"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
@@ -16,13 +18,15 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 )
 
 var albums = []models.Album{
-	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+	{ID: 1, Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+	{ID: 2, Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+	{ID: 3, Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
 func listAlbums() []models.Album {
@@ -31,9 +35,9 @@ func listAlbums() []models.Album {
 
 func resetAlbums() {
 	albums = []models.Album{
-		{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-		{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-		{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+		{ID: 1, Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+		{ID: 2, Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+		{ID: 3, Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 	}
 }
 
@@ -45,20 +49,28 @@ func getAlbums(c *gin.Context) {
 }
 
 func getAlbumByID(c *gin.Context) {
-	id := c.Param("id")
 	span := trace.SpanFromContext(c.Request.Context())
+	defer span.End()
+	id := c.Param("id")
 	span.SetAttributes(attribute.Key("Id").String(id))
 	span.AddEvent("An Event", trace.WithAttributes(attribute.String("id", id)))
-	defer span.End()
 
-	for _, album := range albums {
-		if album.ID == id {
-			c.JSON(http.StatusOK, album)
-			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
-			return
+	if albumId, err := strconv.Atoi(id); err != nil {
+		serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album ID", id, "is not a valid number")}
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		span.SetAttributes(attribute.Key("http.request.id").String(id))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+		return
+	} else {
+		for _, album := range albums {
+			if album.ID == albumId {
+				c.JSON(http.StatusOK, album)
+				span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+				return
+			}
 		}
 	}
-	serverError := models.ServerError{Message: "album not found"}
+	serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album", id, "not found")}
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
@@ -70,8 +82,6 @@ func postAlbum(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&newAlbum); err != nil {
 		var ve validator.ValidationErrors
-		//span.SetAttributes(attribute.Key("body"))//TODO Add body or error
-
 		if errors.As(err, &ve) {
 			bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
 			for i, fe := range ve {
@@ -79,7 +89,8 @@ func postAlbum(c *gin.Context) {
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-			//span.SetAttributes(attribute.Key("binding.errors").StringSlice(bindingErrorMessages))//todo Add errors to slice
+			jsonBytes, _ := json.Marshal(bindingErrorMessages)
+			span.SetAttributes(attribute.Key("postAlbum.error.binding.message").String(fmt.Sprintf("%v", string(jsonBytes))))
 			return
 		}
 	}
@@ -98,8 +109,7 @@ func getErrorMsg(fe validator.FieldError) string {
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
-	router.Use(otelgin.Middleware(service)) // weaves in the span creation automatically
-
+	router.Use(otelgin.Middleware(service)) // weave in OpenTelemetry
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
@@ -137,9 +147,7 @@ func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
 }
 
 func main() {
-	//cleanup := initTracer()
-	//defer cleanup(context.Background())
-	tp, err := tracerProvider("http://localhost:14268/api/traces") //TODO extract to system property
+	tp, err := tracerProvider(getEnvironmentValue("JAEGER_TRACES_URL", "http://localhost:14268/api/traces"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -163,8 +171,17 @@ func main() {
 
 	router := setupRouter()
 
-	if errRun := router.Run("localhost:9080"); errRun != nil {
-		log.Fatal("Could not start server on port 9080")
+	runAddress := getEnvironmentValue("ALBUM_START_URL", "localhost:9080")
+	if errRun := router.Run(runAddress); errRun != nil {
+		log.Fatal("Could not start server on ", runAddress)
 		return
 	}
+}
+
+func getEnvironmentValue(searchValue, defaultValue string) string {
+	envValue := os.Getenv(searchValue)
+	if envValue == "" {
+		return defaultValue
+	}
+	return envValue
 }

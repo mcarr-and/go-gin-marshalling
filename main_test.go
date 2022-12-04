@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"example/go-gin-example/models"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -56,12 +57,30 @@ func Test_getAlbumById(t *testing.T) {
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
 }
 
-func Test_getAlbumById_NotFound(t *testing.T) {
+func Test_getAlbumById_BadId(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var serverError models.ServerError
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/5666", nil)
+	req, _ := http.NewRequest(http.MethodGet, "/albums/X", nil)
+	router.ServeHTTP(w, req)
+
+	body := w.Body.Bytes()
+	if err := json.Unmarshal(body, &serverError); err != nil {
+		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
+	}
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, "Album ID [X] is not a valid number", serverError.Message)
+}
+
+func Test_getAlbumById_NotFound(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	var serverError models.ServerError
+	albumID := 5666
+
+	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%v", "/albums/", albumID), nil)
 	router.ServeHTTP(w, req)
 
 	body := w.Body.Bytes()
@@ -70,7 +89,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	}
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.Equal(t, "album not found", serverError.Message)
+	assert.Equal(t, fmt.Sprintf("%s [%v] %s", "Album", albumID, "not found"), serverError.Message)
 }
 
 func Test_postAlbum(t *testing.T) {
@@ -79,8 +98,8 @@ func Test_postAlbum(t *testing.T) {
 	w := httptest.NewRecorder()
 	var album models.Album
 
-	albumBody := `{"ID": "10", "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
-	expectedAlbum := models.Album{ID: "10", Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
+	albumBody := `{"ID": 10, "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
+	expectedAlbum := models.Album{ID: 10, Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 
 	assert.Equal(t, len(listAlbums()), 3)

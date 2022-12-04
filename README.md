@@ -78,11 +78,13 @@ Postman Collection
 * Benchmark tests for throughput for all unit tests
 
 ## TODO
+* Prometheus export data collection
 * Swagger
-* Adding CI server integration
-* Fuzz testing
 * Use a database as a data store
-* Database migration
+* Database migration tooling via scripts
+* Fuzz testing 
+* Unit test the OpenTelemetry messages are received
+* Adding CI server integration
 * Adding project to a Docker container
 * K3D cluster to run Docker container in K8s.
 * Helm chart to add Gin Server and Database
@@ -99,5 +101,7 @@ Go Gin testing: https://semaphoreci.com/community/tutorials/test-driven-developm
 Test benchmarking: https://blog.logrocket.com/benchmarking-golang-improve-function-performance/
 
 Gin Examples: https://gin-gonic.com/docs/examples/
+
+Opentelemetry and Gin https://signoz.io/opentelemetry/go/
 
 Opentelemetry with Jaeger https://github.com/open-telemetry/opentelemetry-go/tree/main/example/jaeger
