@@ -6,21 +6,28 @@ import (
 	"errors"
 	"example/go-gin-example/models"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/metric/global"
+	"go.opentelemetry.io/otel/metric/instrument"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
-	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	"go.opentelemetry.io/otel/trace"
-	"log"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var albums = []models.Album{
@@ -42,6 +49,15 @@ func resetAlbums() {
 }
 
 func getAlbums(c *gin.Context) {
+	meter := global.Meter("demo-server-meter")
+	serverAttribute := attribute.String("server-attribute", "foo")
+	commonLabels := []attribute.KeyValue{serverAttribute}
+	requestCount, _ := meter.SyncInt64().Counter(
+		"demo_server/request_counts",
+		instrument.WithDescription("The number of requests received"),
+	)
+	requestCount.Add(c, 1, commonLabels...)
+
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 	defer span.End()
@@ -117,57 +133,87 @@ func setupRouter() *gin.Engine {
 }
 
 const (
-	service     = "album-store"
-	environment = "development"
-	id          = 1
+	service = "album-store"
 )
 
-// tracerProvider returns an OpenTelemetry TracerProvider configured to use
-// the Jaeger exporter that will send spans to the provided url. The returned
-// TracerProvider will also use a Resource configured with all the information
-// about the application.
-func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
-	// Create the Jaeger exporter
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
-	if err != nil {
-		return nil, err
-	}
-	tp := tracesdk.NewTracerProvider(
-		// Always be sure to batch in production.
-		tracesdk.WithBatcher(exp),
-		// Record information about this application in a Resource.
-		tracesdk.WithResource(resource.NewWithAttributes(
-			semconv.SchemaURL,
+// Initializes an OTLP exporter, and configures the corresponding trace and
+// metric providers.
+func initProvider() (func(context.Context) error, error) {
+	ctx := context.Background()
+
+	res, err := resource.New(ctx,
+		resource.WithAttributes(
+			// the service name used to display traces in backends
 			semconv.ServiceNameKey.String(service),
-			attribute.String("environment", environment),
-			attribute.Int64("ID", id),
-		)),
+		),
 	)
-	return tp, nil
+	if err != nil {
+		return nil, fmt.Errorf("failed to create resource: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	defer cancel()
+	openTelemetryCollectorServiceLocation := getEnvironmentValue("OTEL_SERVICE_LOCATION", "localhost:4317")
+	conn, err := grpc.DialContext(ctx, openTelemetryCollectorServiceLocation,
+		// Note the use of insecure transport here. TLS is recommended in production.
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+	}
+
+	// Set up a trace exporter
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+	}
+
+	// Register the trace exporter with a TracerProvider, using a batch
+	// span processor to aggregate spans before export.
+	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
+	tracerProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithResource(res),
+		sdktrace.WithSpanProcessor(bsp),
+	)
+	otel.SetTracerProvider(tracerProvider)
+
+	// set global propagator to tracecontext (the default is no-op).
+	otel.SetTextMapPropagator(propagation.TraceContext{})
+
+	// Shutdown will flush any remaining spans and shut down the exporter.
+	return tracerProvider.Shutdown, nil
 }
 
 func main() {
-	tp, err := tracerProvider(getEnvironmentValue("JAEGER_TRACES_URL", "http://localhost:14268/api/traces"))
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
+	shutdown, err := initProvider()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// Register our TracerProvider as the global so any imported
-	// instrumentation in the future will default to using it.
-	otel.SetTracerProvider(tp)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	// Cleanly shutdown and flush telemetry when the application exits.
-	defer func(ctx context.Context) {
-		// Do not make the application hang when it is shutdown.
-		ctx, cancel = context.WithTimeout(ctx, time.Second*5)
-		defer cancel()
-		if err := tp.Shutdown(ctx); err != nil {
-			log.Fatal(err)
+	defer func() {
+		if err := shutdown(ctx); err != nil {
+			log.Fatal("failed to shutdown TracerProvider: %w", err)
 		}
-	}(ctx)
+	}()
+
+	// Attributes represent additional key-value descriptors that can be bound
+	// to a metric observer or recorder.
+	commonAttrs := []attribute.KeyValue{
+		attribute.String("attrA", "chocolate"),
+		attribute.String("attrB", "raspberry"),
+		attribute.String("attrC", "vanilla"),
+	}
+
+	tracer := otel.Tracer("test-tracer")
+	ctx, span := tracer.Start(
+		ctx,
+		"CollectorExporter-Example",
+		trace.WithAttributes(commonAttrs...))
+	defer span.End()
 
 	router := setupRouter()
 
@@ -179,8 +225,8 @@ func main() {
 }
 
 func getEnvironmentValue(searchValue, defaultValue string) string {
-	envValue, err := os.LookupEnv(searchValue)
-	if err {
+	envValue, returnedValue := os.LookupEnv(searchValue)
+	if !returnedValue {
 		return defaultValue
 	}
 	return envValue
