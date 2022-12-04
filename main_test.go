@@ -98,8 +98,8 @@ func Test_postAlbum(t *testing.T) {
 	w := httptest.NewRecorder()
 	var album models.Album
 
-	albumBody := `{"ID": 10, "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
-	expectedAlbum := models.Album{ID: 10, Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 56.99}
+	albumBody := `{"ID": 10, "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 66.60}`
+	expectedAlbum := models.Album{ID: 10, Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 66.60}
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 
 	assert.Equal(t, len(listAlbums()), 3)

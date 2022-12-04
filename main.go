@@ -160,7 +160,7 @@ func initProvider() (func(context.Context) error, error) {
 		grpc.WithBlock(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+		return nil, fmt.Errorf("failed to create gRPC connection to opentelemetry-collector: %w", err)
 	}
 
 	// Set up a trace exporter

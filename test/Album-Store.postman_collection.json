@@ -25,10 +25,16 @@
 			"response": []
 		},
 		{
-			"name": "Get Album by Id. Success",
+			"name": "Get Album by Id - Success",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "http://localhost:9080/albums/1",
 					"protocol": "http",
@@ -45,7 +51,27 @@
 			"response": []
 		},
 		{
-			"name": "Get - Album by id - Error - Album with id 667 does not exist",
+			"name": "Get Album by id - Erorr - Invalid ID - not a number",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9080/albums/X",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9080",
+					"path": [
+						"albums",
+						"X"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Album by id - Error - Album with this ID does not exist",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -65,13 +91,13 @@
 			"response": []
 		},
 		{
-			"name": "Post - Create album. Success",
+			"name": "Post - Create album - Success",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"ID\": \"10\",\n    \"Title\": \"Blue Train\",\n    \"Artistx\": \"John Coltrane\",\n    \"Price\": 56.99,\n    \"X\": \"asdf\"\n}",
+					"raw": "{\n    \"ID\": 10,\n    \"Title\": \"Blue Train\",\n    \"Artist\": \"John Coltrane\",\n    \"Price\": 56.99\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -100,7 +126,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"XID\": \"10\",\n    \"Titlexx\": \"Blue Train\",\n    \"Artistx\": \"John Coltrane\",\n    \"Price\": 56.99,\n    \"X\": \"asdf\"\n}å",
+					"raw": "{\n    \"XID\": 10,\n    \"Titlexx\": \"Blue Train\",\n    \"Artistx\": \"John Coltrane\",\n    \"Price\": 56.99,\n    \"X\": \"asdf\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -122,6 +148,5 @@
 			},
 			"response": []
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }

@@ -10,23 +10,26 @@ Using Jaeger tracing for observability https://www.jaegertracing.io/
 1. Go
 2. Docker 
 
-## 1. Start Jaeger and server
+## 1. Start All Expected Services 
 
-1. Install and Run Docker Jaeger
+The following will start 
+* OpenTelemetry collector
+* Jaeger
+* Zipkin
+* Prometheus 
+
+ 
 ```bash
-   make jager-install; 
+   make docker-compose-start 
 ```
 
-[View Albums](http://localhost:9080/albums)
-
-[Jaeger tracing](http://localhost:16686/search )
-
-2. Start Server
+## 2. Start Server
 
 ```bash
   make start;
 ```
-## 2. Run Tests
+
+## 3. Run Tests
 
 
 ### (Either) PostMan collection for tests
@@ -41,18 +44,21 @@ Postman Collection
    
 ### (Or) Run a few Curl commands 
 
-`curl http://localhost:9080/albums/1`
+```bash
+  make local-run-tests;
+```
 
-`curl http://localhost:9080/albums/666`
+## 4. View the Data in the systems
 
-`curl http://localhost:9080/albums`
+[Jaeger](http://localhost:16686/search?limit=20&service=album-store)
 
+[Zipkin](http://localhost:9411/zipkin/)
 
-## 3. See the Spans for the album-store
+[Prometheus](http://localhost:9090/graph?g0.expr=%7Bjob%3D~%22.%2B%22%7D%20&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
 
-[View Jaeger spans for the tests that you have run album-store](http://localhost:16686/search?limit=20&lookback=1h&maxDuration&minDuration&service=album-store)
+[View Albums](http://localhost:9080/albums)
 
-## 4. Stop server & Jaeger 
+## 5. Stop server & Jaeger 
 
 1. Stop Server
 
@@ -61,25 +67,29 @@ Postman Collection
 2. Stop Jaeger
 
 ```bash
-  make jaeger-stop;
+  make docker-comose-stop;
 ```
 
 ## Project includes:
 
-* WIP
-  * Opentelemetry via Jaeger
+* Opentelemetry via OpenTelemetry Collector.
   
-* Unit testing sending and receiving JSON to Gin
-  * Get all albums
-  * Get album by ID
-  * Get album by ID that is not found
-  * Post to create new album
-  * Post album without all the required JSON fields to be a valid object to Gin & V10
-* Benchmark tests for throughput for all unit tests
-* Docker
+* Testing
+  * Unit testing sending and receiving JSON to Gin
+    * Get all albums
+    * Get album by ID
+    * Get album by ID that is not found
+    * Post to create new album
+    * Post album without all the required JSON fields to be a valid object to Gin & V10
+  * Benchmark tests for throughput for all unit tests
+* Docker build
+* Docker-Compose to use local tooling  
+  * Jaeger
+  * Zipkin 
+  * Prometheus 
 
 ## TODO
-* Prometheus export data collection
+* Prometheus export health endpoint
 * Swagger
 * Use a database as a data store
 * Database migration tooling via scripts
