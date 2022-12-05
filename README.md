@@ -26,7 +26,7 @@ make docker-compose-start;
 ## 2. Start go-gin-example Go/Gin Server
 
 ```bash
-make start;
+make local-start;
 ```
 
 #### Note: the application will not start without the OpenTelemetry collector running
@@ -36,7 +36,7 @@ make start;
 [Postman Collection](test/Album-Store.postman_collection.json)
 
 ```bash
-make local-run-tests;
+make local-test;
 ```
 
 ## 4. View the events in the different Services
