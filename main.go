@@ -73,8 +73,7 @@ func getAlbumByID(c *gin.Context) {
 
 	if albumId, err := strconv.Atoi(id); err != nil {
 		serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album ID", id, "is not a valid number")}
-		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		span.SetAttributes(attribute.Key("http.request.id").String(id))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest), attribute.Key("http.request.id").String(id))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
 	} else {
@@ -104,9 +103,8 @@ func postAlbum(c *gin.Context) {
 				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
-			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
-			span.SetAttributes(attribute.Key("postAlbum.error.binding.message").String(fmt.Sprintf("%v", string(jsonBytes))))
+			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest), attribute.Key("postAlbum.error.binding.message").String(fmt.Sprintf("%v", string(jsonBytes))))
 			return
 		}
 	}
