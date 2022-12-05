@@ -1,9 +1,16 @@
-Test project to understand the  [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework)
+## About
+Test project to understand how to use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework)
 
-Project is a backend service that music store with an in-memory database.
+The project is a backend service that represents a music store with an in-memory database.
 
-Using Jaeger tracing for observability https://www.jaegertracing.io/
+The project uses OpenTelemetry to send information to Observability & Log Viewing Services
 
+### OpenTelemetry collector 
+
+Send data to the following services:
+* Jaeger
+* Zipkin
+* Prometheus
 
 ## 0. Expected tooling to run this project
 
@@ -11,31 +18,25 @@ Using Jaeger tracing for observability https://www.jaegertracing.io/
 2. Docker 
 
 ## 1. Start All Observability & Log Viewing Services
-
-The following will start 
-* OpenTelemetry collector
-* Jaeger
-* Zipkin
-* Prometheus
  
 ```bash
-   make docker-compose-start 
+make docker-compose-start;
 ```
 
 ## 2. Start go-gin-example Go/Gin Server
 
 ```bash
-  make start;
+make start;
 ```
 
-[View Albums in browser](http://localhost:9080/albums)
+#### Note: the application will not start without the OpenTelemetry collector running
 
 ## 3. Run Some Tests
 
 [Postman Collection](test/Album-Store.postman_collection.json)
 
 ```bash
-  make local-run-tests;
+make local-run-tests;
 ```
 
 ## 4. View the events in the different Services
@@ -55,7 +56,7 @@ The following will start
 ### 2. Stop Observability and Log Viewing Services
 
 ```bash
-  make docker-comose-stop;
+make docker-comose-stop;
 ```
 
 ## Project includes:
@@ -90,7 +91,7 @@ The following will start
 * Helm chart to add Gin Server and Database
 * Skaffold to set up the K8s cluster for this project.
 
-## Source Sites for creating this project
+## Bibliography of sites used for creating this project:
 
 Golang tutorial for Gin music store: https://go.dev/doc/tutorial/web-service-gin. 
 
