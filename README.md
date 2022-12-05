@@ -56,7 +56,7 @@ make local-test;
 ### 2. Stop Observability and Log Viewing Services
 
 ```bash
-make docker-comose-stop;
+make docker-compose-stop;
 ```
 
 ## Project includes:
