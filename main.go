@@ -6,6 +6,7 @@ import (
 	"errors"
 	"example/go-gin-example/models"
 	"fmt"
+	"go.opentelemetry.io/otel/codes"
 	"log"
 	"net/http"
 	"os"
@@ -19,8 +20,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/metric/global"
-	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -49,23 +48,15 @@ func resetAlbums() {
 }
 
 func getAlbums(c *gin.Context) {
-	meter := global.Meter("demo-server-meter")
-	serverAttribute := attribute.String("server-attribute", "foo")
-	commonLabels := []attribute.KeyValue{serverAttribute}
-	requestCount, _ := meter.SyncInt64().Counter(
-		"demo_server/request_counts",
-		instrument.WithDescription("The number of requests received"),
-	)
-	requestCount.Add(c, 1, commonLabels...)
-
 	span := trace.SpanFromContext(c.Request.Context())
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+	span.SetName("/albums GET")
 	defer span.End()
-	c.JSON(http.StatusOK, albums)
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 }
 
 func getAlbumByID(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/albums/:id GET")
 	defer span.End()
 	id := c.Param("id")
 	span.SetAttributes(attribute.Key("Id").String(id))
@@ -74,6 +65,7 @@ func getAlbumByID(c *gin.Context) {
 	if albumId, err := strconv.Atoi(id); err != nil {
 		serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album ID", id, "is not a valid number")}
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest), attribute.Key("http.request.id").String(id))
+		span.SetStatus(codes.Error, serverError.Message)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
 	} else {
@@ -87,11 +79,13 @@ func getAlbumByID(c *gin.Context) {
 	}
 	serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album", id, "not found")}
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+	span.SetStatus(codes.Error, serverError.Message)
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
 func postAlbum(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/albums POST")
 	defer span.End()
 	var newAlbum models.Album
 
@@ -104,7 +98,8 @@ func postAlbum(c *gin.Context) {
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
-			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest), attribute.Key("postAlbum.error.binding.message").String(fmt.Sprintf("%v", string(jsonBytes))))
+			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+			span.SetStatus(codes.Error, fmt.Sprintf("%v", string(jsonBytes)))
 			return
 		}
 	}

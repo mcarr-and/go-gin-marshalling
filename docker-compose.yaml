@@ -4,6 +4,7 @@ services:
   # Jaeger
   jaeger-all-in-one:
     image: jaegertracing/all-in-one:latest
+    container_name: jaeger-gin-go
     restart: always
     ports:
       - "16686:16686"
@@ -13,6 +14,7 @@ services:
   # Zipkin
   zipkin-all-in-one:
     image: openzipkin/zipkin:latest
+    container_name: zipkin-gin-go
     restart: always
     ports:
       - "9411:9411"
@@ -20,6 +22,7 @@ services:
   # Collector
   otel-collector:
     image: ${OTELCOL_IMG}
+    container_name: otel-gin-go
     restart: always
     command: ["--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}"]
     volumes:
@@ -48,7 +51,7 @@ services:
 #      - otel-collector
 
   prometheus:
-    container_name: prometheus
+    container_name: prometheus-gin-go
     image: prom/prometheus:latest
     restart: always
     volumes:
