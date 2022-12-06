@@ -51,7 +51,8 @@ func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
 	defer span.End()
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	c.JSON(http.StatusOK, albums)
 }
 
 func getAlbumByID(c *gin.Context) {
@@ -60,12 +61,14 @@ func getAlbumByID(c *gin.Context) {
 	defer span.End()
 	id := c.Param("id")
 	span.SetAttributes(attribute.Key("Id").String(id))
-	span.AddEvent("An Event", trace.WithAttributes(attribute.String("id", id)))
 
 	if albumId, err := strconv.Atoi(id); err != nil {
 		serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album ID", id, "is not a valid number")}
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest), attribute.Key("http.request.id").String(id))
 		span.SetStatus(codes.Error, serverError.Message)
+		errorMsg := fmt.Sprintf("Get /album invalid ID %s", id)
+		span.AddEvent(errorMsg)
+		log.Println(errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
 	} else {
@@ -80,6 +83,9 @@ func getAlbumByID(c *gin.Context) {
 	serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album", id, "not found")}
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 	span.SetStatus(codes.Error, serverError.Message)
+	errorMsg := fmt.Sprintf("Get /album not found with ID %s", id)
+	span.AddEvent(errorMsg)
+	log.Println(errorMsg)
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
@@ -98,10 +104,17 @@ func postAlbum(c *gin.Context) {
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
-			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-			span.SetStatus(codes.Error, fmt.Sprintf("%v", string(jsonBytes)))
-			return
+			errorMsg := fmt.Sprintf("%s", jsonBytes)
+			span.AddEvent(errorMsg)
+			log.Println(errorMsg)
+		} else {
+			errorMsg := fmt.Sprintf("%s", err)
+			span.AddEvent(errorMsg)
+			log.Println(errorMsg)
 		}
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		span.SetStatus(codes.Error, "could not bind JSON posted to method")
+		return
 	}
 	albums = append(albums, newAlbum)
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
@@ -111,9 +124,18 @@ func postAlbum(c *gin.Context) {
 func getErrorMsg(fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
-		return "This field is Required"
+		return "required field"
+	case "min":
+		return "below minimum value"
+	case "gte":
+		return "below minimum value"
+	case "max":
+		return "above maximum value"
+	case "lte":
+		return "above maximum value"
+	default:
+		return fmt.Sprintf("Unknown Error %s", fe.Tag())
 	}
-	return "Unknown Error"
 }
 
 func setupRouter() *gin.Engine {
@@ -146,7 +168,7 @@ func initProvider() (func(context.Context) error, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
-	openTelemetryCollectorServiceLocation := getEnvironmentValue("OTEL_SERVICE_LOCATION", "localhost:4317")
+	openTelemetryCollectorServiceLocation := getEnvironmentValue("OTEL_SERVICE_LOCATION", "localhost:4327")
 	conn, err := grpc.DialContext(ctx, openTelemetryCollectorServiceLocation,
 		// Note the use of insecure transport here. TLS is recommended in production.
 		grpc.WithTransportCredentials(insecure.NewCredentials()),

@@ -24,6 +24,7 @@ func TestMain(m *testing.M) {
 }
 
 func Test_getAllAlbums(t *testing.T) {
+
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var albums []models.Album
@@ -115,11 +116,11 @@ func Test_postAlbum(t *testing.T) {
 	assert.Equal(t, len(listAlbums()), 4)
 }
 
-func Test_postAlbum_BadRequest_BadJSON(t *testing.T) {
+func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	resetAlbums()
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	album := `{"XID": "10", "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf"}`
+	album := `{"XID": 10, "Titlex": "Blue Train", "Artistx": "Lead Belly", "Pricex": 56.99, "X": "asdf"}`
 	var serverError models.ServerError
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(w, req)
@@ -130,9 +131,42 @@ func Test_postAlbum_BadRequest_BadJSON(t *testing.T) {
 		errors.As(err, &ve)
 		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
 	}
-	assert.Equal(t, 1, len(serverError.BindingErrors))
-	assert.Equal(t, "Title", serverError.BindingErrors[0].Field)
-	assert.Equal(t, "This field is Required", serverError.BindingErrors[0].Message)
+	assert.Equal(t, 4, len(serverError.BindingErrors))
+	assert.Equal(t, "ID", serverError.BindingErrors[0].Field)
+	assert.Equal(t, "required field", serverError.BindingErrors[0].Message)
+	assert.Equal(t, "Title", serverError.BindingErrors[1].Field)
+	assert.Equal(t, "required field", serverError.BindingErrors[1].Message)
+	assert.Equal(t, "Artist", serverError.BindingErrors[2].Field)
+	assert.Equal(t, "required field", serverError.BindingErrors[2].Message)
+	assert.Equal(t, "Price", serverError.BindingErrors[3].Field)
+	assert.Equal(t, "required field", serverError.BindingErrors[3].Message)
+	assert.Equal(t, len(listAlbums()), 3)
+}
+
+func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
+	resetAlbums()
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	album := `{"ID": -1, "Title": "a", "Artist": "z", "Price": -0.1}`
+	var serverError models.ServerError
+	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
+	router.ServeHTTP(w, req)
+	body := w.Body.Bytes()
+
+	if err := json.Unmarshal(body, &serverError); err != nil {
+		var ve validator.ValidationErrors
+		errors.As(err, &ve)
+		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
+	}
+	assert.Equal(t, 4, len(serverError.BindingErrors))
+	assert.Equal(t, "ID", serverError.BindingErrors[0].Field)
+	assert.Equal(t, "below minimum value", serverError.BindingErrors[0].Message)
+	assert.Equal(t, "Title", serverError.BindingErrors[1].Field)
+	assert.Equal(t, "below minimum value", serverError.BindingErrors[1].Message)
+	assert.Equal(t, "Artist", serverError.BindingErrors[2].Field)
+	assert.Equal(t, "below minimum value", serverError.BindingErrors[2].Message)
+	assert.Equal(t, "Price", serverError.BindingErrors[3].Field)
+	assert.Equal(t, "below minimum value", serverError.BindingErrors[3].Message)
 	assert.Equal(t, len(listAlbums()), 3)
 }
 
