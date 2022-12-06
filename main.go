@@ -211,7 +211,7 @@ func main() {
 
 	router := setupRouter()
 	srv := &http.Server{
-		Addr:    getEnvironmentValue("ALBUM_START_URL", "localhost:9080"),
+		Addr:    getEnvironmentValue("ALBUM_SERVICE_URL", "localhost:9080"),
 		Handler: router,
 	}
 

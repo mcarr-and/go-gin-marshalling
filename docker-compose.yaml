@@ -8,7 +8,7 @@ services:
     restart: always
     ports:
       - "16696:16686"
-      - "14268:14268" # Changed to expose port for running applications outside docker-compose
+      - "14268"
       - "14250"
 
   # Zipkin

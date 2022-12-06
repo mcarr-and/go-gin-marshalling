@@ -25,6 +25,10 @@ make docker-compose-start;
 
 ## 2. Start go-gin-example Go/Gin Server
 
+Environmental Variable `ALBUM_SERVICE_URL` can be set to change the default URL from `localhost:9080`
+
+Environmental Variable `OTEL_SERVICE_LOCATION` can be changed from default URL `localhost:4327`
+
 ```bash
 make local-start;
 ```
