@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -203,26 +204,52 @@ func initProvider() (func(context.Context) error, error) {
 }
 
 func main() {
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
-
-	shutdown, err := initProvider()
+	shutdownTraceProvider, err := initProvider()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func() {
-		if err := shutdown(ctx); err != nil {
-			log.Fatal("failed to shutdown TracerProvider: %w", err)
+
+	router := setupRouter()
+	srv := &http.Server{
+		Addr:    getEnvironmentValue("ALBUM_START_URL", "localhost:9080"),
+		Handler: router,
+	}
+
+	// Wait for interrupt signal to gracefully shut down the server with
+	// a timeout of 500 milliseconds.
+	quit := make(chan os.Signal)
+	// kill (no param) default send syscanll.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall. SIGKILL but can"t be caught, so don't need to add it
+	go func() {
+		// service connections
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
 		}
 	}()
 
-	router := setupRouter()
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
-	runAddress := getEnvironmentValue("ALBUM_START_URL", "localhost:9080")
-	if errRun := router.Run(runAddress); errRun != nil {
-		log.Fatal("Could not start server on ", runAddress)
-		return
+	log.Println("Shutdown Server ...")
+	ctxServer, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+
+	log.Println("Shutting down TraceProvider")
+	if err := shutdownTraceProvider(ctxServer); err != nil {
+		log.Fatal("failed to shutdown TracerProvider: %w", err)
 	}
+
+	if err := srv.Shutdown(ctxServer); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
+	// catching ctx.Done(). timeout of 500 milliseconds.
+	select {
+	case <-ctxServer.Done():
+		log.Println("timeout of 500 milliseconds.")
+	}
+
+	log.Println("Server exiting")
 }
 
 func getEnvironmentValue(searchValue, defaultValue string) string {
