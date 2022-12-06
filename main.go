@@ -67,8 +67,7 @@ func getAlbumByID(c *gin.Context) {
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest), attribute.Key("http.request.id").String(id))
 		span.SetStatus(codes.Error, serverError.Message)
 		errorMsg := fmt.Sprintf("Get /album invalid ID %s", id)
-		span.AddEvent(errorMsg)
-		log.Println(errorMsg)
+		addSpanEventAndLog(span, errorMsg)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
 	} else {
@@ -84,8 +83,7 @@ func getAlbumByID(c *gin.Context) {
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 	span.SetStatus(codes.Error, serverError.Message)
 	errorMsg := fmt.Sprintf("Get /album not found with ID %s", id)
-	span.AddEvent(errorMsg)
-	log.Println(errorMsg)
+	addSpanEventAndLog(span, errorMsg)
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
@@ -105,12 +103,10 @@ func postAlbum(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
 			errorMsg := fmt.Sprintf("%s", jsonBytes)
-			span.AddEvent(errorMsg)
-			log.Println(errorMsg)
+			addSpanEventAndLog(span, errorMsg)
 		} else {
 			errorMsg := fmt.Sprintf("%s", err)
-			span.AddEvent(errorMsg)
-			log.Println(errorMsg)
+			addSpanEventAndLog(span, errorMsg)
 		}
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		span.SetStatus(codes.Error, "could not bind JSON posted to method")
@@ -119,6 +115,11 @@ func postAlbum(c *gin.Context) {
 	albums = append(albums, newAlbum)
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	c.JSON(http.StatusCreated, newAlbum)
+}
+
+func addSpanEventAndLog(span trace.Span, errorMsg string) {
+	span.AddEvent(errorMsg)
+	log.Println(errorMsg)
 }
 
 func getErrorMsg(fe validator.FieldError) string {
