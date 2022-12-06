@@ -18,10 +18,13 @@ local-test:
 	curl --location --request GET 'http://localhost:9080/albums/666' --header 'Accept: application/json';
 	curl --location --request GET 'http://localhost:9080/albums/X' --header 'Accept: application/json';
 	curl --location --request GET 'http://localhost:9080/albums';
-	curl --location --request POST 'http://localhost:9080/albums/' \
+	curl --location --request POST 'http://localhost:9080/albums' \
 		--header 'Content-Type: application/json' --header 'Accept: application/json' \
 		--data-raw '{ "XID": 10, "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf" }';
-	curl --location --request POST 'http://localhost:9080/albums/' \
+	curl --location --request POST 'http://localhost:9080/albums' \
+    		--header 'Content-Type: application/json' --header 'Accept: application/json' \
+    		--data-raw '{ "ID": -1, "Title": "s", "Artist": "p", "Price": -0.1}';
+	curl --location --request POST 'http://localhost:9080/albums' \
         --header 'Content-Type: application/json' --header 'Accept: application/json' \
         --data-raw '{"ID": 10, "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 66.60}';
 

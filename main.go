@@ -216,21 +216,6 @@ func main() {
 		}
 	}()
 
-	// Attributes represent additional key-value descriptors that can be bound
-	// to a metric observer or recorder.
-	commonAttrs := []attribute.KeyValue{
-		attribute.String("attrA", "chocolate"),
-		attribute.String("attrB", "raspberry"),
-		attribute.String("attrC", "vanilla"),
-	}
-
-	tracer := otel.Tracer("test-tracer")
-	ctx, span := tracer.Start(
-		ctx,
-		"CollectorExporter-Example",
-		trace.WithAttributes(commonAttrs...))
-	defer span.End()
-
 	router := setupRouter()
 
 	runAddress := getEnvironmentValue("ALBUM_START_URL", "localhost:9080")
