@@ -19,3 +19,7 @@
 # binary file
 go-gin-example
 coverage.*
+.DS_Store
+
+# vscode file
+__debug_bin

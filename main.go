@@ -6,7 +6,6 @@ import (
 	"errors"
 	"example/go-gin-example/models"
 	"fmt"
-	"go.opentelemetry.io/otel/codes"
 	"log"
 	"net/http"
 	"os"
@@ -20,6 +19,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -52,7 +52,7 @@ func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
 	defer span.End()
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
 	c.JSON(http.StatusOK, albums)
 }
 
@@ -63,28 +63,26 @@ func getAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 	span.SetAttributes(attribute.Key("Id").String(id))
 
-	if albumId, err := strconv.Atoi(id); err != nil {
+	albumId, err := strconv.Atoi(id)
+	if err != nil {
 		serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album ID", id, "is not a valid number")}
-		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest), attribute.Key("http.request.id").String(id))
-		span.SetStatus(codes.Error, serverError.Message)
-		errorMsg := fmt.Sprintf("Get /album invalid ID %s", id)
-		addSpanEventAndLog(span, errorMsg)
+		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, serverError.Message)
+		addSpanEventAndLog(span, fmt.Sprintf("Get /album invalid ID %s", id))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
-	} else {
-		for _, album := range albums {
-			if album.ID == albumId {
-				c.JSON(http.StatusOK, album)
-				span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
-				return
-			}
+	}
+
+	for _, album := range albums {
+		if album.ID == albumId {
+			c.JSON(http.StatusOK, album)
+			setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
+			return
 		}
 	}
+
 	serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album", id, "not found")}
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-	span.SetStatus(codes.Error, serverError.Message)
-	errorMsg := fmt.Sprintf("Get /album not found with ID %s", id)
-	addSpanEventAndLog(span, errorMsg)
+	setStatusOnSpan(span, http.StatusBadRequest, codes.Error, serverError.Message)
+	addSpanEventAndLog(span, fmt.Sprintf("Get /album not found with ID %s", id))
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
@@ -103,19 +101,21 @@ func postAlbum(c *gin.Context) {
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
-			errorMsg := fmt.Sprintf("%s", jsonBytes)
-			addSpanEventAndLog(span, errorMsg)
+			addSpanEventAndLog(span, string(jsonBytes))
 		} else {
-			errorMsg := fmt.Sprintf("%s", err)
-			addSpanEventAndLog(span, errorMsg)
+			addSpanEventAndLog(span, fmt.Sprintf("%s", err))
 		}
-		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		span.SetStatus(codes.Error, "could not bind JSON posted to method")
+		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON posted to method")
 		return
 	}
 	albums = append(albums, newAlbum)
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
 	c.JSON(http.StatusCreated, newAlbum)
+}
+
+func setStatusOnSpan(span trace.Span, httpStatusCode int, spanStatusCode codes.Code, message string) {
+	span.SetAttributes(attribute.Key("http.status_code").Int(httpStatusCode))
+	span.SetStatus(spanStatusCode, message)
 }
 
 func addSpanEventAndLog(span trace.Span, errorMsg string) {
@@ -150,7 +150,8 @@ func setupRouter() *gin.Engine {
 }
 
 const (
-	service = "album-store"
+	service   = "album-store"
+	okMessage = "OK"
 )
 
 // Initializes an OTLP exporter, and configures the corresponding trace and
@@ -215,39 +216,30 @@ func main() {
 		Handler: router,
 	}
 
-	// Wait for interrupt signal to gracefully shut down the server with
-	// a timeout of 500 milliseconds.
 	quit := make(chan os.Signal)
-	// kill (no param) default send syscanll.SIGTERM
-	// kill -2 is syscall.SIGINT
-	// kill -9 is syscall. SIGKILL but can"t be caught, so don't need to add it
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
 	}()
-
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Println("Shutdown Server ...")
+	log.Println("Server shutdown with 500ms timeout...")
 	ctxServer, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 
-	log.Println("Shutting down TraceProvider")
+	log.Println("OpenTelemetry TraceProvider shutting down")
 	if err := shutdownTraceProvider(ctxServer); err != nil {
-		log.Fatal("failed to shutdown TracerProvider: %w", err)
+		log.Fatal("OpenTelemetry TracerProvider shutdown failure: %w", err)
 	}
+	log.Println("OpenTelemetry TraceProvider exited")
 
 	if err := srv.Shutdown(ctxServer); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		log.Fatal("Server shutdown failure:", err)
 	}
-	// catching ctx.Done(). timeout of 500 milliseconds.
-	select {
-	case <-ctxServer.Done():
-		log.Println("timeout of 500 milliseconds.")
-	}
+	<-ctxServer.Done()
 
 	log.Println("Server exiting")
 }
