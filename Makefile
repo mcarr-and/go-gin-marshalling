@@ -1,7 +1,7 @@
 .PHONY: build
 
 build:
-	go build -v -o go-gin-example
+	go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o go-gin-example
 
 test:
 	go test -v
@@ -9,9 +9,8 @@ test:
 test-benchmark:
 	go test -bench=. -count 2 -run=^# -benchmem
 
-local-start:
-	go mod tidy
-	go run main.go;
+local-start: build
+	./go-gin-example -otel-location=localhost:4327 -namespace=no-namespace -instance-name=go-gin-example-1
 
 local-test:
 	curl --location --request GET 'http://localhost:9080/albums/1' --header 'Accept: application/json';

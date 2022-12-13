@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"example/go-gin-example/models"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -142,7 +143,7 @@ func getErrorMsg(fe validator.FieldError) string {
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
-	router.Use(otelgin.Middleware(service)) // weave in OpenTelemetry
+	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Applicaiton
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
@@ -150,19 +151,29 @@ func setupRouter() *gin.Engine {
 }
 
 const (
-	service   = "album-store"
-	okMessage = "OK"
+	serviceName = "album-store"
+	okMessage   = "OK"
 )
+
+var address = "localhost:9080"
+var version = "0.1"
+var gitHash = "No-Hash"
 
 // Initializes an OTLP exporter, and configures the corresponding trace and
 // metric providers.
 func initProvider() (func(context.Context) error, error) {
 	ctx := context.Background()
+	namespace := flag.String("namespace", "a-namespace", "namespace where running")
+	otelLocation := flag.String("otel-location", "localhost:4327", "location of the otel-collector")
+	instanceName := flag.String("instance-name", "name-1234", "kubernetes instance name")
 
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			// the service name used to display traces in backends
-			semconv.ServiceNameKey.String(service),
+			semconv.ServiceNameKey.String(serviceName),
+			semconv.ServiceVersionKey.String(version+"-"+gitHash),
+			semconv.ServiceNamespaceKey.String(*namespace),
+			semconv.ServiceInstanceIDKey.String(*instanceName),
 		),
 	)
 	if err != nil {
@@ -171,8 +182,8 @@ func initProvider() (func(context.Context) error, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
-	openTelemetryCollectorServiceLocation := getEnvironmentValue("OTEL_SERVICE_LOCATION", "localhost:4327")
-	conn, err := grpc.DialContext(ctx, openTelemetryCollectorServiceLocation,
+
+	conn, err := grpc.DialContext(ctx, *otelLocation,
 		// Note the use of insecure transport here. TLS is recommended in production.
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
@@ -212,7 +223,7 @@ func main() {
 
 	router := setupRouter()
 	srv := &http.Server{
-		Addr:    getEnvironmentValue("ALBUM_SERVICE_URL", "localhost:9080"),
+		Addr:    address,
 		Handler: router,
 	}
 
@@ -242,12 +253,4 @@ func main() {
 	<-ctxServer.Done()
 
 	log.Println("Server exiting")
-}
-
-func getEnvironmentValue(searchValue, defaultValue string) string {
-	envValue, returnedValue := os.LookupEnv(searchValue)
-	if !returnedValue {
-		return defaultValue
-	}
-	return envValue
 }

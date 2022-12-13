@@ -9,7 +9,6 @@ The project uses OpenTelemetry to send information to Observability & Log Viewin
 
 Send data to the following services:
 * Jaeger
-* Zipkin
 * Prometheus
 
 ## 0. Expected tooling to run this project
@@ -47,8 +46,6 @@ make local-test;
 
 [View Jaeger](http://localhost:16696/search?limit=20&service=album-store)
 
-[View Zipkin](http://localhost:9411/zipkin/)
-
 [View Prometheus](http://localhost:9080/graph?g0.expr=%7Bjob%3D~%22.%2B%22%7D%20&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
 
 ## 5. Stop go-gin-example server & Services  
@@ -66,7 +63,11 @@ make docker-compose-stop;
 ## Project includes:
 
 * Opentelemetry via OpenTelemetry Collector.
-  
+* Opentelemetry display version = version-git_short_hash
+* require passed in parameters for use in Kubernetes
+  * namespace
+  * instance-name
+  * otel-location
 * Testing
   * Unit testing sending and receiving JSON to Gin
     * Get all albums
@@ -78,15 +79,18 @@ make docker-compose-stop;
 * Docker build
 * Docker-Compose to use local tooling:  
   * Jaeger
-  * Zipkin 
   * Prometheus 
 
 ## TODO
+* Display application vesion in all span
 * Create Prometheus export health endpoint
 * Create status endpoint that says if service is up or down.
-* Display OpenAPI 2.0 docs for endpoints
+* Display OpenAPI 3.0 docs for endpoints
+* Async processing of requests 
+* Back pressure on APIs & rate limiting
+* pagination of get methods so can receive many and respond in chunks
 * Use a database as a data store
-* Database migration tooling via scripts
+* Database migration tooling via scripts 
 * Fuzz testing 
 * Unit test the OpenTelemetry messages are received
 * Adding CI server integration
