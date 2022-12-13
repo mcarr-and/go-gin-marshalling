@@ -156,16 +156,18 @@ const (
 )
 
 var address = "localhost:9080"
-var version = "0.1"
+var version = "No-Version"
 var gitHash = "No-Hash"
 
 // Initializes an OTLP exporter, and configures the corresponding trace and
 // metric providers.
 func initProvider() (func(context.Context) error, error) {
 	ctx := context.Background()
-	namespace := flag.String("namespace", "a-namespace", "namespace where running")
-	otelLocation := flag.String("otel-location", "localhost:4327", "location of the otel-collector")
-	instanceName := flag.String("instance-name", "name-1234", "kubernetes instance name")
+	namespace := flag.String("namespace", "", "kubernetes namespace where running")
+	otelLocation := flag.String("otel-location", "", "location of the otel-collector: E.G.: -otel-location=localhost:4327")
+	instanceName := flag.String("instance-name", "", "kubernetes instance name")
+	flag.Parse()
+	log.Println("version: " + version)
 
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
