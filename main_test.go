@@ -36,10 +36,10 @@ func setupTestRouter() (*tracetest.SpanRecorder, *gin.Engine) {
 	return sr, router
 }
 
-func makeKeyMap(attributes []attribute.KeyValue) map[attribute.Key]attribute.KeyValue {
-	var attributeMap = make(map[attribute.Key]attribute.KeyValue)
+func makeKeyMap(attributes []attribute.KeyValue) map[attribute.Key]attribute.Value {
+	var attributeMap = make(map[attribute.Key]attribute.Value)
 	for _, keyValue := range attributes {
-		attributeMap[keyValue.Key] = keyValue
+		attributeMap[keyValue.Key] = keyValue.Value
 	}
 	return attributeMap
 }
@@ -58,7 +58,7 @@ func Test_getAllAlbums(t *testing.T) {
 	finishedSpan := sr.Ended()
 	assert.Len(t, finishedSpan, 1)
 	attributeMap := makeKeyMap(finishedSpan[0].Attributes())
-	assert.Contains(t, attributeMap["http.status_code"].Value.Emit(), "200")
+	assert.Contains(t, attributeMap["http.status_code"].Emit(), "200")
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums(), albums)
@@ -80,7 +80,7 @@ func Test_getAlbumById(t *testing.T) {
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Contains(t, attributeMap["http.status_code"].Value.Emit(), "200")
+	assert.Contains(t, attributeMap["http.status_code"].Emit(), "200")
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums()[1], album)
@@ -103,8 +103,8 @@ func Test_getAlbumById_BadId(t *testing.T) {
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Value.Emit())
-	assert.Equal(t, "X", attributeMap["Id"].Value.Emit())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "X", attributeMap["Id"].Emit())
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
 	assert.Equal(t, "Get /album invalid ID X", finishedSpans[0].Events()[0].Name)
 	assert.Equal(t, "Error", finishedSpans[0].Status().Code.String())
@@ -128,7 +128,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	endedTraceList := sr.Ended()
 	assert.Len(t, endedTraceList, 1)
 	attributeMap := makeKeyMap(endedTraceList[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Value.Emit())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, "Error", endedTraceList[0].Status().Code.String())
 	assert.Equal(t, "Get /album not found with ID 5666", endedTraceList[0].Events()[0].Name)
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
