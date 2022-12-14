@@ -123,7 +123,7 @@ func postAlbum(c *gin.Context) {
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
-// used with gin.Context.ShouldBindBodyWith() puts the body into the context and we get it back out to display in a span
+// used with gin.Context.ShouldBindBodyWith() puts the body into the context, and we get it back out to display in a span
 func addRequestBodyFromContextToSpan(c *gin.Context, span trace.Span) {
 	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
