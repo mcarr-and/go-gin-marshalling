@@ -44,7 +44,17 @@
                                 }
                             }
                         }
-                    }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerError"
+                                }
+                            }
+                        }
+                    },
                 }
             }
         }
@@ -53,11 +63,16 @@
         "schemas": {
             "Album": {
                 "type": "object",
+                "required": [
+                    "title",
+                    "artist",
+                    "price"
+                ],
                 "properties": {
                     "id": {
                         "type": "integer",
                         "format": "int64",
-                        "example": 10
+                        "example": 10,
                     },
                     "title": {
                         "type": "string",
@@ -66,7 +81,7 @@
                     },
                     "artist": {
                         "type": "string",
-                        "description": "ALbum Artist(s)",
+                        "description": "Album Artist(s)",
                         "example": "Stockholm Sessions"
                     },
                     "price": {
@@ -76,6 +91,37 @@
                 },
                 "xml": {
                     "name": "album"
+                }
+            },
+            "ServerError": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "errors": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BindingErrorMsg"
+                        }
+                    }
+                }
+            },
+            "BindingErrorMsg": {
+                "type": "object",
+                "required": [
+                    "field",
+                    "message"
+                ],
+                "properties": {
+                    "field": {
+                        "type": "string",
+                        "required": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "required": true
+                    }
                 }
             }
         }
