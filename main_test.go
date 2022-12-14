@@ -100,7 +100,7 @@ func Test_postAlbum(t *testing.T) {
 	w := httptest.NewRecorder()
 	var album models.Album
 
-	albumBody := `{"ID": 10, "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 66.60}`
+	albumBody := `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`
 	expectedAlbum := models.Album{ID: 10, Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 66.60}
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 
@@ -121,7 +121,7 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	resetAlbums()
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	album := `{"XID": 10, "Titlex": "Blue Train", "Artistx": "Lead Belly", "Pricex": 56.99, "X": "asdf"}`
+	album := `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`
 	var serverError models.ServerError
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(w, req)
@@ -146,7 +146,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	resetAlbums()
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	album := `{"ID": -1, "Title": "a", "Artist": "z", "Price": -0.1}`
+	album := `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`
 	var serverError models.ServerError
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(w, req)
@@ -220,7 +220,7 @@ func Benchmark_getAlbumById_BadRequest(b *testing.B) {
 func Benchmark_postAlbum(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	albumJson := `{"ID": "10", "Title": "The Ozzman Cometh", "Artist": "Black Sabbath", "Price": 56.99}`
+	albumJson := `{"id": "10", "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 56.99}`
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
 	var albumReturned models.Album
 
@@ -238,7 +238,7 @@ func Benchmark_postAlbum_BadRequest_BadJson(b *testing.B) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	var returnedError models.ServerError
-	albumJson := `{"XID": "10", "Titlexx": "Blue Train", "Artistx": "John Coltrane", "Price": 56.99, "X": "asdf"}`
+	albumJson := `{"xid": "10", "titlex": "Blue Train", "artistx": "John Coltrane", "pricex": 56.99, "X": "asdf"}`
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
 
 	for i := 0; i < b.N; i++ {

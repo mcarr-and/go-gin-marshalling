@@ -102,7 +102,7 @@ func postAlbum(c *gin.Context) {
 				field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fe.Field())
 				fieldJSONName, okay := field.Tag.Lookup("json")
 				if !okay {
-					log.Fatal("No json type on type  Album E.G. : `json:\"title\" binding:\"required,min=2,max=1000\"`")
+					log.Fatal("No json type on Struct model.Album E.G. : `json:\"title\" binding:\"required,min=2,max=1000\"`")
 				}
 				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fe)}
 			}
