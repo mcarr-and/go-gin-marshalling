@@ -113,17 +113,18 @@ func postAlbum(c *gin.Context) {
 		} else {
 			addSpanEventAndLog(span, fmt.Sprintf("%s", err))
 		}
-		addRequestBodyToSpan(c, span)
+		addRequestBodyFromContextToSpan(c, span)
 		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON posted to method")
 		return
 	}
-	addRequestBodyToSpan(c, span)
+	addRequestBodyFromContextToSpan(c, span)
 	albums = append(albums, newAlbum)
 	setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
-func addRequestBodyToSpan(c *gin.Context, span trace.Span) {
+// used with gin.Context.ShouldBindBodyWith() puts the body into the context and we get it back out to display in a span
+func addRequestBodyFromContextToSpan(c *gin.Context, span trace.Span) {
 	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
 }
