@@ -55,11 +55,11 @@ func Test_getAllAlbums(t *testing.T) {
 		assert.Fail(t, "json unmarshal fail", "should be []Albums ", albums)
 	}
 
-	finishedSpan := sr.Ended()
-	assert.Len(t, finishedSpan, 1)
-	attributeMap := makeKeyMap(finishedSpan[0].Attributes())
+	finishedSpans := sr.Ended()
+	assert.Len(t, finishedSpans, 1)
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Contains(t, attributeMap["http.status_code"].Emit(), "200")
-
+	assert.Equal(t, "Ok", finishedSpans[0].Status().Code.String())
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums(), albums)
 }
@@ -81,7 +81,7 @@ func Test_getAlbumById(t *testing.T) {
 	assert.Len(t, finishedSpans, 1)
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Contains(t, attributeMap["http.status_code"].Emit(), "200")
-
+	assert.Equal(t, "Ok", finishedSpans[0].Status().Code.String())
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums()[1], album)
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
