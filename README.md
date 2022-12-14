@@ -60,33 +60,10 @@ make local-test;
 make docker-compose-stop;
 ```
 
-## Project includes:
-
-* Opentelemetry via OpenTelemetry Collector.
-* Opentelemetry display version = version-git_short_hash
-* require passed in parameters for use in Kubernetes
-  * namespace
-  * instance-name
-  * otel-location
-* Testing
-  * Unit testing sending and receiving JSON to Gin
-    * Get all albums
-    * Get album by ID
-    * Get album by ID that is not found
-    * Post to create new album
-    * Post album without all the required JSON fields to be a valid object to Gin & V10
-  * Benchmark tests for throughput for all unit tests
-* Docker build
-* Docker-Compose to use local tooling:  
-  * OpenTelemetry Collector wich sends 
-  * Jaeger
-  * Prometheus 
-
 ## TODO
 * Display application vesion in all span
 * Create Prometheus export health endpoint
 * Create status endpoint that says if service is up or down.
-* Display OpenAPI 3.0 docs for endpoints
 * Async processing of requests 
 * Back pressure on APIs & rate limiting
 * pagination of get methods so can receive many and respond in chunks
