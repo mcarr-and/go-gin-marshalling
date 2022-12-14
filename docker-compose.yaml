@@ -40,7 +40,7 @@ services:
     volumes:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
-      - "9080:9090"
+      - "9090:9090"
   #  go-gin-example:
   #    build:
   #      dockerfile: Dockerfile

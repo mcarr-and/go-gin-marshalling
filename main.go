@@ -144,6 +144,7 @@ func getErrorMsg(fe validator.FieldError) string {
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Gin
+	router.Static("/v3/api-docs/swaggerui", "cmd/api/swaggerui")
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
