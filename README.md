@@ -22,11 +22,11 @@ Send data to the following services:
 make docker-compose-start;
 ```
 
-## 2. Start go-gin-example Go/Gin Server
+## 2. Start go-gin-example Go/Gin Server with flags set
 
-Environmental Variable `ALBUM_SERVICE_URL` can be set to change the default URL from `localhost:9080`
-
-Environmental Variable `OTEL_SERVICE_LOCATION` can be changed from default URL `localhost:4327`
+* `-namespace` kubernetes namespace 
+* `-otel-location` can be changed from default URL `localhost:4327`
+* `-instance-name` kubernetes instance name (unique name when horizontal scaling)
 
 ```bash
 make local-start;
@@ -78,6 +78,7 @@ make docker-compose-stop;
   * Benchmark tests for throughput for all unit tests
 * Docker build
 * Docker-Compose to use local tooling:  
+  * OpenTelemetry Collector wich sends 
   * Jaeger
   * Prometheus 
 
