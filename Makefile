@@ -25,8 +25,11 @@ local-test:
     		--data-raw '{ "id": -1, "title": "s", "artist": "p", "price": -0.1}';
 	curl --location --request POST 'http://localhost:9080/albums' \
         --header 'Content-Type: application/json' --header 'Accept: application/json' \
+        --data-raw '{"id": 10,';
+	curl --location --request POST 'http://localhost:9080/albums' \
+        --header 'Content-Type: application/json' --header 'Accept: application/json' \
         --data-raw '{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}';
-
+	curl --location --request GET 'http://localhost:9080/v3/api-docs';
 docker-build:
 	docker build -t go-gin-example:0.1 .
 

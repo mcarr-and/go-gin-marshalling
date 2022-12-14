@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel"
@@ -94,7 +95,7 @@ func postAlbum(c *gin.Context) {
 	defer span.End()
 	var newAlbum models.Album
 
-	if err := c.ShouldBindJSON(&newAlbum); err != nil {
+	if err := c.ShouldBindBodyWith(&newAlbum, binding.JSON); err != nil {
 		var ve validator.ValidationErrors
 		if errors.As(err, &ve) {
 			bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
@@ -112,12 +113,19 @@ func postAlbum(c *gin.Context) {
 		} else {
 			addSpanEventAndLog(span, fmt.Sprintf("%s", err))
 		}
+		addRequestBodyToSpan(c, span)
 		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON posted to method")
 		return
 	}
+	addRequestBodyToSpan(c, span)
 	albums = append(albums, newAlbum)
 	setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
 	c.JSON(http.StatusCreated, newAlbum)
+}
+
+func addRequestBodyToSpan(c *gin.Context, span trace.Span) {
+	value, _ := c.Get(ginBodyBytesReference)
+	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
 }
 
 func setStatusOnSpan(span trace.Span, httpStatusCode int, spanStatusCode codes.Code, message string) {
@@ -158,8 +166,9 @@ func setupRouter() *gin.Engine {
 }
 
 const (
-	serviceName = "album-store"
-	okMessage   = "OK"
+	serviceName           = "album-store"
+	okMessage             = "OK"
+	ginBodyBytesReference = "_gin-gonic/gin/bodybyteskey"
 )
 
 var address = "localhost:9080"
