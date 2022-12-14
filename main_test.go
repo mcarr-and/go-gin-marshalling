@@ -5,14 +5,15 @@ import (
 	"errors"
 	"example/go-gin-example/models"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
@@ -132,13 +133,11 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
 	}
 	assert.Equal(t, 4, len(serverError.BindingErrors))
-	assert.Equal(t, "ID", serverError.BindingErrors[0].Field)
-	assert.Equal(t, "required field", serverError.BindingErrors[0].Message)
-	assert.Equal(t, "Title", serverError.BindingErrors[1].Field)
+	assert.Equal(t, "title", serverError.BindingErrors[1].Field)
 	assert.Equal(t, "required field", serverError.BindingErrors[1].Message)
-	assert.Equal(t, "Artist", serverError.BindingErrors[2].Field)
+	assert.Equal(t, "artist", serverError.BindingErrors[2].Field)
 	assert.Equal(t, "required field", serverError.BindingErrors[2].Message)
-	assert.Equal(t, "Price", serverError.BindingErrors[3].Field)
+	assert.Equal(t, "price", serverError.BindingErrors[3].Field)
 	assert.Equal(t, "required field", serverError.BindingErrors[3].Message)
 	assert.Equal(t, len(listAlbums()), 3)
 }
@@ -159,13 +158,13 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
 	}
 	assert.Equal(t, 4, len(serverError.BindingErrors))
-	assert.Equal(t, "ID", serverError.BindingErrors[0].Field)
+	assert.Equal(t, "id", serverError.BindingErrors[0].Field)
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[0].Message)
-	assert.Equal(t, "Title", serverError.BindingErrors[1].Field)
+	assert.Equal(t, "title", serverError.BindingErrors[1].Field)
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[1].Message)
-	assert.Equal(t, "Artist", serverError.BindingErrors[2].Field)
+	assert.Equal(t, "artist", serverError.BindingErrors[2].Field)
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[2].Message)
-	assert.Equal(t, "Price", serverError.BindingErrors[3].Field)
+	assert.Equal(t, "price", serverError.BindingErrors[3].Field)
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[3].Message)
 	assert.Equal(t, len(listAlbums()), 3)
 }

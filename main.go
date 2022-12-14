@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"reflect"
 	"strconv"
 	"syscall"
 	"time"
@@ -98,7 +99,12 @@ func postAlbum(c *gin.Context) {
 		if errors.As(err, &ve) {
 			bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
 			for i, fe := range ve {
-				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fe.Field(), Message: getErrorMsg(fe)}
+				field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fe.Field())
+				fieldJSONName, okay := field.Tag.Lookup("json")
+				if !okay {
+					log.Fatal("No json type on type  Album E.G. : `json:\"title\" binding:\"required,min=2,max=1000\"`")
+				}
+				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fe)}
 			}
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)

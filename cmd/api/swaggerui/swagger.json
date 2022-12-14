@@ -31,7 +31,13 @@
             },
             "post": {
                 "requestBody": {
-                    "$ref": "#/components/schemas/Album"
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Album"
+                            }
+                        }
+                    }
                 },
                 "responses": {
                     "200": {
@@ -127,7 +133,8 @@
                     },
                     "price": {
                         "type": "number",
-                        "format": "double"
+                        "format": "double",
+                        "example": 1.99
                     }
                 },
                 "xml": {
