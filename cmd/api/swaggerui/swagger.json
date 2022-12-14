@@ -124,12 +124,12 @@
                     "title": {
                         "type": "string",
                         "description": "Album Title",
-                        "example": "John Coltraine"
+                        "example": "John Coltrane"
                     },
                     "artist": {
                         "type": "string",
                         "description": "Album Artist(s)",
-                        "example": "Stockholm Sessions"
+                        "example": "Live in Stockholm 1963"
                     },
                     "price": {
                         "type": "number",
