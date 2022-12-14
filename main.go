@@ -124,7 +124,7 @@ func postAlbum(c *gin.Context) {
 }
 
 func addRequestBodyToSpan(c *gin.Context, span trace.Span) {
-	value, _ := c.Get(ginBodyBytesReference)
+	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
 }
 
@@ -166,9 +166,8 @@ func setupRouter() *gin.Engine {
 }
 
 const (
-	serviceName           = "album-store"
-	okMessage             = "OK"
-	ginBodyBytesReference = "_gin-gonic/gin/bodybyteskey" // from gin.context.ShouldBindBodyWith() pushes body to context
+	serviceName = "album-store"
+	okMessage   = "OK"
 )
 
 var address = "localhost:9080"
