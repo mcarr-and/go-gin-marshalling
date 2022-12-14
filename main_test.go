@@ -5,15 +5,19 @@ import (
 	"errors"
 	"example/go-gin-example/models"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
@@ -24,25 +28,44 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func Test_getAllAlbums(t *testing.T) {
-
+func setupTestRouter() (*tracetest.SpanRecorder, *gin.Engine) {
+	sr := tracetest.NewSpanRecorder()
+	otel.SetTracerProvider(sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sr)))
 	router := setupRouter()
+	router.Use(otelgin.Middleware("test-otel"))
+	return sr, router
+}
+
+func makeKeyMap(attributes []attribute.KeyValue) map[attribute.Key]attribute.KeyValue {
+	var attributeMap = make(map[attribute.Key]attribute.KeyValue)
+	for _, keyValue := range attributes {
+		attributeMap[keyValue.Key] = keyValue
+	}
+	return attributeMap
+}
+
+func Test_getAllAlbums(t *testing.T) {
+	sr, router := setupTestRouter()
+
 	testRecorder := httptest.NewRecorder()
 	var albums []models.Album
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
-
 	router.ServeHTTP(testRecorder, req)
-
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &albums); err != nil {
 		assert.Fail(t, "json unmarshal fail", "should be []Albums ", albums)
 	}
+
+	endedTraceList := sr.Ended()
+	assert.Len(t, endedTraceList, 1)
+	attributeMap := makeKeyMap(endedTraceList[0].Attributes())
+	assert.Contains(t, attributeMap["http.status_code"].Value.Emit(), "200")
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums(), albums)
 }
 
 func Test_getAlbumById(t *testing.T) {
-	router := setupRouter()
+	sr, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	var album models.Album
 
@@ -54,13 +77,18 @@ func Test_getAlbumById(t *testing.T) {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
 	}
 
+	endedTraceList := sr.Ended()
+	assert.Len(t, endedTraceList, 1)
+	attributeMap := makeKeyMap(endedTraceList[0].Attributes())
+	assert.Contains(t, attributeMap["http.status_code"].Value.Emit(), "200")
+
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums()[1], album)
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
 }
 
 func Test_getAlbumById_BadId(t *testing.T) {
-	router := setupRouter()
+	sr, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	var serverError models.ServerError
 
@@ -72,12 +100,20 @@ func Test_getAlbumById_BadId(t *testing.T) {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
 	}
 
+	endedTraceList := sr.Ended()
+	assert.Len(t, endedTraceList, 1)
+	attributeMap := makeKeyMap(endedTraceList[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Value.Emit())
+	assert.Equal(t, "X", attributeMap["Id"].Value.Emit())
+	assert.Equal(t, 1, len(endedTraceList[0].Events()))
+	assert.Equal(t, "Get /album invalid ID X", endedTraceList[0].Events()[0].Name)
+	assert.Equal(t, "Error", endedTraceList[0].Status().Code.String())
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 	assert.Equal(t, "Album ID [X] is not a valid number", serverError.Message)
 }
 
 func Test_getAlbumById_NotFound(t *testing.T) {
-	router := setupRouter()
+	sr, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	var serverError models.ServerError
 	albumID := 5666
@@ -89,7 +125,12 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	if err := json.Unmarshal(body, &serverError); err != nil {
 		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", string(body))
 	}
-
+	endedTraceList := sr.Ended()
+	assert.Len(t, endedTraceList, 1)
+	attributeMap := makeKeyMap(endedTraceList[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Value.Emit())
+	assert.Equal(t, "Error", endedTraceList[0].Status().Code.String())
+	assert.Equal(t, "Get /album not found with ID 5666", endedTraceList[0].Events()[0].Name)
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 	assert.Equal(t, fmt.Sprintf("%s [%v] %s", "Album", albumID, "not found"), serverError.Message)
 }
