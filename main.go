@@ -143,7 +143,7 @@ func getErrorMsg(fe validator.FieldError) string {
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
-	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Applicaiton
+	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Gin
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
@@ -171,7 +171,6 @@ func initProvider() (func(context.Context) error, error) {
 
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
-			// the service name used to display traces in backends
 			semconv.ServiceNameKey.String(serviceName),
 			semconv.ServiceVersionKey.String(version+"-"+gitHash),
 			semconv.ServiceNamespaceKey.String(*namespace),
