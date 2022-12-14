@@ -1,9 +1,7 @@
 ## About
-Test project to understand how to use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework)
+Use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework) & [OpenTelemetry](https://opentelemetry.io/docs/) for Observability
 
 The project is a backend service that represents a music store with an in-memory database.
-
-The project uses OpenTelemetry to send information to Observability & Log Viewing Services
 
 ### OpenTelemetry collector 
 
