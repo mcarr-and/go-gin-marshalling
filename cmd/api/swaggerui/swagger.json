@@ -115,12 +115,10 @@
                 ],
                 "properties": {
                     "field": {
-                        "type": "string",
-                        "required": true
+                        "type": "string"
                     },
                     "message": {
-                        "type": "string",
-                        "required": true
+                        "type": "string"
                     }
                 }
             }
