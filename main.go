@@ -168,7 +168,7 @@ func setupRouter() *gin.Engine {
 const (
 	serviceName           = "album-store"
 	okMessage             = "OK"
-	ginBodyBytesReference = "_gin-gonic/gin/bodybyteskey"
+	ginBodyBytesReference = "_gin-gonic/gin/bodybyteskey" // from gin.context.ShouldBindBodyWith() pushes body to context
 )
 
 var address = "localhost:9080"
