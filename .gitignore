@@ -16,9 +16,14 @@
 /.idea
 *.iml
 
-# binary file
+# project binary
 go-gin-example
+album-store
+
+#coverage informaiton
 coverage.*
+
+#Apple Finder file
 .DS_Store
 
 # vscode file

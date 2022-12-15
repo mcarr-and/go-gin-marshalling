@@ -15,7 +15,7 @@ FROM golang:1.19 as build
 WORKDIR /app/
 COPY . .
 RUN go env -w GOPROXY=direct
-RUN CGO_ENABLED=0 go build -o go-gin-example main.go
+RUN CGO_ENABLED=0 go build -o album-store main.go
 FROM alpine:3.17.0
-COPY --from=build /app/go-gin-example  /app/go-gin-example
-CMD ["/app/go-gin-example"]
+COPY --from=build /app/album-store  /app/album-store
+CMD ["/app/album-store"]

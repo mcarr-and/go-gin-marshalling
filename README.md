@@ -20,7 +20,7 @@ Send data to the following services:
 make docker-compose-start;
 ```
 
-## 2. Start go-gin-example Go/Gin Server with flags set
+## 2. Start album-store Go/Gin Server with flags set
 
 * `-namespace` kubernetes namespace 
 * `-otel-location` can be changed from default URL `localhost:4327`
@@ -44,9 +44,9 @@ make local-test;
 
 [View Jaeger](http://localhost:16696/search?limit=20&service=album-store)
 
-[View Prometheus](http://localhost:9080/graph?g0.expr=%7Bjob%3D~%22.%2B%22%7D%20&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
+[View Prometheus](http://localhost:9090/graph?g0.expr=%7Bjob%3D~%22.%2B%22%7D%20&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=1h)
 
-## 5. Stop go-gin-example server & Services  
+## 5. Stop album-store server & Services  
 
 ### 1. Stop Server
 
@@ -59,6 +59,7 @@ make docker-compose-stop;
 ```
 
 ## TODO
+* Contract tests for swagger to output 
 * Create Prometheus export health endpoint
 * Create status endpoint that says if service is up or down.
 * Async processing of requests 
@@ -69,9 +70,10 @@ make docker-compose-stop;
 * Fuzz testing 
 * Adding CI server integration
 * Adding project to a Docker container
-* K3D cluster to run Docker container in K8s.
+* K3D cluster to run Docker container in local K8s.
 * Helm chart to add Gin Server and Database
 * Skaffold to set up the K8s cluster for this project.
+* Terrafrom project into EKS
 
 ## Bibliography of sites used for creating this project:
 
@@ -90,3 +92,7 @@ Opentelemetry and Gin https://signoz.io/opentelemetry/go/
 OpenTelemetry using Otel-collector https://github.com/open-telemetry/opentelemetry-go/blob/main/example/otel-collector/main.go
 
 OpenTelemetry source of Docker-Compose setup https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo/server
+
+OpenTelemetry unit testing spans https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gin-gonic/gin/otelgin/test/gintrace_test.go
+
+Go & Docker example https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gin-gonic/gin/otelgin/example/Dockerfile
