@@ -107,19 +107,22 @@ func postAlbum(c *gin.Context) {
 				}
 				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fe)}
 			}
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
 			addSpanEventAndLog(span, string(jsonBytes))
+			setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON to Album type")
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
+			return
 		} else {
 			addSpanEventAndLog(span, fmt.Sprintf("%s", err))
 		}
 		addRequestBodyFromContextToSpan(c, span)
 		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON posted to method")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": "could not bind JSON posted to method"})
 		return
 	}
 	addRequestBodyFromContextToSpan(c, span)
 	albums = append(albums, newAlbum)
-	setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
+	setStatusOnSpan(span, http.StatusCreated, codes.Ok, okMessage)
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
