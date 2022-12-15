@@ -59,13 +59,18 @@ func Test_getAllAlbums(t *testing.T) {
 		assert.Fail(t, "json unmarshal fail", "should be []Albums ", albums)
 	}
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
-	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+
 	assert.Equal(t, listAlbums(), albums)
 }
 
@@ -82,13 +87,18 @@ func Test_getAlbumById(t *testing.T) {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
 	}
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
-	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+
 	assert.Equal(t, listAlbums()[1], album)
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
 }
@@ -106,15 +116,20 @@ func Test_getAlbumById_BadId(t *testing.T) {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
-	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, "X", attributeMap["Id"].Emit())
-	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Get /album invalid ID X", finishedSpans[0].Events()[0].Name)
+
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "Album ID [X] is not a valid number", finishedSpans[0].Status().Description)
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "ID=X", attributeMap["http.request.parameters"].Emit())
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "Get /album invalid ID X", finishedSpans[0].Events()[0].Name)
+
 	assert.Equal(t, "Album ID [X] is not a valid number", serverError.Message)
 }
 
@@ -132,14 +147,19 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", string(body))
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
-	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "Album [5666] not found", finishedSpans[0].Status().Description)
+
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
 	assert.Equal(t, "Get /album not found with ID 5666", finishedSpans[0].Events()[0].Name)
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
 	assert.Equal(t, fmt.Sprintf("%s [%v] %s", "Album", albumID, "not found"), serverError.Message)
 }
 
@@ -161,14 +181,19 @@ func Test_postAlbum(t *testing.T) {
 		assert.Fail(t, "json unmarshalling fail", "Should be an Album ", string(body))
 	}
 	assert.Equal(t, http.StatusCreated, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
-	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Len(t, finishedSpans, 1)
-	assert.Equal(t, "201", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`, attributeMap["http.request.body"].Emit())
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`, attributeMap["http.request.body"].Emit())
+	assert.Equal(t, "201", attributeMap["http.status_code"].Emit())
+
 	assert.Equal(t, album, expectedAlbum)
 	assert.Equal(t, len(listAlbums()), 4)
 }
@@ -190,15 +215,20 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "could not bind JSON to Album type", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"required field"},{"field":"artist","message":"required field"},{"field":"price","message":"required field"}]`, finishedSpans[0].Events()[0].Name)
+
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`, attributeMap["http.request.body"].Emit())
-	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "could not bind JSON to Album type", finishedSpans[0].Status().Description)
-	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"required field"},{"field":"artist","message":"required field"},{"field":"price","message":"required field"}]`, finishedSpans[0].Events()[0].Name)
+
 	assert.Equal(t, 4, len(serverError.BindingErrors))
 	assert.Equal(t, "title", serverError.BindingErrors[1].Field)
 	assert.Equal(t, "required field", serverError.BindingErrors[1].Message)
@@ -206,8 +236,8 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	assert.Equal(t, "required field", serverError.BindingErrors[2].Message)
 	assert.Equal(t, "price", serverError.BindingErrors[3].Field)
 	assert.Equal(t, "required field", serverError.BindingErrors[3].Message)
-	assert.Equal(t, len(listAlbums()), 3)
 
+	assert.Equal(t, len(listAlbums()), 3)
 }
 
 func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
@@ -226,15 +256,20 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "could not bind JSON to Album type", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"below minimum value"},{"field":"artist","message":"below minimum value"},{"field":"price","message":"below minimum value"}]`, finishedSpans[0].Events()[0].Name)
+
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`, attributeMap["http.request.body"].Emit())
-	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "could not bind JSON to Album type", finishedSpans[0].Status().Description)
-	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"below minimum value"},{"field":"artist","message":"below minimum value"},{"field":"price","message":"below minimum value"}]`, finishedSpans[0].Events()[0].Name)
+
 	assert.Equal(t, 4, len(serverError.BindingErrors))
 	assert.Equal(t, "id", serverError.BindingErrors[0].Field)
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[0].Message)
@@ -244,6 +279,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[2].Message)
 	assert.Equal(t, "price", serverError.BindingErrors[3].Field)
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[3].Message)
+
 	assert.Equal(t, len(listAlbums()), 3)
 }
 
@@ -261,17 +297,23 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 		assert.Fail(t, "", "should be ServerError ")
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "Malformed JSON. Not valid for Album", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "Malformed JSON. unexpected EOF", finishedSpans[0].Events()[0].Name)
+
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, `{"id": -1,`, attributeMap["http.request.body"].Emit())
-	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Malformed JSON. unexpected EOF", finishedSpans[0].Events()[0].Name)
-	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "Malformed JSON. Not valid for Album", finishedSpans[0].Status().Description)
+
 	assert.Equal(t, "Malformed JSON. Not valid for Album", serverError.Message)
 	assert.Equal(t, 0, len(serverError.BindingErrors))
+
 	assert.Equal(t, len(listAlbums()), 3)
 }
 
