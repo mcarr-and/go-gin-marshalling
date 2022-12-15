@@ -138,8 +138,6 @@ func postAlbum(c *gin.Context) {
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
-// used with gin.Context.ShouldBindBodyWith() puts the body into the context, and we get it back out to display in a span
-
 func getErrorMsg(fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
