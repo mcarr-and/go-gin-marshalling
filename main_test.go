@@ -33,11 +33,11 @@ func TestMain(m *testing.M) {
 }
 
 func setupTestRouter() (*tracetest.SpanRecorder, *gin.Engine) {
-	sr := tracetest.NewSpanRecorder()
-	otel.SetTracerProvider(sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(sr)))
+	spanRecorder := tracetest.NewSpanRecorder()
+	otel.SetTracerProvider(sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(spanRecorder)))
 	router := setupRouter()
 	router.Use(otelgin.Middleware("test-otel"))
-	return sr, router
+	return spanRecorder, router
 }
 
 func makeKeyMap(attributes []attribute.KeyValue) map[attribute.Key]attribute.Value {
@@ -49,7 +49,7 @@ func makeKeyMap(attributes []attribute.KeyValue) map[attribute.Key]attribute.Val
 }
 
 func Test_getAllAlbums(t *testing.T) {
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 
 	testRecorder := httptest.NewRecorder()
 	var albums []models.Album
@@ -60,7 +60,7 @@ func Test_getAllAlbums(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
@@ -75,7 +75,7 @@ func Test_getAllAlbums(t *testing.T) {
 }
 
 func Test_getAlbumById(t *testing.T) {
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	var album models.Album
 
@@ -88,7 +88,7 @@ func Test_getAlbumById(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
@@ -104,7 +104,7 @@ func Test_getAlbumById(t *testing.T) {
 }
 
 func Test_getAlbumById_BadId(t *testing.T) {
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	var serverError models.ServerError
 
@@ -117,24 +117,26 @@ func Test_getAlbumById_BadId(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
+	expectedErrorMessage := "Album [X] not found, invalid request"
+
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "Album ID [X] is not a valid number", finishedSpans[0].Status().Description)
+	assert.Equal(t, expectedErrorMessage, finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Get /album invalid ID X", finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, expectedErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, "ID=X", attributeMap["http.request.parameters"].Emit())
 
-	assert.Equal(t, "Album ID [X] is not a valid number", serverError.Message)
+	assert.Equal(t, expectedErrorMessage, serverError.Message)
 }
 
 func Test_getAlbumById_NotFound(t *testing.T) {
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	var serverError models.ServerError
 	albumID := 5666
@@ -148,24 +150,26 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
+	expectedErrorMessage := "Album [5666] not found"
+
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "Album [5666] not found", finishedSpans[0].Status().Description)
+	assert.Equal(t, expectedErrorMessage, finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Get /album not found with ID 5666", finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, expectedErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, fmt.Sprintf("%s [%v] %s", "Album", albumID, "not found"), serverError.Message)
+	assert.Equal(t, expectedErrorMessage, serverError.Message)
 }
 
 func Test_postAlbum(t *testing.T) {
 	resetAlbums()
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	var album models.Album
 
@@ -178,11 +182,11 @@ func Test_postAlbum(t *testing.T) {
 	body := testRecorder.Body.Bytes()
 
 	if err := json.Unmarshal(body, &album); err != nil {
-		assert.Fail(t, "json unmarshalling fail", "Should be an Album ", string(body))
+		assert.Fail(t, "json unmarshalling fail", "Should be a valid Album ", string(body))
 	}
 	assert.Equal(t, http.StatusCreated, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
@@ -200,7 +204,7 @@ func Test_postAlbum(t *testing.T) {
 
 func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	resetAlbums()
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 
 	album := `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`
@@ -216,11 +220,11 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "could not bind JSON to Album type", finishedSpans[0].Status().Description)
+	assert.Equal(t, "Album JSON field validation failed", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
 	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"required field"},{"field":"artist","message":"required field"},{"field":"price","message":"required field"}]`, finishedSpans[0].Events()[0].Name)
@@ -242,7 +246,7 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 
 func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	resetAlbums()
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	album := `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`
 	var serverError models.ServerError
@@ -257,11 +261,11 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "could not bind JSON to Album type", finishedSpans[0].Status().Description)
+	assert.Equal(t, "Album JSON field validation failed", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
 	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"below minimum value"},{"field":"artist","message":"below minimum value"},{"field":"price","message":"below minimum value"}]`, finishedSpans[0].Events()[0].Name)
@@ -285,7 +289,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 
 func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	resetAlbums()
-	sr, router := setupTestRouter()
+	spanRecorder, router := setupTestRouter()
 	testRecorder := httptest.NewRecorder()
 	album := `{"id": -1,`
 	var serverError models.ServerError
@@ -298,7 +302,7 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
-	finishedSpans := sr.Ended()
+	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)

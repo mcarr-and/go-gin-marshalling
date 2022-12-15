@@ -69,10 +69,11 @@ func getAlbumByID(c *gin.Context) {
 
 	albumId, err := strconv.Atoi(id)
 	if err != nil {
-		serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album ID", id, "is not a valid number")}
+		errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found, invalid request")
+		serverError := models.ServerError{Message: errorMessage}
 		setSpanStatus(span, codes.Error, serverError.Message)
 		addHttpStatusToSpanAttributes(span, http.StatusBadRequest)
-		addSpanEventAndLog(span, fmt.Sprintf("Get /album invalid ID %s", id))
+		addSpanEventAndLog(span, errorMessage)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
 	}
@@ -86,10 +87,11 @@ func getAlbumByID(c *gin.Context) {
 		}
 	}
 
-	serverError := models.ServerError{Message: fmt.Sprintf("%s [%s] %s", "Album", id, "not found")}
+	errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found")
+	serverError := models.ServerError{Message: errorMessage}
 	setSpanStatus(span, codes.Error, serverError.Message)
 	addHttpStatusToSpanAttributes(span, http.StatusBadRequest)
-	addSpanEventAndLog(span, fmt.Sprintf("Get /album not found with ID %s", id))
+	addSpanEventAndLog(span, errorMessage)
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
@@ -114,7 +116,7 @@ func postAlbum(c *gin.Context) {
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
 			addSpanEventAndLog(span, string(jsonBytes))
 			addJSONBodyToSpanAttributes(c, span)
-			setSpanStatus(span, codes.Error, "could not bind JSON to Album type")
+			setSpanStatus(span, codes.Error, "Album JSON field validation failed")
 			addHttpStatusToSpanAttributes(span, http.StatusBadRequest)
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			return
