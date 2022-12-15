@@ -55,8 +55,8 @@ func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
 	defer span.End()
-	setSpanStatus(span, codes.Ok, "")
-	addHttpStatusToSpanAttributes(span, http.StatusOK)
+	span.SetStatus(codes.Ok, "")
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	c.JSON(http.StatusOK, albums)
 }
 
@@ -71,17 +71,17 @@ func getAlbumByID(c *gin.Context) {
 	if err != nil {
 		errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found, invalid request")
 		serverError := models.ServerError{Message: errorMessage}
-		setSpanStatus(span, codes.Error, serverError.Message)
-		addHttpStatusToSpanAttributes(span, http.StatusBadRequest)
-		addSpanEventAndLog(span, errorMessage)
+		span.SetStatus(codes.Error, serverError.Message)
+		span.AddEvent(errorMessage)
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
 	}
 
 	for _, album := range albums {
 		if album.ID == albumId {
-			setSpanStatus(span, codes.Ok, "")
-			addHttpStatusToSpanAttributes(span, http.StatusOK)
+			span.SetStatus(codes.Ok, "")
+			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 			c.JSON(http.StatusOK, album)
 			return
 		}
@@ -89,9 +89,9 @@ func getAlbumByID(c *gin.Context) {
 
 	errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found")
 	serverError := models.ServerError{Message: errorMessage}
-	setSpanStatus(span, codes.Error, serverError.Message)
-	addHttpStatusToSpanAttributes(span, http.StatusBadRequest)
-	addSpanEventAndLog(span, errorMessage)
+	span.SetStatus(codes.Error, serverError.Message)
+	span.AddEvent(errorMessage)
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
@@ -113,46 +113,32 @@ func postAlbum(c *gin.Context) {
 				}
 				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fe)}
 			}
-			jsonBytes, _ := json.Marshal(bindingErrorMessages)
-			addSpanEventAndLog(span, string(jsonBytes))
-			addJSONBodyToSpanAttributes(c, span)
-			setSpanStatus(span, codes.Error, "Album JSON field validation failed")
-			addHttpStatusToSpanAttributes(span, http.StatusBadRequest)
+			bindingErrorMessage, _ := json.Marshal(bindingErrorMessages)
+			requestBodyJSON, _ := c.Get(gin.BodyBytesKey) // get body from gin context
+			span.SetStatus(codes.Error, "Album JSON field validation failed")
+			span.AddEvent(string(bindingErrorMessage))
+			span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
+			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			return
 		}
-		addSpanEventAndLog(span, fmt.Sprintf("Malformed JSON. %s", err))
-		addJSONBodyToSpanAttributes(c, span)
-		setSpanStatus(span, codes.Error, "Malformed JSON. Not valid for Album")
-		addHttpStatusToSpanAttributes(span, http.StatusBadRequest)
+		requestBodyJSON, _ := c.Get(gin.BodyBytesKey) // get body from gin context
+		span.SetStatus(codes.Error, "Malformed JSON. Not valid for Album")
+		span.AddEvent(fmt.Sprintf("Malformed JSON. %s", err))
+		span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
 		return
 	}
-	addJSONBodyToSpanAttributes(c, span)
+	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 	albums = append(albums, newAlbum)
-	setSpanStatus(span, codes.Ok, "")
-	addHttpStatusToSpanAttributes(span, http.StatusCreated)
+	span.SetStatus(codes.Ok, "")
+	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusCreated))
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
 // used with gin.Context.ShouldBindBodyWith() puts the body into the context, and we get it back out to display in a span
-func addJSONBodyToSpanAttributes(c *gin.Context, span trace.Span) {
-	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
-	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
-}
-
-func setSpanStatus(span trace.Span, spanStatusCode codes.Code, message string) {
-	span.SetStatus(spanStatusCode, message)
-}
-
-func addHttpStatusToSpanAttributes(span trace.Span, httpStatusCode int) {
-	span.SetAttributes(attribute.Key("http.status_code").Int(httpStatusCode))
-}
-
-func addSpanEventAndLog(span trace.Span, errorMsg string) {
-	span.AddEvent(errorMsg)
-	log.Println(errorMsg)
-}
 
 func getErrorMsg(fe validator.FieldError) string {
 	switch fe.Tag() {
