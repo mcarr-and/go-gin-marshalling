@@ -55,7 +55,7 @@ func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
 	defer span.End()
-	setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
+	setStatusOnSpan(span, http.StatusOK, codes.Ok, OkMessage)
 	c.JSON(http.StatusOK, albums)
 }
 
@@ -77,8 +77,8 @@ func getAlbumByID(c *gin.Context) {
 
 	for _, album := range albums {
 		if album.ID == albumId {
+			setStatusOnSpan(span, http.StatusOK, codes.Ok, OkMessage)
 			c.JSON(http.StatusOK, album)
-			setStatusOnSpan(span, http.StatusOK, codes.Ok, okMessage)
 			return
 		}
 	}
@@ -115,13 +115,13 @@ func postAlbum(c *gin.Context) {
 		}
 		addSpanEventAndLog(span, fmt.Sprintf("Malformed JSON. %s", err))
 		addRequestBodyFromContextToSpan(c, span)
-		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON posted to method")
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": "could not bind JSON posted to method"})
+		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "Malformed JSON. Not valid for Album")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
 		return
 	}
 	addRequestBodyFromContextToSpan(c, span)
 	albums = append(albums, newAlbum)
-	setStatusOnSpan(span, http.StatusCreated, codes.Ok, okMessage)
+	setStatusOnSpan(span, http.StatusCreated, codes.Ok, OkMessage)
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
@@ -170,7 +170,7 @@ func setupRouter() *gin.Engine {
 
 const (
 	serviceName = "album-store"
-	okMessage   = "OK"
+	OkMessage   = "OK"
 )
 
 var address = "localhost:9080"
