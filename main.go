@@ -175,8 +175,7 @@ var address = "localhost:9080"
 var version = "No-Version"
 var gitHash = "No-Hash"
 
-// Initializes an OTLP exporter, and configures the corresponding trace and
-// metric providers.
+// Initializes an OTLP exporter, and configures the corresponding trace and metric providers.
 func initProvider() (func(context.Context) error, error) {
 	ctx := context.Background()
 	namespace := flag.String("namespace", "", "kubernetes namespace where running")
