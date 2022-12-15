@@ -32,12 +32,13 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func setupTestRouter() (*tracetest.SpanRecorder, *gin.Engine) {
+func setupTestRouter() (*httptest.ResponseRecorder, *tracetest.SpanRecorder, *gin.Engine) {
 	spanRecorder := tracetest.NewSpanRecorder()
 	otel.SetTracerProvider(sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(spanRecorder)))
 	router := setupRouter()
+	testRecorder := httptest.NewRecorder()
 	router.Use(otelgin.Middleware("test-otel"))
-	return spanRecorder, router
+	return testRecorder, spanRecorder, router
 }
 
 func makeKeyMap(attributes []attribute.KeyValue) map[attribute.Key]attribute.Value {
@@ -49,9 +50,8 @@ func makeKeyMap(attributes []attribute.KeyValue) map[attribute.Key]attribute.Val
 }
 
 func Test_getAllAlbums(t *testing.T) {
-	spanRecorder, router := setupTestRouter()
+	testRecorder, spanRecorder, router := setupTestRouter()
 
-	testRecorder := httptest.NewRecorder()
 	var albums []models.Album
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
@@ -75,8 +75,8 @@ func Test_getAllAlbums(t *testing.T) {
 }
 
 func Test_getAlbumById(t *testing.T) {
-	spanRecorder, router := setupTestRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, spanRecorder, router := setupTestRouter()
+
 	var album models.Album
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/2", nil)
@@ -104,8 +104,8 @@ func Test_getAlbumById(t *testing.T) {
 }
 
 func Test_getAlbumById_BadId(t *testing.T) {
-	spanRecorder, router := setupTestRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, spanRecorder, router := setupTestRouter()
+
 	var serverError models.ServerError
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/X", nil)
@@ -136,8 +136,8 @@ func Test_getAlbumById_BadId(t *testing.T) {
 }
 
 func Test_getAlbumById_NotFound(t *testing.T) {
-	spanRecorder, router := setupTestRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, spanRecorder, router := setupTestRouter()
+
 	var serverError models.ServerError
 	albumID := 5666
 
@@ -169,8 +169,8 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 
 func Test_postAlbum(t *testing.T) {
 	resetAlbums()
-	spanRecorder, router := setupTestRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, spanRecorder, router := setupTestRouter()
+
 	var album models.Album
 
 	albumBody := `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`
@@ -204,8 +204,7 @@ func Test_postAlbum(t *testing.T) {
 
 func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	resetAlbums()
-	spanRecorder, router := setupTestRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, spanRecorder, router := setupTestRouter()
 
 	album := `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`
 	var serverError models.ServerError
@@ -246,18 +245,18 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 
 func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	resetAlbums()
-	spanRecorder, router := setupTestRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, spanRecorder, router := setupTestRouter()
+
 	album := `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`
 	var serverError models.ServerError
+
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(testRecorder, req)
-	body := testRecorder.Body.Bytes()
 
-	if err := json.Unmarshal(body, &serverError); err != nil {
+	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		var ve validator.ValidationErrors
 		errors.As(err, &ve)
-		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(body))
+		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(testRecorder.Body.Bytes()))
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -289,15 +288,15 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 
 func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	resetAlbums()
-	spanRecorder, router := setupTestRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, spanRecorder, router := setupTestRouter()
+
 	album := `{"id": -1,`
 	var serverError models.ServerError
+
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(testRecorder, req)
-	body := testRecorder.Body.Bytes()
 
-	if err := json.Unmarshal(body, &serverError); err != nil {
+	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		assert.Fail(t, "", "should be ServerError ")
 	}
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
@@ -323,8 +322,8 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 
 func Test_getSwagger(t *testing.T) {
 	resetAlbums()
-	router := setupRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, _, router := setupTestRouter()
+
 	req, _ := http.NewRequest(http.MethodGet, "/v3/api-docs/", nil)
 	router.ServeHTTP(testRecorder, req)
 	bodyString := string(testRecorder.Body.Bytes())
@@ -333,8 +332,7 @@ func Test_getSwagger(t *testing.T) {
 }
 
 func Benchmark_getAllAlbums(b *testing.B) {
-	router := setupRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, _, router := setupTestRouter()
 	var albums []models.Album
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
 
@@ -349,8 +347,8 @@ func Benchmark_getAllAlbums(b *testing.B) {
 }
 
 func Benchmark_getAlbumById(b *testing.B) {
-	router := setupRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, _, router := setupTestRouter()
+
 	var album models.Album
 	req, _ := http.NewRequest(http.MethodGet, "/albums/2", nil)
 
@@ -365,8 +363,8 @@ func Benchmark_getAlbumById(b *testing.B) {
 }
 
 func Benchmark_getAlbumById_BadRequest(b *testing.B) {
-	router := setupRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, _, router := setupTestRouter()
+
 	var serverError models.ServerError
 	req, _ := http.NewRequest(http.MethodGet, "/albums/5666", nil)
 
@@ -381,8 +379,8 @@ func Benchmark_getAlbumById_BadRequest(b *testing.B) {
 }
 
 func Benchmark_postAlbum(b *testing.B) {
-	router := setupRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, _, router := setupTestRouter()
+
 	albumJson := `{"id": "10", "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 56.99}`
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
 	var albumReturned models.Album
@@ -398,8 +396,8 @@ func Benchmark_postAlbum(b *testing.B) {
 }
 
 func Benchmark_postAlbum_BadRequest_BadJson(b *testing.B) {
-	router := setupRouter()
-	testRecorder := httptest.NewRecorder()
+	testRecorder, _, router := setupTestRouter()
+
 	var returnedError models.ServerError
 	albumJson := `{"xid": "10", "titlex": "Blue Train", "artistx": "John Coltrane", "pricex": 56.99, "X": "asdf"}`
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumJson))
