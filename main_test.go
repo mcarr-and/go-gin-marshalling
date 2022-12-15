@@ -123,12 +123,12 @@ func Test_getAlbumById_BadId(t *testing.T) {
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "Album ID [X] is not a valid number", finishedSpans[0].Status().Description)
 
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "Get /album invalid ID X", finishedSpans[0].Events()[0].Name)
+
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, "ID=X", attributeMap["http.request.parameters"].Emit())
-
-	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Get /album invalid ID X", finishedSpans[0].Events()[0].Name)
 
 	assert.Equal(t, "Album ID [X] is not a valid number", serverError.Message)
 }
