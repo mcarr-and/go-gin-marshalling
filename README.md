@@ -59,7 +59,6 @@ make docker-compose-stop;
 ```
 
 ## TODO
-* Display application vesion in all span
 * Create Prometheus export health endpoint
 * Create status endpoint that says if service is up or down.
 * Async processing of requests 
@@ -68,7 +67,6 @@ make docker-compose-stop;
 * Use a database as a data store
 * Database migration tooling via scripts 
 * Fuzz testing 
-* Unit test the OpenTelemetry messages are received
 * Adding CI server integration
 * Adding project to a Docker container
 * K3D cluster to run Docker container in K8s.
