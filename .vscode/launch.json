@@ -6,6 +6,11 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
+            "args": [
+                "-namespace=no-namespace",
+                "-otel-location=localhost:4327",
+                "-instance-name=go-gin-example-1"
+            ],
             "program": "${workspaceFolder}/main.go"
         }
     ]
