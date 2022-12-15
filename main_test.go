@@ -20,6 +20,8 @@ import (
 	"testing"
 )
 
+// Gin & span testing upon https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gin-gonic/gin/otelgin/test/gintrace_test.go
+
 func TestMain(m *testing.M) {
 	//Set Gin to Test Mode
 	gin.SetMode(gin.TestMode)
