@@ -58,7 +58,7 @@ func Test_getAllAlbums(t *testing.T) {
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &albums); err != nil {
 		assert.Fail(t, "json unmarshal fail", "should be []Albums ", albums)
 	}
-
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
@@ -66,7 +66,6 @@ func Test_getAllAlbums(t *testing.T) {
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
-	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums(), albums)
 }
 
@@ -82,7 +81,7 @@ func Test_getAlbumById(t *testing.T) {
 	if err := json.Unmarshal(body, &album); err != nil {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
 	}
-
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
@@ -90,7 +89,6 @@ func Test_getAlbumById(t *testing.T) {
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
-	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, listAlbums()[1], album)
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
 }
@@ -107,7 +105,7 @@ func Test_getAlbumById_BadId(t *testing.T) {
 	if err := json.Unmarshal(body, &serverError); err != nil {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(body))
 	}
-
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
@@ -117,7 +115,6 @@ func Test_getAlbumById_BadId(t *testing.T) {
 	assert.Equal(t, "Get /album invalid ID X", finishedSpans[0].Events()[0].Name)
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "Album ID [X] is not a valid number", finishedSpans[0].Status().Description)
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 	assert.Equal(t, "Album ID [X] is not a valid number", serverError.Message)
 }
 
@@ -134,6 +131,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	if err := json.Unmarshal(body, &serverError); err != nil {
 		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", string(body))
 	}
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
@@ -142,7 +140,6 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	assert.Equal(t, "Album [5666] not found", finishedSpans[0].Status().Description)
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
 	assert.Equal(t, "Get /album not found with ID 5666", finishedSpans[0].Events()[0].Name)
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 	assert.Equal(t, fmt.Sprintf("%s [%v] %s", "Album", albumID, "not found"), serverError.Message)
 }
 
@@ -163,6 +160,7 @@ func Test_postAlbum(t *testing.T) {
 	if err := json.Unmarshal(body, &album); err != nil {
 		assert.Fail(t, "json unmarshalling fail", "Should be an Album ", string(body))
 	}
+	assert.Equal(t, http.StatusCreated, testRecorder.Code)
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
@@ -170,7 +168,6 @@ func Test_postAlbum(t *testing.T) {
 	assert.Equal(t, "201", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
-	assert.Equal(t, http.StatusCreated, testRecorder.Code)
 	assert.Equal(t, album, expectedAlbum)
 	assert.Equal(t, len(listAlbums()), 4)
 }
