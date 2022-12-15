@@ -109,24 +109,25 @@ func postAlbum(c *gin.Context) {
 			}
 			jsonBytes, _ := json.Marshal(bindingErrorMessages)
 			addSpanEventAndLog(span, string(jsonBytes))
+			addJSONBodyToSpanAttributes(c, span)
 			setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON to Album type")
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			return
 		}
 		addSpanEventAndLog(span, fmt.Sprintf("Malformed JSON. %s", err))
-		addRequestBodyFromContextToSpan(c, span)
+		addJSONBodyToSpanAttributes(c, span)
 		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "Malformed JSON. Not valid for Album")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
 		return
 	}
-	addRequestBodyFromContextToSpan(c, span)
+	addJSONBodyToSpanAttributes(c, span)
 	albums = append(albums, newAlbum)
 	setStatusOnSpan(span, http.StatusCreated, codes.Ok, "")
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
 // used with gin.Context.ShouldBindBodyWith() puts the body into the context, and we get it back out to display in a span
-func addRequestBodyFromContextToSpan(c *gin.Context, span trace.Span) {
+func addJSONBodyToSpanAttributes(c *gin.Context, span trace.Span) {
 	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
 }
