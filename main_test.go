@@ -257,7 +257,7 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, attributeMap["http.request.body"].Emit(), "{\"id\": -1,")
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "unexpected EOF", finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, "Malformed JSON. unexpected EOF", finishedSpans[0].Events()[0].Name)
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, 0, len(serverError.BindingErrors))
 	assert.Equal(t, len(listAlbums()), 3)

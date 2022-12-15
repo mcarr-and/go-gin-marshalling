@@ -113,7 +113,7 @@ func postAlbum(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			return
 		}
-		addSpanEventAndLog(span, fmt.Sprintf("%s", err))
+		addSpanEventAndLog(span, fmt.Sprintf("Malformed JSON. %s", err))
 		addRequestBodyFromContextToSpan(c, span)
 		setStatusOnSpan(span, http.StatusBadRequest, codes.Error, "could not bind JSON posted to method")
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": "could not bind JSON posted to method"})
