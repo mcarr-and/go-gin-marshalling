@@ -61,6 +61,7 @@ func Test_getAllAlbums(t *testing.T) {
 
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
@@ -84,6 +85,7 @@ func Test_getAlbumById(t *testing.T) {
 
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
@@ -163,6 +165,7 @@ func Test_postAlbum(t *testing.T) {
 	}
 	finishedSpans := sr.Ended()
 	assert.Len(t, finishedSpans, 1)
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "201", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
