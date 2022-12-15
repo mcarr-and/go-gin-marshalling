@@ -55,7 +55,7 @@ func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
 	defer span.End()
-	setStatusOnSpan(span, http.StatusOK, codes.Ok, OkMessage)
+	setStatusOnSpan(span, http.StatusOK, codes.Ok, "")
 	c.JSON(http.StatusOK, albums)
 }
 
@@ -77,7 +77,7 @@ func getAlbumByID(c *gin.Context) {
 
 	for _, album := range albums {
 		if album.ID == albumId {
-			setStatusOnSpan(span, http.StatusOK, codes.Ok, OkMessage)
+			setStatusOnSpan(span, http.StatusOK, codes.Ok, "")
 			c.JSON(http.StatusOK, album)
 			return
 		}
@@ -121,7 +121,7 @@ func postAlbum(c *gin.Context) {
 	}
 	addRequestBodyFromContextToSpan(c, span)
 	albums = append(albums, newAlbum)
-	setStatusOnSpan(span, http.StatusCreated, codes.Ok, OkMessage)
+	setStatusOnSpan(span, http.StatusCreated, codes.Ok, "")
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
@@ -170,7 +170,6 @@ func setupRouter() *gin.Engine {
 
 const (
 	serviceName = "album-store"
-	OkMessage   = "OK"
 )
 
 var address = "localhost:9080"
