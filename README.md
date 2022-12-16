@@ -61,6 +61,7 @@ make docker-compose-stop;
 ## TODO
 * Contract tests for swagger to output 
 * Create Prometheus export health endpoint
+* Test data builder for creating hundreds of albums for pagination testing and load testing
 * Create status endpoint that says if service is up or down.
 * Async processing of requests 
 * Back pressure on APIs & rate limiting

@@ -41,13 +41,16 @@ services:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-  #  go-gin-example:
+
+  #  album-store:
   #    build:
   #      dockerfile: Dockerfile
   #      context: .
   #    restart: always
   #    environment:
-  #      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+  #      - -otel-location=localhost:4327
+  #      - -namespace=no-namespace
+  #      - -instance-name=album-store-1
   #    ports:
   #      - "9080:9080"
   #    depends_on:

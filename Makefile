@@ -10,7 +10,7 @@ test-benchmark:
 	go test -bench=. -count 2 -run=^# -benchmem
 
 local-start: build
-	./album-store -otel-location=localhost:4327 -namespace=no-namespace -instance-name=go-gin-example-1
+	./album-store -otel-location=localhost:4327 -namespace=no-namespace -instance-name=album-store-1
 
 local-test:
 	curl --location --request GET 'http://localhost:9080/albums/1' --header 'Accept: application/json';
