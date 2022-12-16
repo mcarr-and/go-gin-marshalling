@@ -99,6 +99,7 @@ func Test_getAlbumById(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, `{"id":2,"title":"Jeru","artist":"Gerry Mulligan","price":17.99}`, attributeMap["http.response.body"].Emit())
 
 	assert.Equal(t, listAlbums()[1], album)
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
@@ -194,6 +195,7 @@ func Test_postAlbum(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`, attributeMap["http.request.body"].Emit())
 	assert.Equal(t, "201", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, `{"id":10,"title":"The Ozzman Cometh","artist":"Black Sabbath","price":66.6}`, attributeMap["http.response.body"].Emit())
 
 	assert.Equal(t, album, expectedAlbum)
 	assert.Equal(t, len(listAlbums()), 4)

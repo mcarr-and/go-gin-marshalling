@@ -82,6 +82,8 @@ func getAlbumByID(c *gin.Context) {
 		if album.ID == albumId {
 			span.SetStatus(codes.Ok, "")
 			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+			jsonVal, _ := json.Marshal(album)
+			span.SetAttributes(attribute.Key("http.response.body").String(string(jsonVal)))
 			c.JSON(http.StatusOK, album)
 			return
 		}
@@ -135,6 +137,8 @@ func postAlbum(c *gin.Context) {
 	span.SetStatus(codes.Ok, "")
 	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusCreated))
+	jsonVal, _ := json.Marshal(newAlbum)
+	span.SetAttributes(attribute.Key("http.response.body").String(string(jsonVal)))
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
