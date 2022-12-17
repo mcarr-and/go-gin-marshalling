@@ -71,7 +71,6 @@ make docker-compose-stop;
 * Fuzz testing 
 * Adding CI server integration
 * Adding project to a Docker container
-* K3D cluster to run Docker container in local K8s.
 * Helm chart to add Gin Server and Database
 * Skaffold to set up the K8s cluster for this project.
 * Terrafrom project into EKS
