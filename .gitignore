@@ -16,6 +16,8 @@
 /.idea
 *.iml
 
+/.kpt-pipeline
+
 # project binary
 go-gin-example
 album-store

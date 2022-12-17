@@ -1,0 +1,67 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: dashboard
+deploy:
+  helm:
+    releases:
+      - name: kubernetes-dashboard
+        remoteChart: kubernetes-dashboard
+        repo: https://kubernetes.github.io/dashboard/
+        namespace: kubernetes-dashboard
+        createNamespace: true
+        valuesFiles: ["./values/local/dashboard.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: ingress-nginx
+profiles:
+  - name: local
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: ingress-nginx
+            remoteChart: ingress-nginx
+            repo: https://kubernetes.github.io/ingress-nginx
+            namespace: ingress-nginx
+            createNamespace: true
+            valuesFiles: ["./values/local/nginx-ingress.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: opentelemetry-collector
+profiles:
+  - name: local
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: opentelemetry-collector
+            remoteChart: opentelemetry-collector
+            repo: https://open-telemetry.github.io/opentelemetry-helm-charts
+            namespace: opentelemetry
+            createNamespace: true
+            valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: jaeger
+profiles:
+  - name: local
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: jaeger-all-in-one
+            remoteChart: jaeger-all-in-one
+            repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
+            namespace: jaeger
+            createNamespace: true
+            valuesFiles: ["./values/local/jaeger-all-in-one.values.yaml"]
