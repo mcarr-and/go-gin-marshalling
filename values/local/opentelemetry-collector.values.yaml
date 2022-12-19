@@ -311,14 +311,14 @@ ingress:
   enabled: true
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
   hosts:
-    - host: otel-collector.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-          port: 4317
+   - host: otel-collector.local
+     paths:
+       - path: /
+         pathType: Prefix
+         port: 4317
   tls: []
 
 
