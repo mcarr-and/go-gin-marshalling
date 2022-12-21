@@ -12,10 +12,10 @@ Send data to the following services:
 ## 1. Running Project
 
 ### Docker Compose
-[Docker-Compose instructions](README-Docker-Compose.md)
+[Docker-Compose instructions](docs/Install-Docker-Compose.md)
 
 ## K3D
-[Local Kubernetes with K3D instructions](README-K3D.md)
+[Local Kubernetes with K3D instructions](docs/Install-Kubernetes-K3D.md)
 
 ## TODO
 * Contract tests for swagger to output 

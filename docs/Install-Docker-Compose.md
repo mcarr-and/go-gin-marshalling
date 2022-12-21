@@ -23,7 +23,7 @@ make local-start;
 
 ## 3. Run Some Tests
 
-[Postman Collection](test/Album-Store.postman_collection.json)
+[Postman Collection](../test/Album-Store.postman_collection.json)
 
 ```bash
 make local-test;
