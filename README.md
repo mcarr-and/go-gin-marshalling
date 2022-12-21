@@ -18,6 +18,8 @@ Send data to the following services:
 [Local Kubernetes with K3D instructions](docs/Install-Kubernetes-K3D.md)
 
 ## TODO
+* Run album store externally to Kubernetes with K3D cluster running OpenTelemetry  
+* Run album store inside cluster 
 * Contract tests for swagger to output 
 * Create Prometheus export health endpoint
 * Test data builder for creating hundreds of albums for pagination testing and load testing
@@ -31,7 +33,6 @@ Send data to the following services:
 * Adding CI server integration
 * Adding project to a Docker container
 * Helm chart to add Gin Server and Database
-* Skaffold to set up the K8s cluster for this project.
 * Terrafrom project into EKS
 
 ## Bibliography of sites used for creating this project:
