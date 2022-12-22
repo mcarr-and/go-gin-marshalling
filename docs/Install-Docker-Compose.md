@@ -16,7 +16,7 @@ make docker-compose-start;
 * `-instance-name` kubernetes instance name (unique name when horizontal scaling)
 
 ```bash
-make local-start;
+make local-start-docker-compose-grpc;
 ```
 
 #### Note: the application will not start without the OpenTelemetry collector running
