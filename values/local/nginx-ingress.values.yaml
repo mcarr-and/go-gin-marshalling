@@ -178,6 +178,8 @@ controller:
   # -- Additional command line arguments to pass to nginx-ingress-controller
   # E.g. to specify the default SSL certificate you can use
   extraArgs: {}
+   # v: 3 # setup debug logging for nginx-ingress remove {} above
+
   ## extraArgs:
   ##   default-ssl-certificate: "<namespace>/<secret_name>"
 

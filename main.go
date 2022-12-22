@@ -210,7 +210,7 @@ func initOtelProvider() (func(context.Context) error, error) {
 	}
 
 	//setup for Protobuff - model.proto works with sending this to port 14250 in Jaeger
-	otelTraceExporter, err := setupOtelProtoBuffTrace(ctx, otelLocation)
+	otelTraceExporter, err := setupOtelProtoBuffGrpcTrace(ctx, otelLocation)
 	if err != nil {
 		return nil, err
 	}
@@ -241,6 +241,7 @@ func setupOtelTraceProvider(traceExporter *otlptrace.Exporter, otelResource *res
 	return tracerProvider
 }
 
+// NOT WORKING - http post of span fails with a EOF????
 func setupOtelHttpTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
 	// insecure transport here DO NOT USE IN PROD
 	client := otlptracehttp.NewClient(
@@ -250,16 +251,16 @@ func setupOtelHttpTrace(ctx context.Context, otelLocation *string) (*otlptrace.E
 	)
 	err := client.Start(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to start http client: %w", err)
+		return nil, fmt.Errorf("failed to create http connection to opentelemetry-collector: %w", err)
 	}
 	traceExporter, err := otlptrace.New(ctx, client)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+		return nil, fmt.Errorf("failed to create opentelemetry trace exporter: %w", err)
 	}
 	return traceExporter, nil
 }
 
-func setupOtelProtoBuffTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
+func setupOtelProtoBuffGrpcTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
 	// insecure transport here. DO NOT USE IN PROD
 	conn, err := grpc.DialContext(ctx, *otelLocation,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -270,7 +271,7 @@ func setupOtelProtoBuffTrace(ctx context.Context, otelLocation *string) (*otlptr
 	}
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+		return nil, fmt.Errorf("failed to create opentelemetry trace exporter: %w", err)
 	}
 	return traceExporter, nil
 }
