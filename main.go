@@ -175,7 +175,6 @@ const (
 	serviceName = "album-store"
 )
 
-var address = "localhost:9080"
 var version = "No-Version"
 var gitHash = "No-Hash"
 
@@ -241,7 +240,7 @@ func setupOtelTraceProvider(traceExporter *otlptrace.Exporter, otelResource *res
 	return tracerProvider
 }
 
-// NOT WORKING - http post of span fails with a EOF????
+// NOT WORKING - http post of span fails with an EOF????
 func setupOtelHttpTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
 	// insecure transport here DO NOT USE IN PROD
 	client := otlptracehttp.NewClient(
@@ -283,8 +282,9 @@ func main() {
 	}
 
 	router := setupRouter()
+	//serve requests until termination signal is sent.
 	srv := &http.Server{
-		Addr:    address,
+		Addr:    "localhost:9080",
 		Handler: router,
 	}
 
@@ -302,7 +302,7 @@ func main() {
 	ctxServer, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 
-	log.Println("OpenTelemetry TraceProvider shutting down")
+	log.Println("OpenTelemetry TraceProvider flushing & shutting down")
 	if err := shutdownTraceProvider(ctxServer); err != nil {
 		log.Fatal("OpenTelemetry TracerProvider shutdown failure: %w", err)
 	}

@@ -14,7 +14,7 @@ Send data to the following services:
 ### Docker Compose
 [Docker-Compose instructions](docs/Install-Docker-Compose.md)
 
-## K3D
+## [WIP & NON-FUNCTIONING] K3D cluster 
 [Local Kubernetes with K3D instructions](docs/Install-Kubernetes-K3D.md)
 
 ## TODO
@@ -56,3 +56,5 @@ OpenTelemetry source of Docker-Compose setup https://github.com/open-telemetry/o
 OpenTelemetry unit testing spans https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gin-gonic/gin/otelgin/test/gintrace_test.go
 
 Go & Docker example https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gin-gonic/gin/otelgin/example/Dockerfile
+
+Go & Contract testing for swagger https://github.com/getkin/kin-openapi
