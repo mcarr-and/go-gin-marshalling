@@ -19,6 +19,24 @@ profiles:
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
+  name: jaeger
+profiles:
+  - name: local
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: jaeger-all-in-one
+            remoteChart: jaeger-all-in-one
+            repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
+            namespace: opentelemetry
+            createNamespace: true
+            valuesFiles: ["./values/local/jaeger-all-in-one.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
   name: opentelemetry-collector
 profiles:
   - name: local
@@ -33,24 +51,6 @@ profiles:
             namespace: opentelemetry
             createNamespace: true
             valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
----
-apiVersion: skaffold/v2beta22
-kind: Config
-metadata:
-  name: jaeger
-profiles:
-  - name: local
-    activation:
-      - kubeContext: k3d-k3s-default
-    deploy:
-      helm:
-        releases:
-          - name: jaeger-all-in-one
-            remoteChart: jaeger-all-in-one
-            repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
-            namespace: jaeger
-            createNamespace: true
-            valuesFiles: ["./values/local/jaeger-all-in-one.values.yaml"]
 ---
 apiVersion: skaffold/v2beta29
 kind: Config

@@ -8,14 +8,20 @@
 
 ```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local```
 
+## 1. Create K3d Cluster
 
-## 1. Start All Observability & Log Viewing Services
+```bash
+make k3d-cluster-create
+#kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.10.1/cert-manager.yaml;
+```
+
+## 2. Start All Observability & Log Viewing Services
  
 ```bash
 make skaffold-dev;
 ```
 
-## 2. Start album-store Go/Gin Server with flags set
+## 3. Start album-store Go/Gin Server with flags set
 
 * `-namespace` kubernetes namespace 
 * `-otel-location` can be changed from K3D-Nginx `otel-collector.local`
@@ -27,7 +33,7 @@ make local-start;
 
 #### Note: the application will not start without the OpenTelemetry collector running
 
-## 3. Run Some Tests
+## 4. Run Some Tests
 
 [Postman Collection](../test/Album-Store.postman_collection.json)
 
@@ -35,7 +41,7 @@ make local-start;
 make local-test;
 ```
 
-## 4. View the events in the different Services in K3D
+## 5. View the events in the different Services in K3D
 
 [View Jaeger](http://jaeger.local:8070/search?limit=20&service=album-store)
 
@@ -43,7 +49,7 @@ make local-test;
 
 TODO Prometheus 
 
-## 5. Stop album-store server & Services  
+## 6. Stop album-store server & Services  
 
 ### 1. Stop Server
 
@@ -52,3 +58,9 @@ TODO Prometheus
 ### 2. Stop Observability and Log Viewing Services
 
 Ctr + C on the terminal window where you started `make skaffold-dev`
+
+## 7. Delete K3D Cluster
+
+```bash
+make k3d-cluster-delete
+```

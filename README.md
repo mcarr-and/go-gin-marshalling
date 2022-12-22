@@ -49,7 +49,7 @@ Gin Examples: https://gin-gonic.com/docs/examples/
 
 Opentelemetry and Gin https://signoz.io/opentelemetry/go/
 
-OpenTelemetry using Otel-collector https://github.com/open-telemetry/opentelemetry-go/blob/main/example/otel-collector/main.go
+OpenTelemetry using Protobuf GRPC Otel-collector https://github.com/open-telemetry/opentelemetry-go/blob/main/example/otel-collector/main.go
 
 OpenTelemetry source of Docker-Compose setup https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/examples/demo/server
 

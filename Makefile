@@ -10,10 +10,20 @@ test:
 test-benchmark:
 	go test -bench=. -count 2 -run=^# -benchmem
 
-.PHONY: local-start
-local-start: build
-	#./album-store -otel-location=localhost:4327 -namespace=no-namespace -instance-name=album-store-1
+.PHONY: local-start-k3d
+local-start-k3d: build
 	./album-store -otel-location=otel-collector.local:8070 -namespace=no-namespace -instance-name=album-store-1
+
+.PHONY: local-start-docker-compose-grpc
+local-start-docker-compose-grpc: build
+	export GRPC_GO_LOG_VERBOSITY_LEVEL=99;
+	export GRPC_GO_LOG_SEVERITY_LEVEL=info;
+	./album-store -otel-location=localhost:4327 -namespace=no-namespace -instance-name=album-store-1
+
+.PHONY: local-start-docker-compose-http
+local-start-docker-compose-http: build
+	./album-store -otel-location=localhost:4328 -namespace=no-namespace -instance-name=album-store-1
+
 
 .PHONY: skaffold-dev
 skaffold-dev:
@@ -58,6 +68,14 @@ docker-compose-start:
 .PHONY: docker-compose-stop
 docker-compose-stop:
 	docker-compose down
+
+.PHONY: k3d-cluster-create
+k3d-cluster-create:
+	k3d cluster create --config k3d-config.yaml
+
+.PHONY: k3d-cluster-delete
+k3d-cluster-delete:
+	k3d cluster delete --config k3d-config.yaml
 
 .PHONY: coverage
 coverage:

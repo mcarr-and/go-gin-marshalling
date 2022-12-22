@@ -7,6 +7,8 @@ import (
 	"example/go-gin-example/models"
 	"flag"
 	"fmt"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"log"
 	"net/http"
 	"os"
@@ -177,13 +179,9 @@ var address = "localhost:9080"
 var version = "No-Version"
 var gitHash = "No-Hash"
 
-// Initializes an OTLP exporter, and configures the corresponding trace and metric providers.
-func initProvider() (func(context.Context) error, error) {
-	ctx := context.Background()
-	namespace := flag.String("namespace", "", "kubernetes namespace where running")
-	otelLocation := flag.String("otel-location", "", "location of the otel-collector: E.G.: -otel-location=localhost:4327")
-	instanceName := flag.String("instance-name", "", "kubernetes instance name")
-	flag.Parse()
+// Set up the context for this Application in Open Telemetry
+// application name, application version, k8s namespace , k8s instance name (horizontal scaling)
+func setupOtelResource(ctx context.Context, namespace *string, instanceName *string) (*resource.Resource, error) {
 	log.Println("version: " + version)
 
 	res, err := resource.New(ctx,
@@ -194,47 +192,91 @@ func initProvider() (func(context.Context) error, error) {
 			semconv.ServiceInstanceIDKey.String(*instanceName),
 		),
 	)
+	return res, err
+}
+
+// Initializes an OTLP exporter, and configures the corresponding trace and metric providers.
+func initOtelProvider() (func(context.Context) error, error) {
+	ctx := context.Background()
+
+	otelLocation := flag.String("otel-location", "", "location of the otel-collector: E.G.: -otel-location=localhost:4327")
+	namespace := flag.String("namespace", "", "kubernetes namespace where running")
+	instanceName := flag.String("instance-name", "", "kubernetes instance name")
+	flag.Parse()
+
+	otelResource, err := setupOtelResource(ctx, namespace, instanceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create resource: %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
+	//setup for Protobuff - model.proto works with sending this to port 14250 in Jaeger
+	otelTraceExporter, err := setupOtelProtoBuffTrace(ctx, otelLocation)
+	if err != nil {
+		return nil, err
+	}
 
+	//setup for HTTP
+	//NOT WORKING - http post of span fails with a EOF????
+	/*
+		otelTraceExporter, err := setupOtelHttpTrace(ctx, otelLocation)
+		if err != nil {
+			return nil, err
+		}
+	*/
+
+	traceProvider := setupOtelTraceProvider(otelTraceExporter, otelResource)
+	return traceProvider.Shutdown, nil //return shutdown signal so the application can trigger shutting itself down
+}
+
+func setupOtelTraceProvider(traceExporter *otlptrace.Exporter, otelResource *resource.Resource) *sdktrace.TracerProvider {
+	// Register the trace exporter with a TracerProvider, using a batch span processor to aggregate spans before export.
+	batchSpanProcessor := sdktrace.NewBatchSpanProcessor(traceExporter)
+	tracerProvider := sdktrace.NewTracerProvider(
+		sdktrace.WithSampler(sdktrace.AlwaysSample()),
+		sdktrace.WithResource(otelResource),
+		sdktrace.WithSpanProcessor(batchSpanProcessor),
+	)
+	otel.SetTracerProvider(tracerProvider)
+	otel.SetTextMapPropagator(propagation.TraceContext{}) // set global propagator to tracecontext (the default is no-op).
+	return tracerProvider
+}
+
+func setupOtelHttpTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
+	// insecure transport here DO NOT USE IN PROD
+	client := otlptracehttp.NewClient(
+		otlptracehttp.WithInsecure(),
+		otlptracehttp.WithEndpoint(*otelLocation),
+		otlptracehttp.WithCompression(otlptracehttp.GzipCompression),
+	)
+	err := client.Start(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start http client: %w", err)
+	}
+	traceExporter, err := otlptrace.New(ctx, client)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
+	}
+	return traceExporter, nil
+}
+
+func setupOtelProtoBuffTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
+	// insecure transport here. DO NOT USE IN PROD
 	conn, err := grpc.DialContext(ctx, *otelLocation,
-		// Note the use of insecure transport here. TLS is recommended in production.
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC connection to opentelemetry-collector: %w", err)
 	}
-
-	// Set up a trace exporter
 	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
-
-	// Register the trace exporter with a TracerProvider, using a batch
-	// span processor to aggregate spans before export.
-	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
-	tracerProvider := sdktrace.NewTracerProvider(
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithResource(res),
-		sdktrace.WithSpanProcessor(bsp),
-	)
-	otel.SetTracerProvider(tracerProvider)
-
-	// set global propagator to tracecontext (the default is no-op).
-	otel.SetTextMapPropagator(propagation.TraceContext{})
-
-	// Shutdown will flush any remaining spans and shut down the exporter.
-	return tracerProvider.Shutdown, nil
+	return traceExporter, nil
 }
 
 func main() {
-	shutdownTraceProvider, err := initProvider()
+	shutdownTraceProvider, err := initOtelProvider()
 	if err != nil {
 		log.Fatal(err)
 	}
