@@ -24,8 +24,8 @@ make skaffold-dev;
 ## 3. Start album-store Go/Gin Server with flags set
 
 * `-namespace` kubernetes namespace 
-* `-otel-location` can be changed from K3D-Nginx `otel-collector.local`
 * `-instance-name` kubernetes instance name (unique name when horizontal scaling)
+* `-otel-location` can be changed from K3D-Nginx `otel-collector.local`
 
 ```bash
 make local-start-k3d-grpc;

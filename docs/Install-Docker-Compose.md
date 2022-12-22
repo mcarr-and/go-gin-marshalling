@@ -12,8 +12,8 @@ make docker-compose-start;
 ## 2. Start album-store Go/Gin Server with flags set
 
 * `-namespace` kubernetes namespace 
-* `-otel-location`  can be changed from Docker-Compose URL `localhost:4327` 
 * `-instance-name` kubernetes instance name (unique name when horizontal scaling)
+* `-otel-location`  can be changed from Docker-Compose URL `localhost:4327` 
 
 ```bash
 make local-start-docker-compose-grpc;
