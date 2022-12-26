@@ -14,12 +14,16 @@ Send data to the following services:
 ### Docker Compose
 [Docker-Compose instructions](docs/Install-Docker-Compose.md)
 
+## Microk8s Cluster
+[Local Kubernetes with Microk8s instructions](docs/Install-Kubernetes-Microk8s.md)
+
+
 ## [WIP & NON-FUNCTIONING] K3D cluster 
 [Local Kubernetes with K3D instructions](docs/Install-Kubernetes-K3D.md)
 
 ## TODO
-* Run album store externally to Kubernetes with K3D cluster running OpenTelemetry  
-* Run album store inside cluster 
+* Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D)  
+* Run album store inside cluster via helm chart
 * Contract tests for swagger to output 
 * Create Prometheus export health endpoint
 * Test data builder for creating hundreds of albums for pagination testing and load testing

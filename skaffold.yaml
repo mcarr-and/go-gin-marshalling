@@ -3,7 +3,7 @@ kind: Config
 metadata:
   name: ingress-nginx
 profiles:
-  - name: local
+  - name: k3d
     activation:
       - kubeContext: k3d-k3s-default
     deploy:
@@ -21,7 +21,7 @@ kind: Config
 metadata:
   name: jaeger
 profiles:
-  - name: local
+  - name: k3d
     activation:
       - kubeContext: k3d-k3s-default
     deploy:
@@ -37,9 +37,9 @@ profiles:
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
-  name: opentelemetry-collector
+  name: opentelemetry-collector-k3d
 profiles:
-  - name: local
+  - name: k3d
     activation:
       - kubeContext: k3d-k3s-default
     deploy:
@@ -56,12 +56,34 @@ apiVersion: skaffold/v2beta29
 kind: Config
 metadata:
   name: dashboard
-deploy:
-  helm:
-    releases:
-      - name: kubernetes-dashboard
-        remoteChart: kubernetes-dashboard
-        repo: https://kubernetes.github.io/dashboard/
-        namespace: kubernetes-dashboard
-        createNamespace: true
-        valuesFiles: ["./values/local/dashboard.values.yaml"]
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: kubernetes-dashboard
+            remoteChart: kubernetes-dashboard
+            repo: https://kubernetes.github.io/dashboard/
+            namespace: kubernetes-dashboard
+            createNamespace: true
+            valuesFiles: ["./values/local/dashboard.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: opentelemetry-collector-microk8s
+profiles:
+  - name: microk8s
+    activation:
+      - kubeContext: microk8s
+    deploy:
+      helm:
+        releases:
+          - name: opentelemetry-collector
+            remoteChart: opentelemetry-collector
+            repo: https://open-telemetry.github.io/opentelemetry-helm-charts
+            namespace: opentelemetry
+            createNamespace: true
+            valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]

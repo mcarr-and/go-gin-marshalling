@@ -25,9 +25,14 @@ local-start-docker-compose-http: build
 	./album-store -otel-location=localhost:4328 -namespace=no-namespace -instance-name=album-store-1
 
 
-.PHONY: skaffold-dev
-skaffold-dev:
-	skaffold dev -p local
+.PHONY: skaffold-dev-k3d
+skaffold-dev-k3d:
+	skaffold dev -p k3d
+
+.PHONY: skaffold-dev-microk8s
+skaffold-dev-microk8s:
+	skaffold dev -p microk8s
+
 
 .PHONY: local-test
 local-test:
