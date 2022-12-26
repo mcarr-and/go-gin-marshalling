@@ -4,9 +4,8 @@
 2. Docker 
 3. Skaffold
 4. Microk8s
-5. local changes to your `/etc/hosts` to use nginx-ingress with your  
 
-```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local```
+TODO - config for jager and microk8s
 
 ## 1. Add the services 
 
