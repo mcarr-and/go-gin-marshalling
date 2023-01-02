@@ -1,5 +1,6 @@
 .PHONY: build
 build:
+	go clean;
 	go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o album-store
 
 .PHONY: test
@@ -12,6 +13,8 @@ test-benchmark:
 
 .PHONY: local-start-k3d
 local-start-k3d: build
+	export GRPC_GO_LOG_VERBOSITY_LEVEL=99;
+	export GRPC_GO_LOG_SEVERITY_LEVEL=info;
 	./album-store -otel-location=otel-collector.local:8070 -namespace=no-namespace -instance-name=album-store-1
 
 .PHONY: local-start-docker-compose-grpc
@@ -76,11 +79,11 @@ docker-compose-stop:
 
 .PHONY: k3d-cluster-create
 k3d-cluster-create:
-	k3d cluster create --config k3d-config.yaml
+	k3d cluster create k3s-default --config k3d-config.yaml
 
 .PHONY: k3d-cluster-delete
 k3d-cluster-delete:
-	k3d cluster delete --config k3d-config.yaml
+	k3d cluster delete k3s-default
 
 .PHONY: coverage
 coverage:
