@@ -20,7 +20,6 @@
 
 # project binary
 go-gin-example
-album-store
 
 #coverage informaiton
 coverage.*
@@ -30,3 +29,4 @@ coverage.*
 
 # vscode file
 __debug_bin
+/album-store
