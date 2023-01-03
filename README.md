@@ -14,7 +14,7 @@ Send data to the following services:
 ### Docker Compose
 [Docker-Compose instructions](docs/Install-Docker-Compose.md)
 
-## Microk8s Cluster
+## [WIP & NON-FUNCTIONING] Microk8s Cluster
 [Local Kubernetes with Microk8s instructions](docs/Install-Kubernetes-Microk8s.md)
 
 
