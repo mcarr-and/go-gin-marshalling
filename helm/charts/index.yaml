@@ -3,12 +3,12 @@ entries:
   album-store:
   - apiVersion: v2
     appVersion: v0.1
-    created: "2023-01-03T23:09:12.340284Z"
+    created: "2023-01-03T23:17:28.672803Z"
     description: A Helm chart for Kubernetes
-    digest: a4ec5a57c739583a9f39dfcadb6ba8ce9228c9084c4d8d1c7baf85523b44a324
+    digest: 9979c259f58edf5029fd0b32c7c53a57fb1ad4940cc428112cb89f8505754126
     name: album-store
     type: application
     urls:
     - album-store-0.1.0.tgz
     version: 0.1.0
-generated: "2023-01-03T23:09:12.337848Z"
+generated: "2023-01-03T23:17:28.669666Z"
