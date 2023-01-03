@@ -21,6 +21,8 @@ Send data to the following services:
 ## [WIP & NON-FUNCTIONING] K3D cluster 
 [Local Kubernetes with K3D instructions](docs/Install-Kubernetes-K3D.md)
 
+[K3D and using local registry](docs/K3D-registry.md)
+
 ## TODO
 * Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D)  
 * Run album store inside cluster via helm chart

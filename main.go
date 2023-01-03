@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 	"log"
 	"net/http"
 	"os"
@@ -286,7 +288,7 @@ func main() {
 	//serve requests until termination signal is sent.
 	srv := &http.Server{
 		Addr:    "localhost:9080",
-		Handler: router,
+		Handler: h2c.NewHandler(router, &http2.Server{}),
 	}
 
 	quit := make(chan os.Signal)

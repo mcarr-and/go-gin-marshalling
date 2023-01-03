@@ -5,7 +5,9 @@
 3. Skaffold
 4. Microk8s
 
-TODO - config for jager and microk8s
+TODO - config for jager and microk8s & make this work.
+
+WIP not currently running
 
 ## 1. Add the services 
 

@@ -1,18 +1,20 @@
-## 0. Expected tooling to run this project in K3D
+### Tools used
 
 1. Go
-2. Docker 
+2. Docker
 3. Skaffold
-4. K3D 
-5. local changes to your `/etc/hosts` to use nginx-ingress with your  
+4. K3D
 
-```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local```
+## 0. Expected tooling to run this project in K3D
+
+local changes to your `/etc/hosts` to use nginx-ingress with your  
+
+```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local```
 
 ## 1. Create K3d Cluster
 
 ```bash
 make k3d-cluster-create
-#kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.10.1/cert-manager.yaml;
 ```
 
 ## 2. Start All Observability & Log Viewing Services
@@ -21,17 +23,23 @@ make k3d-cluster-create
 make skaffold-dev-k3d;
 ```
 
-## 3. Start album-store Go/Gin Server with flags set
-
-* `-namespace` kubernetes namespace 
-* `-instance-name` kubernetes instance name (unique name when horizontal scaling)
-* `-otel-location` can be changed from K3D-Nginx `otel-collector.local`
+## 3. Build the application and deploy to K3D 
 
 ```bash
-make local-start-k3d-grpc;
+make docker-build;
 ```
 
-#### Note: the application will not start without the OpenTelemetry collector running
+```bash
+make docker-k3d-docker-registry;
+```
+
+WIP 
+
+```bash
+make k3d-internal-deploy;
+```
+
+#### Note: the application will hang after printing it's version number if  OpenTelemetry collector is not running
 
 ## 4. Run Some Tests
 

@@ -66,14 +66,20 @@ local-test:
 
 .PHONY: docker-build
 docker-build:
-	docker build -t album-store:0.1 -t album-store .
+	docker build -t album-store:0.1 -t album-store:latest .
 
-.PHONY: docker-build-k3d
-docker-build-k3d:
-	export DOCKER_HOST="tcp://localhost:54094";
-	docker build -t album-store:0.1 -t album-store .
+.PHONY: docker-k3d-docker-registry
+docker-k3d-docker-registry:
 	docker tag album-store:latest localhost:54094/album-store:v0.1
 	docker push localhost:54094/album-store:v0.1
+
+.PHONY: k3d-internal-deploy
+k3d-internal-deploy:
+	kubectl apply -f album-store-k3d-deployment.yaml
+
+.PHONY: k3d-internal-undeploy
+k3d-internal-undeploy:
+	kubectl delete -f album-store-k3d-deployment.yaml
 
 .PHONY: docker-start
 docker-start:
@@ -96,12 +102,13 @@ docker-compose-stop:
 
 .PHONY: k3d-cluster-create
 k3d-cluster-create:
-	k3d cluster create k3s-default --config k3d-config.yaml;
-	k3d registry create --port 0.0.0.0:54094;
+	k3d registry create registry --port 0.0.0.0:54094;
+	k3d cluster create k3s-default --config k3d-config.yaml --registry-use k3d-registry:54094;
 
 .PHONY: k3d-cluster-delete
 k3d-cluster-delete:
 	k3d cluster delete k3s-default;
+	k3d registry delete k3d-registry;
 
 .PHONY: coverage
 coverage:
