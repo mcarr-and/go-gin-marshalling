@@ -64,3 +64,5 @@ OpenTelemetry unit testing spans https://github.com/open-telemetry/opentelemetry
 Go & Docker example https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gin-gonic/gin/otelgin/example/Dockerfile
 
 Go & Contract testing for swagger https://github.com/getkin/kin-openapi
+
+Go & HTTP2 + too large frame issue https://kennethjenkins.net/posts/go-nginx-grpc/
