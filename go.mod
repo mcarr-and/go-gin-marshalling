@@ -1,4 +1,4 @@
-module example/go-gin-example
+module example/album-store
 
 go 1.19
 

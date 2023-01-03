@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"example/go-gin-example/models"
-	"flag"
+	"example/album-store/models"
 	"fmt"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -198,18 +197,20 @@ func setupOtelResource(ctx context.Context, namespace *string, instanceName *str
 func initOtelProvider() (func(context.Context) error, error) {
 	ctx := context.Background()
 
-	otelLocation := flag.String("otel-location", "", "location of the otel-collector: E.G.: -otel-location=localhost:4327")
-	namespace := flag.String("namespace", "", "kubernetes namespace where running")
-	instanceName := flag.String("instance-name", "", "kubernetes instance name")
-	flag.Parse()
+	namespace := os.Getenv("NAMESPACE")
+	instanceName := os.Getenv("INSTANCE_NAME")
+	otelLocation := os.Getenv("OTEL_LOCATION")
+	if instanceName == "" || otelLocation == "" || namespace == "" {
+		log.Fatalf("Env variables not assigned NAMESPACE=%v, INSTANCE_NAME=%v, OTEL_LOCATION=%v", namespace, instanceName, otelLocation)
+	}
 
-	otelResource, err := setupOtelResource(ctx, namespace, instanceName)
+	otelResource, err := setupOtelResource(ctx, &namespace, &instanceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create resource: %w", err)
 	}
 
 	//setup for Protobuff - model.proto works with sending this to port 14250 in Jaeger
-	otelTraceExporter, err := setupOtelProtoBuffGrpcTrace(ctx, otelLocation)
+	otelTraceExporter, err := setupOtelProtoBuffGrpcTrace(ctx, &otelLocation)
 	if err != nil {
 		return nil, err
 	}
