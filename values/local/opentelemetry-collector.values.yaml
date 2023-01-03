@@ -63,6 +63,11 @@ configMap:
 config:
   exporters:
     logging: {}
+#    jaeger:
+##       endpoint: jaeger-all-in-one.opentelemetry.svc.cluster.local:14250
+#      endpoint: jaeger-all-in-one:14250
+#      tls:
+#        insecure: true
   extensions:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
@@ -96,8 +101,8 @@ config:
             static_configs:
               - targets:
                   - ${MY_POD_IP}:8888
-#    zipkin:
-#      endpoint: 0.0.0.0:9411
+  #    zipkin:
+  #      endpoint: 0.0.0.0:9411
   service:
     telemetry:
       metrics:
@@ -126,6 +131,7 @@ config:
       traces:
         exporters:
           - logging
+          - jaeger
         processors:
           - memory_limiter
           - batch
@@ -315,13 +321,12 @@ ingress:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
   hosts:
-   - host: otel-collector.local
-     paths:
-       - path: /
-         pathType: ImplementationSpecific
-         port: 4318
+  - host: otel-collector.local
+    paths:
+      - path: /
+        pathType: ImplementationSpecific
+        port: 4318
   tls: []
-
 
   # Additional ingresses - only created if ingress.enabled is true
   # Useful for when differently annotated ingress services are required
