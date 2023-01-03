@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-world
+spec:
+  template:
+    metadata:
+      name: hello-world-pod
+    spec:
+      containers:
+        - name: hello-world
+          image: k3d-registry:54094/forketyfork/hello-world:v0.1
+      restartPolicy: Never
