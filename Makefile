@@ -68,8 +68,8 @@ local-test:
 docker-build:
 	docker build -t album-store:0.1 -t album-store:latest .
 
-.PHONY: docker-k3d-docker-registry
-docker-k3d-docker-registry:
+.PHONY: docker-k3d-registry
+docker-k3d-registry:
 	docker tag album-store:latest localhost:54094/album-store:v0.1
 	docker push localhost:54094/album-store:v0.1
 

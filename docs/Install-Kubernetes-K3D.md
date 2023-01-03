@@ -30,7 +30,7 @@ make docker-build;
 ```
 
 ```bash
-make docker-k3d-docker-registry;
+make docker-k3d-registry;
 ```
 
 WIP 
