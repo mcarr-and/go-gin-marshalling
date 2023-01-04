@@ -34,6 +34,8 @@ Internal issue with K3d and all the minikube type provblems.
 
 https://stackoverflow.com/questions/62162209/ingress-nginx-errors-connection-refused
 
+https://stackoverflow.com/questions/72097715/kubernetes-k3d-ingress-always-error-404-not-found
+
 ## Get Album Store Logs 
 
 ```bash
