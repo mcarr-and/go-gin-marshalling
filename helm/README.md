@@ -1,3 +1,9 @@
+TODO add:
+* dnsPolicy: ClusterFirst
+* enableServiceLinks: true
+
+
+
 # Helm Repo
 Repository with k8s Helm repo.
 Basically it's a repository with helm repo.
