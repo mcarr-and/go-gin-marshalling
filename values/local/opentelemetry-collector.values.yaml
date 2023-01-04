@@ -64,7 +64,7 @@ config:
   exporters:
     logging: { }
     jaeger:
-      endpoint: jaeger-all-in-one.opentelemetry.svc.cluster.local:14250
+      endpoint: jaeger-all-in-one.observability.svc.cluster.local:14250
       tls:
         insecure: true
   extensions:

@@ -46,7 +46,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: OTEL_LOCATION
-          value: "opentelemetry-collector.opentelemetry.svc.cluster.local:4317"
+          value: "opentelemetry-collector.observability.svc.cluster.local:4317"
         - name: GRPC_GO_LOG_VERBOSITY_LEVEL
           value: "99"
         - name: GRPC_GO_LOG_SEVERITY_LEVEL

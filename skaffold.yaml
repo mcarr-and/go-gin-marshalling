@@ -12,7 +12,7 @@ profiles:
           - name: ingress-nginx
             remoteChart: ingress-nginx
             repo: https://kubernetes.github.io/ingress-nginx
-            namespace: ingress-nginx
+            namespace: kube-system
             createNamespace: true
             valuesFiles: ["./values/local/nginx-ingress.values.yaml"]
 ---
@@ -30,7 +30,7 @@ profiles:
           - name: jaeger-all-in-one
             remoteChart: jaeger-all-in-one
             repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
-            namespace: opentelemetry
+            namespace: observability
             createNamespace: true
             valuesFiles: ["./values/local/jaeger-all-in-one.values.yaml"]
             wait: true # needed when otel-collector sends data to jaeger but not currently.
@@ -49,7 +49,7 @@ profiles:
           - name: opentelemetry-collector
             remoteChart: opentelemetry-collector
             repo: https://open-telemetry.github.io/opentelemetry-helm-charts
-            namespace: opentelemetry
+            namespace: observability
             createNamespace: true
             valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
 ---
@@ -85,7 +85,7 @@ profiles:
           - name: opentelemetry-collector
             remoteChart: opentelemetry-collector
             repo: https://open-telemetry.github.io/opentelemetry-helm-charts
-            namespace: opentelemetry
+            namespace: observability
             createNamespace: true
             valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
 #---
