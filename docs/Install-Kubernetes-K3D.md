@@ -30,6 +30,7 @@ make k3d-docker-registry;
 make skaffold-dev-k3d;
 ```
 
+## 4. Deploy to Kubernetes 
 ```bash
 make k3d-internal-deploy;
 ```
@@ -46,7 +47,7 @@ curl -v http://album-store.local:8070/albums/ GET -H "Content-Type: application/
 
 #### Note: the application will hang after printing its version number if  OpenTelemetry collector is not running
 
-## 4. Run Some Tests
+## 5. Run Some Tests
 
 [Postman Collection](../test/Album-Store.postman_collection.json)
 
@@ -54,7 +55,7 @@ curl -v http://album-store.local:8070/albums/ GET -H "Content-Type: application/
 make local-test;
 ```
 
-## 5. View the events in the different Services in K3D
+## 6. View the events in the different Services in K3D
 
 [View Jaeger](http://jaeger.local:8070/search?limit=20&service=album-store)
 
@@ -62,7 +63,7 @@ make local-test;
 
 TODO Prometheus 
 
-## 6. Stop album-store server & Services  
+## 7. Stop album-store server & Services  
 
 ### 1. Stop Server
 
@@ -72,7 +73,7 @@ TODO Prometheus
 
 Ctr + C on the terminal window where you started `make skaffold-dev`
 
-## 7. Delete K3D Cluster
+## 8. Delete K3D Cluster
 
 ```bash
 make k3d-cluster-delete
