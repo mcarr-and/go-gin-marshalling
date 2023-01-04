@@ -287,7 +287,7 @@ func main() {
 	router := setupRouter()
 	//serve requests until termination signal is sent.
 	srv := &http.Server{
-		Addr:    "localhost:9080",
+		Addr:    "0.0.0.0:9080",
 		Handler: h2c.NewHandler(router, &http2.Server{}),
 	}
 

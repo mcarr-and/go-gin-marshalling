@@ -3,7 +3,7 @@ kind: Simple
 servers: 1 # same as `--servers 1`
 agents: 1 # same as `--agents 1`
 ports:
-  - port: 8070:80 # same as `--port '8070:90@loadbalancer'` # http default
+  - port: 8070:80 # same as `--port '8070:80@loadbalancer'` # http default
     nodeFilters:
       - loadbalancer
 options:
