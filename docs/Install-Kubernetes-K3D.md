@@ -39,10 +39,6 @@ make skaffold-dev-k3d;
 make k3d-internal-deploy;
 ```
 
-```bash
-curl 'http://album-store.local:8070/albums' --insecure
-```
-
 [Debugging commands for cluster](K3D-Debugging.md)
 
 #### Note: the application will hang after printing its version number if  OpenTelemetry collector is not running
@@ -55,8 +51,15 @@ curl 'http://album-store.local:8070/albums' --insecure
 
 ## 6. Run Some Tests
 
+### 6.1 curl
+
+```bash
+curl --insecure --location 'http://album-store.local:8070/albums/'; 
+```
+### 6.2 Postman
 [Postman Collection](../test/Album-Store.postman_collection.json)
 
+### 6.3 Test Suite
 ```bash
 make k3d-test;
 ```
@@ -64,12 +67,6 @@ make k3d-test;
 TODO Prometheus 
 
 ## 7. Stop album-store server & Services  
-
-### 1. Stop Server
-
-`Ctr + C` in the terminal window where go is running. 
-
-### 2. Stop Observability and Log Viewing Services
 
 Ctr + C on the terminal window where you started `make skaffold-dev`
 
