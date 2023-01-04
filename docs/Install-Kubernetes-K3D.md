@@ -17,26 +17,34 @@ local changes to your `/etc/hosts` to use nginx-ingress with your
 make k3d-cluster-create
 ```
 
-## 2. Start All Observability & Log Viewing Services
- 
-```bash
-make skaffold-dev-k3d;
-```
-
-## 3. Build the application and deploy to K3D 
+## 2. Build the application and deploy to K3D
 
 ```bash
 make docker-build;
 make k3d-docker-registry;
 ```
 
-WIP 
+## 3. Start All Observability & Log Viewing Services
+ 
+```bash
+make skaffold-dev-k3d;
+```
 
 ```bash
 make k3d-internal-deploy;
 ```
 
-#### Note: the application will hang after printing it's version number if  OpenTelemetry collector is not running
+Service starts but is not available from external.
+
+This fails to show the JSON payload you get a 503.
+
+```bash
+curl -v http://album-store.local:8070/albums/ GET -H "Content-Type: application/json" -H "Host: http://album-store.local:8070
+```
+
+[Debugging commands for cluster](Debugging.md)
+
+#### Note: the application will hang after printing its version number if  OpenTelemetry collector is not running
 
 ## 4. Run Some Tests
 
