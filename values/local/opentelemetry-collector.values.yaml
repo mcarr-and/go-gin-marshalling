@@ -63,11 +63,11 @@ configMap:
 config:
   exporters:
     logging: {}
-#    jaeger:
-##       endpoint: jaeger-all-in-one.opentelemetry.svc.cluster.local:14250
-#      endpoint: jaeger-all-in-one:14250
-#      tls:
-#        insecure: true
+    jaeger:
+#       endpoint: jaeger-all-in-one.opentelemetry.svc.cluster.local:14250
+      endpoint: jaeger-all-in-one:14250
+      tls:
+        insecure: true
   extensions:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
@@ -114,6 +114,7 @@ config:
       logs:
         exporters:
           - logging
+#          - jaeger
         processors:
           - memory_limiter
           - batch
@@ -320,6 +321,10 @@ ingress:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "660"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "660"
+
   hosts:
   - host: otel-collector.local
     paths:

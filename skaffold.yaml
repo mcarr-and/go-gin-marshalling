@@ -52,24 +52,24 @@ profiles:
             namespace: opentelemetry
             createNamespace: true
             valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
-#---
-#apiVersion: skaffold/v2beta29
-#kind: Config
-#metadata:
-#  name: dashboard
-#profiles:
-#  - name: k3d
-#    activation:
-#      - kubeContext: k3d-k3s-default
-#    deploy:
-#      helm:
-#        releases:
-#          - name: kubernetes-dashboard
-#            remoteChart: kubernetes-dashboard
-#            repo: https://kubernetes.github.io/dashboard/
-#            namespace: kubernetes-dashboard
-#            createNamespace: true
-#            valuesFiles: ["./values/local/dashboard.values.yaml"]
+---
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: dashboard
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: kubernetes-dashboard
+            remoteChart: kubernetes-dashboard
+            repo: https://kubernetes.github.io/dashboard/
+            namespace: kubernetes-dashboard
+            createNamespace: true
+            valuesFiles: ["./values/local/dashboard.values.yaml"]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
@@ -88,3 +88,21 @@ profiles:
             namespace: opentelemetry
             createNamespace: true
             valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
+#---
+#apiVersion: skaffold/v2beta22
+#kind: Config
+#metadata:
+#  name: album-store
+#profiles:
+#  - name: album-store
+#    activation:
+#      - kubeContext: k3d-k3s-default
+#    deploy:
+#      helm:
+#        releases:
+#          - name: album-store
+#            createNamespace: true
+#            namespace: opentelemetry
+#            remoteChart: album-store
+#            repo: https://raw.githubusercontent.com/mcarr-and/go-gin-otelcollector/master/helm/charts
+#            valuesFiles: ["./helm/album-store/values.yaml"]
