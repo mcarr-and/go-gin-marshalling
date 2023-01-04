@@ -114,7 +114,6 @@ config:
       logs:
         exporters:
           - logging
-#          - jaeger
         processors:
           - memory_limiter
           - batch
