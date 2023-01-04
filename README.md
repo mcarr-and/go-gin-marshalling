@@ -19,6 +19,8 @@ Send data to the following services:
 
 ## K3D cluster
 
+Run the project with a local Kubernetes cluster with K3D. 
+
 [Local Kubernetes with K3D instructions](docs/K3D-Install.md)
 
 [K3D and using local registry](docs/K3D-registry.md)
