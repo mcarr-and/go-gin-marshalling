@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "v0.1"
+    app.kubernetes.io/version: "0.1"
   name: "album-store"
   namespace: "opentelemetry"
 ---
@@ -19,11 +19,11 @@ metadata:
   labels:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "v0.1"
+    app.kubernetes.io/version: "0.1"
 spec:
   containers:
     - name: "album-store"
-      image: k3d-registry:54094/album-store:v0.1 # use the cluster internal name to reference registry
+      image: k3d-registry:54094/album-store:0.1 # use the cluster internal name to reference registry
       command: ["/app/album-store"]
       resources:
         requests:
@@ -66,7 +66,7 @@ metadata:
   labels:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "v0.1"
+    app.kubernetes.io/version: "0.1"
 spec:
   ports:
     - protocol: TCP
@@ -76,7 +76,7 @@ spec:
   selector:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "v0.1"
+    app.kubernetes.io/version: "0.1"
   sessionAffinity: None
   type: ClusterIP
 ---
@@ -91,7 +91,7 @@ metadata:
   labels:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "v0.1"
+    app.kubernetes.io/version: "0.1"
   name: "album-store"
   namespace: opentelemetry
 spec:
