@@ -54,7 +54,7 @@ spec:
   restartPolicy: Never
   hostname: "album-store"
   serviceAccountName: "album-store"
-  dnsPolicy: ClusterFirst
+  dnsPolicy: ClusterFirst # must be `ClusterFirst` to allow nginx to route to it via the ingress
   enableServiceLinks: true
 ---
 apiVersion: v1
