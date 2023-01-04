@@ -11,6 +11,10 @@ local changes to your `/etc/hosts` to use nginx-ingress with your
 
 ```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local```
 
+### 0.1 K3D Registry info
+
+[K3d Registry info](K3D-registry.md)
+
 ## 1. Create K3d Cluster
 
 ```bash
