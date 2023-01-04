@@ -55,6 +55,7 @@ spec:
   hostname: "album-store"
   serviceAccountName: "album-store"
   dnsPolicy: ClusterFirst
+  enableServiceLinks: true
 ---
 apiVersion: v1
 kind: Service
