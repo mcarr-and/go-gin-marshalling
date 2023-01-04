@@ -79,8 +79,8 @@ docker-build:
 
 .PHONY: k3d-docker-registry
 k3d-docker-registry:
-	docker tag album-store.local:latest localhost:54094/album-store.local:0.1
-	docker push localhost:54094/album-store.local:0.1
+	docker tag album-store:latest localhost:54094/album-store:0.1
+	docker push localhost:54094/album-store:0.1
 
 .PHONY: k3d-internal-deploy
 k3d-internal-deploy:
@@ -92,11 +92,11 @@ k3d-internal-undeploy:
 
 .PHONY: docker-k3d-start
 docker-k3d-start:
-	NAMESPACE=no-namespace INSTANCE_NAME=album-store-1 OTEL_LOCATION=otel-collector.local:8070 docker run -d -p 9080:9080 --name album-store album-store.local:0.1
+	NAMESPACE=no-namespace INSTANCE_NAME=album-store-1 OTEL_LOCATION=otel-collector.local:8070 docker run -d -p 9080:9080 --name album-store album-store:0.1
 
 .PHONY: docker-local-start
 docker-local-start:
-	NAMESPACE=no-namespace INSTANCE_NAME=album-store-1 OTEL_LOCATION=localhost:4327 docker run -d -p 9080:9080 --name album-store album-store.local:0.1
+	NAMESPACE=no-namespace INSTANCE_NAME=album-store-1 OTEL_LOCATION=localhost:4327 docker run -d -p 9080:9080 --name album-store album-store:0.1
 
 .PHONY: docker-stop
 docker-stop:

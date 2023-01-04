@@ -264,7 +264,6 @@ hostNetwork: false
 # Pod DNS policy ClusterFirst, ClusterFirstWithHostNet, None, Default, None
 dnsPolicy: "ClusterFirst"
 
-
 # only used with deployment mode
 replicaCount: 1
 
@@ -323,7 +322,6 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "660"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "660"
-
   hosts:
   - host: otel-collector.local
     paths:
