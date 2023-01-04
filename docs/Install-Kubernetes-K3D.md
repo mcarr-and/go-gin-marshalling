@@ -30,7 +30,7 @@ make k3d-docker-registry;
 make skaffold-dev-k3d;
 ```
 
-## 4. Deploy to Kubernetes 
+## 4. Deploy Album-Store to Kubernetes 
 ```bash
 make k3d-internal-deploy;
 ```
