@@ -6,14 +6,21 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "args": [
-                "NAMESPACE=no-namespace",
-                "OTEL_LOCATION=localhost:4327",
-                "INSTANCE_NAME=go-gin-example-1",
-                "GRPC_GO_LOG_VERBOSITY_LEVEL=99",
-                "GRPC_GO_LOG_SEVERITY_LEVEL=info"
-            ],
+            "env": {
+                "NAMESPACE": "no-namespace",
+                "OTEL_LOCATION" : "localhost:4327" ,
+                "INSTANCE_NAME" : "go-gin-example-1" ,
+                "GRPC_GO_LOG_VERBOSITY_LEVEL" : "99" ,
+                "GRPC_GO_LOG_SEVERITY_LEVEL" : "info"
+            },
             "program": "${workspaceFolder}/main.go"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "GRPC_GO_LOG_SEVERITY_LEVEL",
+            "type": "promptString",
+            "default": "info"
         }
     ]
 }

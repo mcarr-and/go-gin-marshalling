@@ -15,12 +15,12 @@ test-benchmark:
 local-start-k3d: build
 	GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 OTEL_LOCATION=otel-collector.local:8070 INSTANCE_NAME=album-store-1 NAMESPACE=no-namespace ./album-store
 
-.PHONY: local-start-docker-compose-grpc
-local-start-docker-compose-grpc:
+.PHONY: local-start-grpc
+local-startgrpc:
 	GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 OTEL_LOCATION=localhost:4327 INSTANCE_NAME=album-store-1 NAMESPACE=no-namespace ./album-store
 
-.PHONY: local-start-docker-compose-http
-local-start-docker-compose-http: build
+.PHONY: local-start-http
+local-starthttp: build
 	GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 OTEL_LOCATION=localhost:4328 INSTANCE_NAME=album-store-1 NAMESPACE=no-namespace ./album-store
 
 .PHONY: skaffold-dev-k3d
@@ -55,8 +55,8 @@ local-test:
 docker-build:
 	docker build -t album-store:0.1 -t album-store:latest .
 
-.PHONY: docker-k3d-registry
-docker-k3d-registry:
+.PHONY: k3d-docker-registry
+k3d-docker-registry:
 	docker tag album-store:latest localhost:54094/album-store:v0.1
 	docker push localhost:54094/album-store:v0.1
 
@@ -70,22 +70,27 @@ k3d-internal-undeploy:
 
 .PHONY: docker-start
 docker-start:
-	export NAMESPACE=no-namespace;
-	export INSTANCE_NAME=album-store-1;
-	export OTEL_LOCATION=otel-collector.local:8070;
-	docker run -d -p 9080:9080 --name go-gin-example go-gin-example:0.1
+	NAMESPACE=no-namespace INSTANCE_NAME=album-store-1 otel-collector.local:8070 docker run -d -p 9080:9080 --name go-gin-example go-gin-example:0.1
 
 .PHONY: docker-stop
 docker-stop:
 	docker stop go-gin-example;
 
-.PHONY: docker-compose-start
-docker-compose-start:
+.PHONY: docker-compose-full-start
+docker-compose-full-start:
 	docker-compose up -d;
 
-.PHONY: docker-compose-stop
-docker-compose-stop:
+.PHONY: docker-compose-full-stop
+docker-compose-full-stop:
 	docker-compose down;
+
+.PHONY: docker-compose-limited-start
+docker-compose-limited-start:
+	docker-compose -f docker-compose-limited.yaml up -d;
+
+.PHONY: docker-compose-limited-stop
+docker-compose-limited-stop:
+	docker-compose -f docker-compose-limited.yaml down;
 
 .PHONY: k3d-cluster-create
 k3d-cluster-create:

@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-gin-go
+    restart: always
+    ports:
+      - "16696:16686"
+      - "14268" # jaeger.thrift
+      - "14250" # model.proto
+      - "4317" # otel grpc
+      - "4318" # otel http
+    networks:
+      - default
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-gin-go
+    restart: always
+    command:
+      [
+        "--config=/etc/otel-collector-config.yaml",
+      ]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888" # pprof extension
+      - "8888:8888" # Prometheus metrics exposed by the collector
+      - "8889:8889" # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4327:4317" # OTLP gRPC receiver
+      - "4328:4318" # OTLP http receiver
+      - "55679:55679" # zpages extension
+    depends_on:
+      - jaeger-all-in-one
+    networks:
+      - default
+  prometheus:
+    container_name: prometheus-gin-go
+    image: prom/prometheus:latest
+    restart: always
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - default

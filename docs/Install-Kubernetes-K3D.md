@@ -27,10 +27,7 @@ make skaffold-dev-k3d;
 
 ```bash
 make docker-build;
-```
-
-```bash
-make docker-k3d-registry;
+make k3d-docker-registry;
 ```
 
 WIP 

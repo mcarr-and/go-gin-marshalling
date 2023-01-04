@@ -13,7 +13,9 @@ Send data to the following services:
 
 ### Docker Compose
 
-[Docker-Compose instructions](docs/Install-Docker-Compose.md)
+[Docker-Compose fully inclusive instructions](docs/Install-Docker-Compose.md)
+
+[Docker-Compose with album-store as an external application instructions](docs/Install-Docker-Compose-External.md)
 
 ## [WIP & NON-FUNCTIONING] Microk8s Cluster
 
