@@ -7,7 +7,7 @@
 
 ## 0. Expected tooling to run this project in K3D
 
-local changes to your `/etc/hosts` to use nginx-ingress with the k3d and ingress-nginx
+local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
 ```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local```
 
