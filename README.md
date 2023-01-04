@@ -13,13 +13,13 @@ Send data to the following services:
 
 ### Docker Compose
 
-[Docker-Compose fully inclusive instructions](docs/Install-Docker-Compose.md)
+[Docker-Compose fully inclusive instructions](docs/Docker-Compose-Install-Full.md)
 
-[Docker-Compose with album-store as an external application instructions](docs/Install-Docker-Compose-External.md)
+[Docker-Compose with album-store as an external application instructions](docs/Docker-Compose-Install-External.md)
 
 ## K3D cluster
 
-[Local Kubernetes with K3D instructions](docs/Install-Kubernetes-K3D.md)
+[Local Kubernetes with K3D instructions](docs/K3D-Install.md)
 
 [K3D and using local registry](docs/K3D-registry.md)
 
@@ -27,10 +27,11 @@ Send data to the following services:
 
 ## [WIP & NON-FUNCTIONING] Microk8s Cluster
 
-[Local Kubernetes with Microk8s instructions](docs/Install-Kubernetes-Microk8s.md)
+[Local Kubernetes with Microk8s instructions](docs/Microk8s-Kubernetes-Install.md)
 
 
 ## TODO
+* Get working helm chart for album-store - github raw url not working for chart, not in skaffold.
 * Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D)  
 * Run album store inside cluster via helm chart
 * Contract tests for swagger to output 
