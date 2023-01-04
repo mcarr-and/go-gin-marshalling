@@ -62,7 +62,7 @@ configMap:
 # For example, {{ REDACTED_EMAIL }} becomes {{` {{ REDACTED_EMAIL }} `}}.
 config:
   exporters:
-    logging: {}
+    logging: { }
     jaeger:
       endpoint: jaeger-all-in-one.opentelemetry.svc.cluster.local:14250
       tls:
@@ -71,10 +71,10 @@ config:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
     # The health_check extension can be modified, but should never be removed.
-    health_check: {}
-    memory_ballast: {}
+    health_check: { }
+    memory_ballast: { }
   processors:
-    batch: {}
+    batch: { }
     # If set to null, will be overridden with values based on k8s resource limits
     memory_limiter: null
   receivers:
@@ -145,18 +145,18 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
-imagePullSecrets: []
+imagePullSecrets: [ ]
 
 # OpenTelemetry Collector executable
 command:
   name: otelcol-contrib
-  extraArgs: []
+  extraArgs: [ ]
 
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # Annotations to add to the service account
-  annotations: {}
+  annotations: { }
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
@@ -165,12 +165,12 @@ clusterRole:
   # Specifies whether a clusterRole should be created
   create: false
   # Annotations to add to the clusterRole
-  annotations: {}
+  annotations: { }
   # The name of the clusterRole to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
   # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-  rules: []
+  rules: [ ]
   # - apiGroups:
   #   - ''
   #   resources:
@@ -183,24 +183,24 @@ clusterRole:
 
   clusterRoleBinding:
     # Annotations to add to the clusterRoleBinding
-    annotations: {}
+    annotations: { }
     # The name of the clusterRoleBinding to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
 
-podSecurityContext: {}
-securityContext: {}
+podSecurityContext: { }
+securityContext: { }
 
-nodeSelector: {}
-tolerations: []
-affinity: {}
+nodeSelector: { }
+tolerations: [ ]
+affinity: { }
 
 # Allows for pod scheduler prioritisation
 priorityClassName: ""
 
-extraEnvs: []
-extraVolumes: []
-extraVolumeMounts: []
+extraEnvs: [ ]
+extraVolumes: [ ]
+extraVolumeMounts: [ ]
 
 # Configuration for ports
 ports:
@@ -254,9 +254,9 @@ resources:
     cpu: 256m
     memory: 512Mi
 
-podAnnotations: {}
+podAnnotations: { }
 
-podLabels: {}
+podLabels: { }
 
 # Host networking requested for this pod. Use the host's network namespace.
 hostNetwork: false
@@ -267,10 +267,10 @@ dnsPolicy: "ClusterFirst"
 # only used with deployment mode
 replicaCount: 1
 
-annotations: {}
+annotations: { }
 
 # List of extra sidecars to add
-extraContainers: []
+extraContainers: [ ]
 # extraContainers:
 #   - name: test
 #     command:
@@ -284,7 +284,7 @@ extraContainers: []
 #         mountPath: /test
 
 # List of init container specs, e.g. for copying a binary to be executed as a lifecycle hook.
-initContainers: []
+initContainers: [ ]
 # initContainers:
 #   - name: test
 #     command:
@@ -298,7 +298,7 @@ initContainers: []
 #         mountPath: /test
 
 # Pod lifecycle policies.
-lifecycleHooks: {}
+lifecycleHooks: { }
 # lifecycleHooks:
 #   preStop:
 #     exec:
@@ -310,30 +310,30 @@ service:
   type: ClusterIP
   # type: LoadBalancer
   # loadBalancerIP: 1.2.3.4
-  annotations: {}
+  annotations: { }
 
 ingress:
   ingressClassName: nginx # required to get nginx-ingress to open up an ingress to the service
   enabled: true
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "660"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "660"
   hosts:
-  - host: otel-collector.local
-    paths:
-      - path: /
-        pathType: ImplementationSpecific
-        port: 4318
-  tls: []
+    - host: otel-collector.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          port: 4317
+  tls: [ ]
 
   # Additional ingresses - only created if ingress.enabled is true
   # Useful for when differently annotated ingress services are required
   # Each additional ingress needs key "name" set to something unique
-  additionalIngresses: []
+  additionalIngresses: [ ]
   # - name: cloudwatch
   #   ingressClassName: nginx
   #   annotations: {}
@@ -357,7 +357,7 @@ podMonitor:
       # interval: 15s
 
   # additional labels for the PodMonitor
-  extraLabels: {}
+  extraLabels: { }
   #   release: kube-prometheus-stack
 
 serviceMonitor:
@@ -369,7 +369,7 @@ serviceMonitor:
       # interval: 15s
 
   # additional labels for the ServiceMonitor
-  extraLabels: {}
+  extraLabels: { }
   #  release: kube-prometheus-stack
 
 # PodDisruptionBudget is used only if deployment enabled
@@ -387,7 +387,7 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 rollout:
-  rollingUpdate: {}
+  rollingUpdate: { }
   # When 'mode: daemonset', maxSurge cannot be used when hostPort is set for any of the ports
   # maxSurge: 25%
   # maxUnavailable: 0
@@ -395,15 +395,15 @@ rollout:
 
 prometheusRule:
   enabled: false
-  groups: []
+  groups: [ ]
   # Create default rules for monitoring the collector
   defaultRules:
     enabled: false
 
   # additional labels for the PrometheusRule
-  extraLabels: {}
+  extraLabels: { }
 
 statefulset:
   # volumeClaimTemplates for a statefulset
-  volumeClaimTemplates: []
+  volumeClaimTemplates: [ ]
   podManagementPolicy: "Parallel"

@@ -10,7 +10,7 @@ image:
   pullPolicy: IfNotPresent
 
 healthCheckUrl: /
-imagePullSecrets: []
+imagePullSecrets: [ ]
 nameOverride: ""
 fullnameOverride: ""
 terminationGracePeriodSeconds: 10
@@ -35,15 +35,15 @@ podAnnotations:
   prometheus.io/path: "/metrics"
   prometheus.io/port: "14269"
 
-podSecurityContext: {}
+podSecurityContext: { }
 # fsGroup: 2000
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
+# runAsNonRoot: true
 # runAsUser: 1000
 
 service:
@@ -53,7 +53,7 @@ service:
     prometheus.io/probe: "true"
     prometheus.io/probe-path: "/"
   headless:
-    annotations: {}
+    annotations: { }
 
 ingress:
   enabled: true
@@ -67,12 +67,12 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: []
+  tls: [ ]
   #  - secretName: jaeger-tls
   #    hosts:
   #      - jaeger.local
 
-resources: {}
+resources: { }
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -81,14 +81,14 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
   # requests:
-  #   cpu: 100m
+#   cpu: 100m
 #   memory: 128Mi
 
-nodeSelector: {}
+nodeSelector: { }
 
-tolerations: []
+tolerations: [ ]
 
-affinity: {}
+affinity: { }
 
 volume:
   enabled: true

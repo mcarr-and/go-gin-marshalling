@@ -3,19 +3,19 @@ kind: ServiceAccount
 metadata:
   annotations:
     meta.helm.sh/release-name: "album-store"
-    meta.helm.sh/release-namespace: "opentelemetry"
+    meta.helm.sh/release-namespace: "album-store"
   labels:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "0.1"
   name: "album-store"
-  namespace: "opentelemetry"
+  namespace: "album-store"
 ---
 apiVersion: v1
 kind: Pod
 metadata:
   name: "album-store"
-  namespace: "opentelemetry"
+  namespace: "album-store"
   labels:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
@@ -40,7 +40,7 @@ spec:
         - name: INSTANCE_NAME
           valueFrom:
             fieldRef:
-              fieldPath: spec.nodeName
+              fieldPath: metadata.name
         - name: NAMESPACE
           valueFrom:
             fieldRef:
@@ -60,7 +60,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: "opentelemetry"
+  namespace: "album-store"
   name: "album-store"
   annotations:
     prometheus.io/probe: "true"
@@ -95,7 +95,7 @@ metadata:
     app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "0.1"
   name: "album-store"
-  namespace: opentelemetry
+  namespace: "album-store"
 spec:
   ingressClassName: nginx
   rules:

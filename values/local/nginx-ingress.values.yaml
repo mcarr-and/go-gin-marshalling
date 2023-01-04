@@ -9,7 +9,7 @@
 
 ## Labels to apply to all resources
 ##
-commonLabels: {}
+commonLabels: { }
 # scmhash: abc123
 # myLabel: aakkmd
 
@@ -43,7 +43,7 @@ controller:
     https: 443
 
   # -- Will add custom configuration options to Nginx https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-  config: {}
+  config: { }
 
   # -- Annotations to be added to the controller config configuration configmap.
   configAnnotations:
@@ -53,16 +53,16 @@ controller:
 
 
   # -- Will add custom headers before sending traffic to backends according to https://github.com/kubernetes/ingress-nginx/tree/main/docs/examples/customization/custom-headers
-  proxySetHeaders: {}
+  proxySetHeaders: { }
 
   # -- Will add custom headers before sending response traffic to the client according to: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#add-headers
-  addHeaders: {}
+  addHeaders: { }
 
   # -- Optionally customize the pod dnsConfig.
-  dnsConfig: {}
+  dnsConfig: { }
 
   # -- Optionally customize the pod hostname.
-  hostname: {}
+  hostname: { }
 
   # -- Optionally change this to ClusterFirstWithHostNet in case you have 'hostNetwork: true'.
   # By default, while using host network, name resolution uses the host's DNS. If you wish nginx-controller
@@ -121,21 +121,21 @@ controller:
     # -- Parameters is a link to a custom resource containing additional
     # configuration for the controller. This is optional if the controller
     # does not require extra parameters.
-    parameters: {}
+    parameters: { }
 
   # -- For backwards compatibility with ingress.class annotation, use ingressClass.
   # Algorithm is as follows, first ingressClassName is considered, if not present, controller looks for ingress.class annotation
   ingressClass: nginx
 
   # -- Labels to add to the pod container metadata
-  podLabels: {}
+  podLabels: { }
   #  key: value
 
   # -- Security Context policies for controller pods
-  podSecurityContext: {}
+  podSecurityContext: { }
 
   # -- See https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ for notes on enabling and using sysctls
-  sysctls: {}
+  sysctls: { }
   # sysctls:
   #   "net.core.somaxconn": "8192"
 
@@ -167,13 +167,13 @@ controller:
     # -- Allows customization of the tcp-services-configmap; defaults to $(POD_NAMESPACE)
     configMapNamespace: ""
     # -- Annotations to be added to the tcp config configmap
-    annotations: {}
+    annotations: { }
 
   udp:
     # -- Allows customization of the udp-services-configmap; defaults to $(POD_NAMESPACE)
     configMapNamespace: ""
     # -- Annotations to be added to the udp config configmap
-    annotations: {}
+    annotations: { }
 
   # -- Maxmind license key to download GeoLite2 Databases.
   ## https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases
@@ -181,14 +181,14 @@ controller:
 
   # -- Additional command line arguments to pass to nginx-ingress-controller
   # E.g. to specify the default SSL certificate you can use
-  extraArgs: {}
-    #v: 3 # setup debug logging for nginx-ingress remove {} above
+  extraArgs: { }
+  #v: 3 # setup debug logging for nginx-ingress remove {} above
 
   ## extraArgs:
   ##   default-ssl-certificate: "<namespace>/<secret_name>"
 
   # -- Additional environment variables to set
-  extraEnvs: []
+  extraEnvs: [ ]
   # extraEnvs:
   #   - name: FOO
   #     valueFrom:
@@ -201,19 +201,19 @@ controller:
 
   # -- Annotations to be added to the controller Deployment or DaemonSet
   ##
-  annotations: {}
+  annotations: { }
   #  keel.sh/pollSchedule: "@every 60m"
 
   # -- Labels to be added to the controller Deployment or DaemonSet and other resources that do not have option to specify labels
   ##
-  labels: {}
+  labels: { }
   #  keel.sh/policy: patch
   #  keel.sh/trigger: poll
 
 
   # -- The update strategy to apply to the Deployment or DaemonSet
   ##
-  updateStrategy: {}
+  updateStrategy: { }
   #  rollingUpdate:
   #    maxUnavailable: 1
   #  type: RollingUpdate
@@ -226,7 +226,7 @@ controller:
   # -- Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
-  tolerations: []
+  tolerations: [ ]
   #  - key: "key"
   #    operator: "Equal|Exists"
   #    value: "value"
@@ -235,7 +235,7 @@ controller:
   # -- Affinity and anti-affinity rules for server scheduling to nodes
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   ##
-  affinity: {}
+  affinity: { }
     # # An example of preferred pod anti-affinity, weight is in the range 1-100
     # podAntiAffinity:
     #   preferredDuringSchedulingIgnoredDuringExecution:
@@ -273,18 +273,18 @@ controller:
     #       - key: app.kubernetes.io/component
     #         operator: In
     #         values:
-    #         - controller
+  #         - controller
   #     topologyKey: "kubernetes.io/hostname"
 
   # -- Topology spread constraints rely on node labels to identify the topology domain(s) that each Node is in.
   ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   ##
-  topologySpreadConstraints: []
+  topologySpreadConstraints: [ ]
     # - maxSkew: 1
     #   topologyKey: topology.kubernetes.io/zone
     #   whenUnsatisfiable: DoNotSchedule
     #   labelSelector:
-    #     matchLabels:
+  #     matchLabels:
   #       app.kubernetes.io/instance: ingress-nginx-internal
 
   # -- `terminationGracePeriodSeconds` to avoid killing pods before we are ready
@@ -347,7 +347,7 @@ controller:
 
   # -- Annotations to be added to controller pods
   ##
-  podAnnotations: {}
+  podAnnotations: { }
 
   replicaCount: 1
 
@@ -376,7 +376,7 @@ controller:
     maxReplicas: 11
     targetCPUUtilizationPercentage: 50
     targetMemoryUtilizationPercentage: 50
-    behavior: {}
+    behavior: { }
       # scaleDown:
       #   stabilizationWindowSeconds: 300
       #   policies:
@@ -387,10 +387,10 @@ controller:
       #   stabilizationWindowSeconds: 300
       #   policies:
       #   - type: Pods
-      #     value: 2
+    #     value: 2
     #     periodSeconds: 60
 
-  autoscalingTemplate: []
+  autoscalingTemplate: [ ]
   # Custom or additional autoscaling metrics
   # ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-custom-metrics
   # - type: Pods
@@ -414,11 +414,11 @@ controller:
     cooldownPeriod: 300
     restoreToOriginalReplicaCount: false
     scaledObject:
-      annotations: {}
+      annotations: { }
       # Custom annotations for ScaledObject resource
       #  annotations:
       # key: value
-    triggers: []
+    triggers: [ ]
     #     - type: prometheus
     #       metadata:
     #         serverAddress: http://<prometheus-host>:9090
@@ -426,7 +426,7 @@ controller:
     #         threshold: '100'
     #         query: sum(rate(http_requests_total{deployment="my-deployment"}[2m]))
 
-    behavior: {}
+    behavior: { }
   #     scaleDown:
   #       stabilizationWindowSeconds: 300
   #       policies:
@@ -461,18 +461,18 @@ controller:
     ##
     appProtocol: true
 
-    annotations: {}
-    labels: {}
+    annotations: { }
+    labels: { }
     # clusterIP: ""
 
     # -- List of IP addresses at which the controller services are available
     ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
     ##
-    externalIPs: []
+    externalIPs: [ ]
 
     # -- Used by cloud providers to connect the resulting `LoadBalancer` to a pre-existing static IP according to https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
     loadBalancerIP: ""
-    loadBalancerSourceRanges: []
+    loadBalancerSourceRanges: [ ]
 
     enableHttp: true
     enableHttps: true
@@ -521,8 +521,8 @@ controller:
     nodePorts:
       http: ""
       https: ""
-      tcp: {}
-      udp: {}
+      tcp: { }
+      udp: { }
 
     external:
       enabled: true
@@ -531,12 +531,12 @@ controller:
       # -- Enables an additional internal load balancer (besides the external one).
       enabled: false
       # -- Annotations are mandatory for the load balancer to come up. Varies with the cloud service.
-      annotations: {}
+      annotations: { }
 
       # loadBalancerIP: ""
 
       # -- Restrict access For LoadBalancer service. Defaults to 0.0.0.0/0.
-      loadBalancerSourceRanges: []
+      loadBalancerSourceRanges: [ ]
 
       ## Set external traffic policy to: "Local" to preserve source IP on
       ## providers supporting it
@@ -549,7 +549,7 @@ controller:
 
   # -- Additional containers to be added to the controller pod.
   # See https://github.com/lemonldap-ng-controller/lemonldap-ng-controller as example.
-  extraContainers: []
+  extraContainers: [ ]
   #  - name: my-sidecar
   #    image: nginx:latest
   #  - name: lemonldap-ng-controller
@@ -572,23 +572,23 @@ controller:
   #      mountPath: /srv/var/lib/lemonldap-ng/portal/skins
 
   # -- Additional volumeMounts to the controller main container.
-  extraVolumeMounts: []
+  extraVolumeMounts: [ ]
   #  - name: copy-portal-skins
   #   mountPath: /var/lib/lemonldap-ng/portal/skins
 
   # -- Additional volumes to the controller pod.
-  extraVolumes: []
+  extraVolumes: [ ]
   #  - name: copy-portal-skins
   #    emptyDir: {}
 
   # -- Containers, which are run before the app containers are started.
-  extraInitContainers: []
+  extraInitContainers: [ ]
   # - name: init-myservice
   #   image: busybox
   #   command: ['sh', '-c', 'until nslookup myservice; do echo waiting for myservice; sleep 2; done;']
 
   # -- Modules, which are mounted into the core nginx image. See values.yaml for a sample to add opentelemetry module
-  extraModules: []
+  extraModules: [ ]
   #   containerSecurityContext:
   #     allowPrivilegeEscalation: false
   #
@@ -603,7 +603,7 @@ controller:
       allowPrivilegeEscalation: false
 
   admissionWebhooks:
-    annotations: {}
+    annotations: { }
     # ignore-check.kube-linter.io/no-read-only-rootfs: "This deployment needs write access to root filesystem".
 
     ## Additional annotations to the admission webhooks.
@@ -611,7 +611,7 @@ controller:
     ## the Jobs Spec of the admission webhooks.
     enabled: false
     # -- Additional environment variables to set
-    extraEnvs: []
+    extraEnvs: [ ]
     # extraEnvs:
     #   - name: FOO
     #     valueFrom:
@@ -624,39 +624,39 @@ controller:
     port: 8443
     certificate: "/usr/local/certificates/cert"
     key: "/usr/local/certificates/key"
-    namespaceSelector: {}
-    objectSelector: {}
+    namespaceSelector: { }
+    objectSelector: { }
     # -- Labels to be added to admission webhooks
-    labels: {}
+    labels: { }
 
     # -- Use an existing PSP instead of creating one
     existingPsp: ""
     networkPolicyEnabled: false
 
     service:
-      annotations: {}
+      annotations: { }
       # clusterIP: ""
-      externalIPs: []
+      externalIPs: [ ]
       # loadBalancerIP: ""
-      loadBalancerSourceRanges: []
+      loadBalancerSourceRanges: [ ]
       servicePort: 443
       type: ClusterIP
 
     createSecretJob:
       securityContext:
         allowPrivilegeEscalation: false
-      resources: {}
+      resources: { }
         # limits:
         #   cpu: 10m
         #   memory: 20Mi
         # requests:
-        #   cpu: 10m
+      #   cpu: 10m
       #   memory: 20Mi
 
     patchWebhookJob:
       securityContext:
         allowPrivilegeEscalation: false
-      resources: {}
+      resources: { }
 
     patch:
       enabled: true
@@ -672,12 +672,12 @@ controller:
       # -- Provide a priority class name to the webhook patching job
       ##
       priorityClassName: ""
-      podAnnotations: {}
+      podAnnotations: { }
       nodeSelector:
         kubernetes.io/os: linux
-      tolerations: []
+      tolerations: [ ]
       # -- Labels to be added to patch job resources
-      labels: {}
+      labels: { }
       securityContext:
         runAsNonRoot: true
         runAsUser: 2000
@@ -702,7 +702,7 @@ controller:
     enabled: false
 
     service:
-      annotations: {}
+      annotations: { }
       # prometheus.io/scrape: "true"
       # prometheus.io/port: "10254"
 
@@ -711,10 +711,10 @@ controller:
       # -- List of IP addresses at which the stats-exporter service is available
       ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
       ##
-      externalIPs: []
+      externalIPs: [ ]
 
       # loadBalancerIP: ""
-      loadBalancerSourceRanges: []
+      loadBalancerSourceRanges: [ ]
       servicePort: 10254
       type: ClusterIP
       # externalTrafficPolicy: ""
@@ -722,26 +722,26 @@ controller:
 
     serviceMonitor:
       enabled: false
-      additionalLabels: {}
+      additionalLabels: { }
       ## The label to use to retrieve the job name from.
       ## jobLabel: "app.kubernetes.io/name"
       namespace: ""
-      namespaceSelector: {}
+      namespaceSelector: { }
       ## Default: scrape .Release.Namespace only
       ## To scrape all, use the following:
       ## namespaceSelector:
       ##   any: true
       scrapeInterval: 30s
       # honorLabels: true
-      targetLabels: []
-      relabelings: []
-      metricRelabelings: []
+      targetLabels: [ ]
+      relabelings: [ ]
+      metricRelabelings: [ ]
 
     prometheusRule:
       enabled: false
-      additionalLabels: {}
+      additionalLabels: { }
       # namespace: ""
-      rules: []
+      rules: [ ]
         # # These are just examples rules, please adapt them to your needs
         # - alert: NGINXConfigFailed
         #   expr: count(nginx_ingress_controller_config_last_reload_successful == 0) > 0
@@ -773,7 +773,7 @@ controller:
         #   labels:
         #     severity: warning
         #   annotations:
-        #     description: Too many 4XXs
+      #     description: Too many 4XXs
       #     summary: More than 5% of all requests returned 4XX, this requires your attention
 
   # -- Improve connection draining when ingress controller pod is deleted using a lifecycle hook:
@@ -819,14 +819,14 @@ defaultBackend:
   # -- Use an existing PSP instead of creating one
   existingPsp: ""
 
-  extraArgs: {}
+  extraArgs: { }
 
   serviceAccount:
     create: true
     name: ""
     automountServiceAccountToken: true
   # -- Additional environment variables to set for defaultBackend pods
-  extraEnvs: []
+  extraEnvs: [ ]
 
   port: 8080
 
@@ -849,28 +849,28 @@ defaultBackend:
   # -- Node tolerations for server scheduling to nodes with taints
   ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
-  tolerations: []
+  tolerations: [ ]
   #  - key: "key"
   #    operator: "Equal|Exists"
   #    value: "value"
   #    effect: "NoSchedule|PreferNoSchedule|NoExecute(1.6 only)"
 
-  affinity: {}
+  affinity: { }
 
   # -- Security Context policies for controller pods
   # See https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ for
   # notes on enabling and using sysctls
   ##
-  podSecurityContext: {}
+  podSecurityContext: { }
 
   # -- Security Context policies for controller main container.
   # See https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ for
   # notes on enabling and using sysctls
   ##
-  containerSecurityContext: {}
+  containerSecurityContext: { }
 
   # -- Labels to add to the pod container metadata
-  podLabels: {}
+  podLabels: { }
   #  key: value
 
   # -- Node labels for default backend pod assignment
@@ -881,13 +881,13 @@ defaultBackend:
 
   # -- Annotations to be added to default backend pods
   ##
-  podAnnotations: {}
+  podAnnotations: { }
 
   replicaCount: 1
 
   minAvailable: 1
 
-  resources: {}
+  resources: { }
   # limits:
   #   cpu: 10m
   #   memory: 20Mi
@@ -895,18 +895,18 @@ defaultBackend:
   #   cpu: 10m
   #   memory: 20Mi
 
-  extraVolumeMounts: []
+  extraVolumeMounts: [ ]
   ## Additional volumeMounts to the default backend container.
   #  - name: copy-portal-skins
   #   mountPath: /var/lib/lemonldap-ng/portal/skins
 
-  extraVolumes: []
+  extraVolumes: [ ]
   ## Additional volumes to the default backend pod.
   #  - name: copy-portal-skins
   #    emptyDir: {}
 
   autoscaling:
-    annotations: {}
+    annotations: { }
     enabled: false
     minReplicas: 1
     maxReplicas: 2
@@ -914,23 +914,23 @@ defaultBackend:
     targetMemoryUtilizationPercentage: 50
 
   service:
-    annotations: {}
+    annotations: { }
 
     # clusterIP: ""
 
     # -- List of IP addresses at which the default backend service is available
     ## Ref: https://kubernetes.io/docs/user-guide/services/#external-ips
     ##
-    externalIPs: []
+    externalIPs: [ ]
 
     # loadBalancerIP: ""
-    loadBalancerSourceRanges: []
+    loadBalancerSourceRanges: [ ]
     servicePort: 80
     type: ClusterIP
 
   priorityClassName: ""
   # -- Labels to be added to the default backend resources
-  labels: {}
+  labels: { }
 
 ## Enable RBAC as per https://github.com/kubernetes/ingress-nginx/blob/main/docs/deploy/rbac.md and https://github.com/kubernetes/ingress-nginx/issues/266
 rbac:
@@ -947,23 +947,23 @@ serviceAccount:
   name: ""
   automountServiceAccountToken: true
   # -- Annotations for the controller service account
-  annotations: {}
+  annotations: { }
 
 # -- Optional array of imagePullSecrets containing private registry credentials
 ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-imagePullSecrets: []
+imagePullSecrets: [ ]
 # - name: secretName
 
 # -- TCP service key-value pairs
 ## Ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/exposing-tcp-udp-services.md
 ##
-tcp: {}
+tcp: { }
 #  8080: "default/example-tcp-svc:9000"
 
 # -- UDP service key-value pairs
 ## Ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/exposing-tcp-udp-services.md
 ##
-udp: {}
+udp: { }
 #  53: "kube-system/kube-dns:53"
 
 # -- Prefix for TCP and UDP ports names in ingress controller service
