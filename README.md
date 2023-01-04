@@ -27,7 +27,7 @@ Send data to the following services:
 
 [K3D and using local registry](docs/K3D-registry.md)
 
-[Debugging useful commands](docs/Debugging.md)
+[Debugging useful commands](docs/K3D-Debugging.md)
 
 ## TODO
 * Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D)  

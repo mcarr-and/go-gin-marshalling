@@ -44,10 +44,10 @@ Service starts but is not available from external.
 This fails to show the JSON payload you get a 503.
 
 ```bash
-curl -v http://album-store.local:8070/albums/ GET -H "Content-Type: application/json" -H "Host: http://album-store.local:8070
+curl -v http://album-store.local:8070/albums/ GET -H "Content-Type: application/json" -H "Host: http://album-store.local:8070"
 ```
 
-[Debugging commands for cluster](Debugging.md)
+[Debugging commands for cluster](K3D-Debugging.md)
 
 #### Note: the application will hang after printing its version number if  OpenTelemetry collector is not running
 

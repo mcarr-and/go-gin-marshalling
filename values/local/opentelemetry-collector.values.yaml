@@ -263,7 +263,8 @@ podLabels: {}
 hostNetwork: false
 
 # Pod DNS policy ClusterFirst, ClusterFirstWithHostNet, None, Default, None
-dnsPolicy: ""
+dnsPolicy: "ClusterFirst"
+
 
 # only used with deployment mode
 replicaCount: 1

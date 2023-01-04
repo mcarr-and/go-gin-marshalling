@@ -54,6 +54,7 @@ spec:
   restartPolicy: Never
   hostname: "album-store"
   serviceAccountName: "album-store"
+  dnsPolicy: ClusterFirst
 ---
 apiVersion: v1
 kind: Service
