@@ -36,6 +36,8 @@ https://stackoverflow.com/questions/62162209/ingress-nginx-errors-connection-ref
 
 https://stackoverflow.com/questions/72097715/kubernetes-k3d-ingress-always-error-404-not-found
 
+https://alesnosek.com/blog/2017/02/14/accessing-kubernetes-pods-from-outside-of-the-cluster/
+
 ## Get Album Store Logs 
 
 ```bash

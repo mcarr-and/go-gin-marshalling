@@ -5,9 +5,8 @@ metadata:
     meta.helm.sh/release-name: "album-store"
     meta.helm.sh/release-namespace: "opentelemetry"
   labels:
-    app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/managed-by: "Helm"
     app.kubernetes.io/name: "album-store"
+    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "v0.1"
   name: "album-store"
   namespace: "opentelemetry"
@@ -18,8 +17,8 @@ metadata:
   name: "album-store"
   namespace: "opentelemetry"
   labels:
-    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/name: "album-store"
+    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "v0.1"
 spec:
   containers:
@@ -65,8 +64,8 @@ metadata:
     prometheus.io/probe: "true"
     prometheus.io/probe-path: /
   labels:
-    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/name: "album-store"
+    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "v0.1"
 spec:
   ports:
@@ -75,8 +74,8 @@ spec:
       port: 9080
       targetPort: 9080
   selector:
-    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/name: "album-store"
+    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "v0.1"
   sessionAffinity: None
   type: ClusterIP
@@ -90,8 +89,8 @@ metadata:
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
     app.kubernetes.io/name: "album-store"
   labels:
-    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/name: "album-store"
+    app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "v0.1"
   name: "album-store"
   namespace: opentelemetry
@@ -103,7 +102,7 @@ spec:
         paths:
           - backend:
               service:
-                name: "album-store"
+                name: album-store
                 port:
                   number: 9080
             path: /
