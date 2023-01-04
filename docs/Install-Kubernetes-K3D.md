@@ -39,12 +39,8 @@ make skaffold-dev-k3d;
 make k3d-internal-deploy;
 ```
 
-Service starts but is not available from external.
-
-This fails to show the JSON payload you get a 503.
-
 ```bash
-curl -v http://album-store.local:8070/albums/ GET -H "Content-Type: application/json" -H "Host: http://album-store.local:8070"
+curl 'http://album-store.local:8070/albums' --insecure
 ```
 
 [Debugging commands for cluster](K3D-Debugging.md)
@@ -62,7 +58,7 @@ curl -v http://album-store.local:8070/albums/ GET -H "Content-Type: application/
 [Postman Collection](../test/Album-Store.postman_collection.json)
 
 ```bash
-make local-test;
+make k3d-test;
 ```
 
 TODO Prometheus 

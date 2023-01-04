@@ -17,17 +17,18 @@ Send data to the following services:
 
 [Docker-Compose with album-store as an external application instructions](docs/Install-Docker-Compose-External.md)
 
-## [WIP & NON-FUNCTIONING] Microk8s Cluster
-
-[Local Kubernetes with Microk8s instructions](docs/Install-Kubernetes-Microk8s.md)
-
-## [WIP & NON-FUNCTIONING] K3D cluster 
+## K3D cluster
 
 [Local Kubernetes with K3D instructions](docs/Install-Kubernetes-K3D.md)
 
 [K3D and using local registry](docs/K3D-registry.md)
 
 [Debugging useful commands](docs/K3D-Debugging.md)
+
+## [WIP & NON-FUNCTIONING] Microk8s Cluster
+
+[Local Kubernetes with Microk8s instructions](docs/Install-Kubernetes-Microk8s.md)
+
 
 ## TODO
 * Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D)  
