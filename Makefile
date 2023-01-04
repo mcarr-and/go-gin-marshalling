@@ -13,28 +13,15 @@ test-benchmark:
 
 .PHONY: local-start-k3d
 local-start-k3d: build
-	export GRPC_GO_LOG_VERBOSITY_LEVEL=99;
-	export GRPC_GO_LOG_SEVERITY_LEVEL=info;
-	export NAMESPACE=no-namespace;
-	export INSTANCE_NAME=album-store-1;
-	export OTEL_LOCATION=otel-collector.local:8070;
-	./album-store
+	GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 OTEL_LOCATION=otel-collector.local:8070 INSTANCE_NAME=album-store-1 NAMESPACE=no-namespace ./album-store
 
 .PHONY: local-start-docker-compose-grpc
-local-start-docker-compose-grpc: build
-	export GRPC_GO_LOG_VERBOSITY_LEVEL=99;
-	export GRPC_GO_LOG_SEVERITY_LEVEL=info;
-	export NAMESPACE=no-namespace;
-	export INSTANCE_NAME=album-store-1;
-	export OTEL_LOCATION=otel-collector.local:8070;
-	./album-store -otel-location=localhost:4327 -namespace=no-namespace -instance-name=album-store-1
+local-start-docker-compose-grpc:
+	GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 OTEL_LOCATION=localhost:4327 INSTANCE_NAME=album-store-1 NAMESPACE=no-namespace ./album-store
 
 .PHONY: local-start-docker-compose-http
 local-start-docker-compose-http: build
-	export NAMESPACE=no-namespace;
-	export INSTANCE_NAME=album-store-1;
-	export OTEL_LOCATION=otel-collector.local:8070;
-	./album-store -otel-location=localhost:4328 -namespace=no-namespace -instance-name=album-store-1
+	GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 OTEL_LOCATION=localhost:4328 INSTANCE_NAME=album-store-1 NAMESPACE=no-namespace ./album-store
 
 .PHONY: skaffold-dev-k3d
 skaffold-dev-k3d:

@@ -1,7 +1,5 @@
-version: "2"
+version: "3.9"
 services:
-
-  # Jaeger
   jaeger-all-in-one:
     image: jaegertracing/all-in-one:latest
     container_name: jaeger-gin-go
@@ -12,16 +10,15 @@ services:
       - "14250" # model.proto
       - "4317" # otel grpc
       - "4318" # otel http
-
-  # Collector
+    networks:
+      - default
   otel-collector:
-    image: ${OTELCOL_IMG}
+    image: otel/opentelemetry-collector:latest
     container_name: otel-gin-go
     restart: always
     command:
       [
         "--config=/etc/otel-collector-config.yaml",
-        "${OTELCOL_ARGS}"
       ]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
@@ -35,7 +32,8 @@ services:
       - "55679:55679" # zpages extension
     depends_on:
       - jaeger-all-in-one
-
+    networks:
+      - default
   prometheus:
     container_name: prometheus-gin-go
     image: prom/prometheus:latest
@@ -44,18 +42,20 @@ services:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-
-  #  album-store:
-  #    build:
-  #      dockerfile: Dockerfile
-  #      context: .
-  #    restart: always
-  #    environment:
-  #      - -otel-location=localhost:4327
-  #      - -namespace=no-namespace
-  #      - -instance-name=album-store-1
-  #    ports:
-  #      - "9080:9080"
-  #    depends_on:
-  #      - otel-collector
-
+    networks:
+      - default
+  album-store:
+    image: album-store:latest
+    restart: always
+    environment:
+      - OTEL_LOCATION=otel-collector:4317
+      - NAMESPACE=default
+      - INSTANCE_NAME=album-store-1
+      - GRPC_GO_LOG_SEVERITY_LEVEL=99
+      - GRPC_GO_LOG_VERBOSITY_LEVEL=info
+    ports:
+      - "9080:9080"
+    networks:
+      - default
+    depends_on:
+      - otel-collector

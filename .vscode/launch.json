@@ -7,9 +7,11 @@
             "request": "launch",
             "mode": "debug",
             "args": [
-                "-namespace=no-namespace",
-                "-otel-location=localhost:4327",
-                "-instance-name=go-gin-example-1"
+                "NAMESPACE=no-namespace",
+                "OTEL_LOCATION=localhost:4327",
+                "INSTANCE_NAME=go-gin-example-1",
+                "GRPC_GO_LOG_VERBOSITY_LEVEL=99",
+                "GRPC_GO_LOG_SEVERITY_LEVEL=info"
             ],
             "program": "${workspaceFolder}/main.go"
         }
