@@ -7,7 +7,7 @@ The project is a backend service that represents a music store with an in-memory
 
 Send data to the following services:
 * Jaeger
-* Prometheus
+* Prometheus[TODO]
 
 ## 1. Running Project
 
@@ -47,9 +47,8 @@ Run the project with a local Kubernetes cluster with K3D.
 * Database migration tooling via scripts 
 * Fuzz testing 
 * Adding CI server integration
-* Adding project to a Docker container
 * Helm chart to add Gin Server and Database
-* Terrafrom project into EKS
+* Terraform project into EKS
 
 ## Bibliography of sites used for creating this project:
 
