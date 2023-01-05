@@ -33,22 +33,26 @@ Run the project with a local Kubernetes cluster with K3D.
 
 
 ## TODO
-* Get working helm chart for album-store - github raw url not working for chart, not in skaffold.
-* Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D)  
-* Run album store inside cluster via helm chart
-* Contract tests for swagger to output 
-* Create Prometheus export health endpoint
-* Test data builder for creating hundreds of albums for pagination testing and load testing
+* Docker cache layers to save on build time for go dependencies
+* Adding CI server integration
+* Add prometheus to cluster
+* liveness endpoint & wire into deployment
+* health endpoint & wire into deployment
+* prometheus endpoint
 * Create status endpoint that says if service is up or down.
+* Contract tests compare swagger output to actual output
 * Async processing of requests 
 * Back pressure on APIs & rate limiting
+* Test data builder for creating hundreds of albums for pagination testing and load testing
 * pagination of get methods so can receive many and respond in chunks
 * Use a database as a data store
 * Database migration tooling via scripts 
 * Fuzz testing 
-* Adding CI server integration
-* Helm chart to add Gin Server and Database
+* Helm chart add Database configuration
 * Terraform project into EKS
+* Run album store inside cluster via helm chart
+* Get working helm chart for album-store - github raw url not working for chart, not in skaffold.
+* Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D) GO issue http2 frame too large.
 
 ## Bibliography of sites used for creating this project:
 
