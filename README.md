@@ -34,6 +34,7 @@ Run the project with a local Kubernetes cluster with K3D.
 
 ## TODO
 * Docker cache layers to save on build time for go dependencies
+* Add open-telmetry to the ingress-nginx so spans are created from the entry point to the cluster.
 * Adding CI server integration
 * Add prometheus to cluster
 * liveness endpoint & wire into deployment
@@ -46,6 +47,7 @@ Run the project with a local Kubernetes cluster with K3D.
 * Test data builder for creating hundreds of albums for pagination testing and load testing
 * pagination of get methods so can receive many and respond in chunks
 * Use a database as a data store
+* add open-telemetry observability to the database driver.
 * Database migration tooling via scripts 
 * Fuzz testing 
 * Helm chart add Database configuration
