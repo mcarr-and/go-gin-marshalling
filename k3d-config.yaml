@@ -7,7 +7,7 @@ ports:
     nodeFilters:
       - loadbalancer
 registries: # define how registries should be created or used
-  create: # creates a default registry to be used with the cluster; same as `--registry-create registry.localhost`
+  create: # creates a default registry to be used with the cluster; same as `--registry-create registry.local`
     name: registry.local
     host: "0.0.0.0"
     hostPort: "54094"
