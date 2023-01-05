@@ -23,7 +23,7 @@ metadata:
 spec:
   containers:
     - name: "album-store"
-      image: k3d-registry:54094/album-store:0.1 # use the cluster internal name to reference registry
+      image: registry.local:54094/album-store:0.1 # use the cluster internal name to reference registry
       command: ["/app/album-store"]
       resources:
         requests:

@@ -9,5 +9,5 @@ spec:
     spec:
       containers:
         - name: hello-world
-          image: k3d-registry:54094/forketyfork/hello-world:v0.1
+          image: registry.local:54094/forketyfork/hello-world:v0.1
       restartPolicy: Never

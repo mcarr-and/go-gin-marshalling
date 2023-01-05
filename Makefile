@@ -112,8 +112,7 @@ docker-compose-limited-stop:
 
 .PHONY: k3d-cluster-create
 k3d-cluster-create:
-	k3d registry create registry --port 0.0.0.0:54094;
-	k3d cluster create k3s-default --config k3d-config.yaml --registry-use k3d-registry:54094;
+	k3d cluster create k3s-default --config k3d-config.yaml
 	kubectl create namespace album-store
 
 .PHONY: k3d-cluster-delete
