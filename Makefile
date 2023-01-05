@@ -67,26 +67,27 @@ k3d-internal-deploy:
 k3d-internal-undeploy:
 	kubectl delete -f album-store-k3d-deployment.yaml
 
-album_setup = GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=album-store-1
+setup-album-properties:
+	$(eval album_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)
 
 .PHONY: docker-k3d-start
-docker-k3d-start:
+docker-k3d-start: setup-album-properties
 	$(album_setup) OTEL_LOCATION=otel-collector.local:8070 docker run -d -p 9080:9080 --name album-store album-store:0.1
 
 .PHONY: docker-local-start
-docker-local-start:
+docker-local-start: setup-album-properties
 	$(album_setup) OTEL_LOCATION=localhost:4327 docker run -d -p 9080:9080 --name album-store album-store:0.1
 
 .PHONY: local-start-k3d
-local-start-k3d: build
+local-start-k3d: build setup-album-properties
 	$(album_setup) OTEL_LOCATION=otel-collector.local:8070 ./album-store
 
 .PHONY: local-start-grpc
-local-start-grpc:
+local-start-grpc: build setup-album-properties
 	$(album_setup) OTEL_LOCATION=localhost:4327 ./album-store
 
 .PHONY: local-start-http
-local-start-http: build
+local-start-http: build setup-album-properties
 	$(album_setup) OTEL_LOCATION=localhost:4328 ./album-store
 
 .PHONY: docker-stop
