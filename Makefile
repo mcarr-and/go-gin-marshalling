@@ -91,7 +91,7 @@ local-start-http: build
 
 .PHONY: docker-stop
 docker-stop:
-	docker stop go-gin-example;
+	docker stop album-store;
 
 .PHONY: docker-compose-full-start
 docker-compose-full-start:
