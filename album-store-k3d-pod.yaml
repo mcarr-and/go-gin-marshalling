@@ -11,6 +11,10 @@ metadata:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/version: "0.1"
 spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
   ports:
     - protocol: TCP
       name: http
@@ -26,29 +30,18 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "album-store"
-  namespace: "album-store"
   labels:
     app.kubernetes.io/component: "album-store"
     app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/version: "0.1"
+  name: "album-store"
+  namespace: "album-store"
 spec:
   containers:
     - name: "album-store"
       image: registry.local:54094/album-store:0.1 # use the cluster internal name to reference registry
       imagePullPolicy: IfNotPresent
-      resources:
-        requests:
-          memory: "64Mi"
-          cpu: "250m"
-        limits:
-          memory: "128Mi"
-          cpu: "500m"
-      ports:
-        - containerPort: 9080
-          name: http
-          protocol: TCP
       env:
         - name: INSTANCE_NAME
           valueFrom:
@@ -64,6 +57,17 @@ spec:
           value: "99"
         - name: GRPC_GO_LOG_SEVERITY_LEVEL
           value: "info"
+      ports:
+        - containerPort: 9080
+          name: http
+          protocol: TCP
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
   dnsPolicy: ClusterFirst # must be `ClusterFirst` to allow nginx to route to it via the ingress
   restartPolicy: Always
   terminationGracePeriodSeconds: 30
