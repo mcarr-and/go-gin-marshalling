@@ -41,7 +41,7 @@ This will deploy 3 replicas of album-store into the cluster.
 You will see different instance names in the Jaeger Process for the 3 pods.
 
 ```bash
-make k3d-internal-deploy;
+make k3d-internal-deploy-deployment;
 ```
 
 ### 4.1 Debugging Advice  
@@ -63,15 +63,22 @@ make k3d-internal-deploy;
 ```bash
 curl --insecure --location 'http://album-store.local:8070/albums/'; 
 ```
-### 6.2 Postman
-[Postman Collection](../test/Album-Store.postman_collection.json)
 
-### 6.3 Test Suite
+### 6.3 Run Test Suite
+
 ```bash
 make k3d-test;
 ```
 
-TODO Prometheus 
+### 6.2 Postman
+
+[Postman Collection](../test/postman_collection.json)
+
+[Postman Environment](../test/album-store.postman_environment.json)
+
+1. Import the folder `../test`
+1. Set Environment to `album-store.local`
+1. Open a test in the `Album-Store` collection and run it.
 
 ## 7. Stop album-store server & Services  
 

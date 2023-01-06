@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d64dfb93-ef36-46af-9cd7-34e17a521c2b",
+		"_postman_id": "e74aceb6-743e-46b7-b6a7-2457f2330d11",
 		"name": "Album-Store",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -11,14 +11,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9080/albums",
-					"protocol": "http",
+					"raw": "{{URL}}/albums/",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9080",
 					"path": [
-						"albums"
+						"albums",
+						""
 					]
 				}
 			},
@@ -36,12 +35,10 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:9080/albums/1",
-					"protocol": "http",
+					"raw": "{{URL}}/albums/1",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9080",
 					"path": [
 						"albums",
 						"1"
@@ -56,12 +53,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9080/albums/X",
-					"protocol": "http",
+					"raw": "{{URL}}/albums/X",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9080",
 					"path": [
 						"albums",
 						"X"
@@ -76,12 +71,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:9080/albums/667",
-					"protocol": "http",
+					"raw": "{{URL}}/albums/667",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9080",
 					"path": [
 						"albums",
 						"667"
@@ -105,12 +98,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:9080/albums/",
-					"protocol": "http",
+					"raw": "{{URL}}/albums/",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9080",
 					"path": [
 						"albums",
 						""
@@ -134,12 +125,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:9080/albums/",
-					"protocol": "http",
+					"raw": "{{URL}}/albums/",
 					"host": [
-						"localhost"
+						"{{URL}}"
 					],
-					"port": "9080",
 					"path": [
 						"albums",
 						""

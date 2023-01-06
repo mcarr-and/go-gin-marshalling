@@ -59,13 +59,21 @@ k3d-docker-registry:
 	docker tag album-store:latest localhost:54094/album-store:0.1
 	docker push localhost:54094/album-store:0.1
 
-.PHONY: k3d-internal-deploy
-k3d-internal-deploy:
+.PHONY: k3d-internal-deploy-deployment
+k3d-internal-deploy-deployment:
 	kubectl apply -f album-store-k3d-deployment.yaml
 
-.PHONY: k3d-internal-undeploy
-k3d-internal-undeploy:
+.PHONY: k3d-internal-undeploy-deployment
+k3d-internal-undeploy-deployment:
 	kubectl delete -f album-store-k3d-deployment.yaml
+
+.PHONY: k3d-internal-pod
+k3d-internal-deploy-pod:
+	kubectl apply -f album-store-k3d-pod.yaml
+
+.PHONY: k3d-internal-undeploy-pod
+k3d-internal-undeploy-pod:
+	kubectl delete -f album-store-k3d-pod.yaml
 
 setup-album-properties:
 	$(eval album_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)

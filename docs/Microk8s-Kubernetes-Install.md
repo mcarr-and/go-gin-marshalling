@@ -82,11 +82,21 @@ make local-start-k3d-grpc;
 
 ## 4. Run Some Tests
 
-[Postman Collection](../test/Album-Store.postman_collection.json)
+### 4.1 Run from command line 
 
 ```bash
 make local-test;
 ```
+
+### 4.2 Use Postman
+
+[Postman Collection](../test/postman_collection.json)
+
+[Postman Environment](../test/album-store.postman_environment.json)
+
+1. Import the collection and environment into your postman
+1. Set Environment to `album-store.local`
+1. Open a test in the `Album-Store` collection and run it.
 
 ## 5. View the events in the different Services in K3D
 

@@ -43,11 +43,21 @@ You will need to set your Environment with the following and run the main.go
 
 ## 4. Run Some Tests
 
-[Postman Collection](../test/Album-Store.postman_collection.json)
+### 4.1 from the command line
 
 ```bash
 make local-test;
 ```
+
+### 4.2 Using Postman
+
+[Postman Environment](../test/album-store.postman_environment.json)
+
+[Postman Collection](../test/postman_collection.json)
+
+1. Import the collection and environment into your postman
+1. Set Environment to `localhost`
+1. Open a test in the `Album-Store` collection and run it.
 
 ## 5. View the events in the different Services
 
