@@ -33,12 +33,12 @@ Run the project with a local Kubernetes cluster with K3D.
 
 
 ## TODO
-* Docker cache layers to save on build time for go dependencies
-* Add open-telmetry to the ingress-nginx so spans are created from the entry point to the cluster.
+* liveness endpoint & wire to album-store
+* health endpoint & wire into album-store
 * Adding CI server integration
+* Docker cache layers to save on build time for go dependencies
 * Add prometheus to cluster
-* liveness endpoint & wire into deployment
-* health endpoint & wire into deployment
+* Add open-telmetry to the ingress-nginx so spans are created from the entry point to the cluster.
 * prometheus endpoint
 * Create status endpoint that says if service is up or down.
 * Contract tests compare swagger output to actual output
