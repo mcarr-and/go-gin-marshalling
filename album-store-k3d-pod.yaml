@@ -1,17 +1,4 @@
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  annotations:
-    meta.helm.sh/release-name: "album-store"
-    meta.helm.sh/release-namespace: "album-store"
-  labels:
-    app.kubernetes.io/name: "album-store"
-    app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "0.1"
-  name: "album-store"
-  namespace: "album-store"
----
-apiVersion: v1
 kind: Pod
 metadata:
   name: "album-store"
@@ -53,7 +40,7 @@ spec:
           value: "info"
   restartPolicy: Never
   hostname: "album-store"
-  serviceAccountName: "album-store"
+  serviceAccountName: default
   dnsPolicy: ClusterFirst # must be `ClusterFirst` to allow nginx to route to it via the ingress
   enableServiceLinks: true
 ---
