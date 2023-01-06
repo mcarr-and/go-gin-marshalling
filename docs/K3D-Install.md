@@ -34,10 +34,17 @@ make k3d-docker-registry;
 make skaffold-dev-k3d;
 ```
 
-## 4. Deploy Album-Store to Kubernetes 
+## 4. Deploy Album-Store to Kubernetes
+
+This will deploy 3 replicas of album-store into the cluster. 
+
+You will see different instance names in the Jaeger Process for the 3 pods.
+
 ```bash
 make k3d-internal-deploy;
 ```
+
+### 4.1 Debugging Advice  
 
 [Debugging commands for cluster](K3D-Debugging.md)
 
