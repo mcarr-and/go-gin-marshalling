@@ -12,9 +12,9 @@ make k3d-cluster-create
 
 Which creates a cluster with a registry wired in.
 
-The registry is internally: 
+The registry is internally referenced inside the cluster as: 
 
-Name `k3d-registry` 
+Name `registry.local` 
 
 Port `54094`
 
@@ -26,23 +26,16 @@ Supplied Dockerfile which prints `hello world`
 docker build  . -t forketyfork/hello-world;
 ```
 
-### 2. tag your image with the repo 
+### 2. tag and push your image with the repo 
 
 Note: Use `localhost` when building from command line 
 
 ```bash
 docker tag forketyfork/hello-world:latest localhost:54094/forketyfork/hello-world:v0.1;
-```
-
-### 3. push your image with tag into the repository 
-
-Note: Use `localhost` when building from command line
-
-```bash
 docker push localhost:54094/forketyfork/hello-world:v0.1;
 ```
 
-### 4. apply a deployment to use this hello-world image in your k8s cluster 
+### 3. apply a deployment to use this hello-world image in your k8s cluster 
 
 Note: internally this uses registry url `k3d-registry` 
 
@@ -50,13 +43,13 @@ Note: internally this uses registry url `k3d-registry`
  kubectl apply -f helloworld.yaml;
  ```
 
-### 5. get hello world message 
+### 4. get hello world message 
 
 ```bash
   kubectl logs $(kubectl get pods -l job-name=hello-world -o jsonpath="{.items[0].metadata.name}")
 ```
 
-### 6. delete hello-world
+### 5. delete hello-world
 
 Note: internally this uses registry url `k3d-registry`
 
