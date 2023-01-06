@@ -126,7 +126,6 @@ k3d-cluster-create:
 .PHONY: k3d-cluster-delete
 k3d-cluster-delete:
 	k3d cluster delete k3s-default;
-	k3d registry delete k3d-registry;
 
 .PHONY: coverage
 coverage:

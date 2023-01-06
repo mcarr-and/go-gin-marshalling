@@ -29,7 +29,7 @@ Run the project with a local Kubernetes cluster with K3D.
 
 ## [WIP & NON-FUNCTIONING] Microk8s Cluster
 
-[Local Kubernetes with Microk8s instructions](docs/Microk8s-Kubernetes-Install.md)
+[Local Kubernetes with Microk8s instructions](docs/Microk8s-Install.md)
 
 
 ## TODO

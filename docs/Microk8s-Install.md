@@ -2,16 +2,24 @@
 
 1. Go
 2. Docker 
-3. Skaffold
-4. Microk8s
+3. [Skaffold](https://skaffold.dev/)
+4. [Microk8s](https://microk8s.io/)
 
-TODO - config for jager and microk8s & make this work.
+WIP not currently running. 
 
-WIP not currently running
+TODO improve ths.
 
-## 1. ./kube/config with Microk8s
+## 0. ./kube/config with Microk8s
 
-[Setup kube config](Microk8s-K8s-Config-Setup.md)
+### 0.1 Setup Kube Config
+
+[Setup kube config](Microk8s-Kube-Config-Setup.md)
+
+### 0.2. Changes to Hosts file
+
+local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
+
+```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local```
 
 ## 2. Start All Observability & Log Viewing Services
  

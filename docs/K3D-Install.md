@@ -2,8 +2,8 @@
 
 1. Go
 2. Docker
-3. Skaffold
-4. K3D
+3. [Skaffold](https://skaffold.dev/)
+4. [K3D](https://k3d.io/v5.4.6/)
 
 ## 0. Expected tooling to run this project in K3D
 
@@ -15,13 +15,13 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
 [K3d Registry info](K3D-registry.md)
 
-## 1. Create K3d Cluster
+## 1. Create K3d Kubernetes Cluster with Internal Registry
 
 ```bash
 make k3d-cluster-create
 ```
 
-## 2. Build the application and deploy to K3D
+## 2. Build the application in Docker and deploy Docker image to the  K3D Internal Registry
 
 ```bash
 make docker-build;
@@ -34,7 +34,7 @@ make k3d-docker-registry;
 make skaffold-dev-k3d;
 ```
 
-## 4. Deploy Album-Store to Kubernetes
+## 4. Deploy Album-Store to the K3D Kubernetes Cluster
 
 This will deploy 3 replicas of album-store into the cluster. 
 
@@ -44,11 +44,11 @@ You will see different instance names in the Jaeger Process for the 3 pods.
 make k3d-internal-deploy-deployment;
 ```
 
+**Note: the application will hang after printing its version number if  OpenTelemetry collector is not running**
+
 ### 4.1 Debugging Advice  
 
 [Debugging commands for cluster](K3D-Debugging.md)
-
-#### Note: the application will hang after printing its version number if  OpenTelemetry collector is not running
 
 ## 5. View the events in the different Services in K3D
 
