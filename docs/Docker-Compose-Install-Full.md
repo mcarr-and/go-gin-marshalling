@@ -10,7 +10,7 @@ This version everything is running inside the docker-compose.
 ## 1. Build the docker image
 
 ```bash
-make docker-build
+make docker-build;
 ```
 
 ## 2. Start All Observability & Log Viewing Services
@@ -31,9 +31,7 @@ make local-test;
 
 ### 3.2 Using Postman
 
-[Postman Environment](../test/album-store.postman_environment.json)
-
-[Postman Collection](../test/postman_collection.json)
+[Postman files](../test/postman_collection.json)
 
 1. Import the collection and environment into your postman
 1. Set Environment to `localhost`

@@ -51,9 +51,7 @@ make local-test;
 
 ### 4.2 Using Postman
 
-[Postman Environment](../test/album-store.postman_environment.json)
-
-[Postman Collection](../test/postman_collection.json)
+[Postman files](../test/postman_collection.json)
 
 1. Import the collection and environment into your postman
 1. Set Environment to `localhost`
