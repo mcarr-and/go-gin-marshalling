@@ -1,7 +1,9 @@
-TODO add:
-* dnsPolicy: ClusterFirst
-* enableServiceLinks: true
+# WIP - not working
 
+TODO get this flushed out and running.
+
+## TODO:
+* dnsPolicy: ClusterFirst
 
 
 # Helm Repo
