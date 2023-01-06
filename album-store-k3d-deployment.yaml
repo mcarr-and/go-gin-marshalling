@@ -10,8 +10,8 @@ items:
       prometheus.io/probe: "true"
       prometheus.io/probe-path: /
     labels:
-      app.kubernetes.io/name: "album-store"
       app.kubernetes.io/instance: "album-store"
+      app.kubernetes.io/name: "album-store"
       app.kubernetes.io/version: "0.1"
   spec:
     internalTrafficPolicy: Cluster
@@ -24,8 +24,8 @@ items:
         port: 9080
         targetPort: 9080
     selector:
-      app.kubernetes.io/name: "album-store"
       app.kubernetes.io/instance: "album-store"
+      app.kubernetes.io/name: "album-store"
       app.kubernetes.io/version: "0.1"
     sessionAffinity: None
     type: ClusterIP
@@ -47,9 +47,10 @@ items:
       replicas: 3
       selector:
         matchLabels:
-          app.kubernetes.io/name: "album-store"
           app.kubernetes.io/component: "album-store"
           app.kubernetes.io/instance: "album-store"
+          app.kubernetes.io/name: "album-store"
+          app.kubernetes.io/version: "0.1"
       strategy:
         rollingUpdate:
           maxSurge: 0
@@ -59,9 +60,9 @@ items:
         metadata:
           labels:
             app: "album-store"
-            app.kubernetes.io/name: "album-store"
             app.kubernetes.io/component: "album-store"
             app.kubernetes.io/instance: "album-store"
+            app.kubernetes.io/name: "album-store"
             app.kubernetes.io/version: "0.1"
         spec:
           containers:
@@ -96,9 +97,6 @@ items:
                   value: "info"
           dnsPolicy: ClusterFirst # must be `ClusterFirst` to allow nginx to route to it via the ingress
           restartPolicy: Always
-          schedulerName: default-scheduler
-          serviceAccountName: default
-          enableServiceLinks: true
           terminationGracePeriodSeconds: 30
 ---
 apiVersion: v1
@@ -113,8 +111,8 @@ items:
         nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
         app.kubernetes.io/name: "album-store"
       labels:
-        app.kubernetes.io/name: "album-store"
         app.kubernetes.io/instance: "album-store"
+        app.kubernetes.io/name: "album-store"
         app.kubernetes.io/version: "0.1"
       name: "album-store"
       namespace: "album-store"

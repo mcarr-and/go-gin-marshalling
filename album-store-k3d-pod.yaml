@@ -1,16 +1,43 @@
 apiVersion: v1
-kind: Pod
+kind: Service
 metadata:
-  name: "album-store"
   namespace: "album-store"
+  name: "album-store"
+  annotations:
+    prometheus.io/probe: "true"
+    prometheus.io/probe-path: /
   labels:
     app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
     app.kubernetes.io/version: "0.1"
 spec:
+  ports:
+    - protocol: TCP
+      name: http
+      port: 9080
+      targetPort: 9080
+  selector:
+    app.kubernetes.io/name: "album-store"
+    app.kubernetes.io/instance: "album-store"
+    app.kubernetes.io/version: "0.1"
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "album-store"
+  namespace: "album-store"
+  labels:
+    app.kubernetes.io/component: "album-store"
+    app.kubernetes.io/instance: "album-store"
+    app.kubernetes.io/name: "album-store"
+    app.kubernetes.io/version: "0.1"
+spec:
   containers:
     - name: "album-store"
       image: registry.local:54094/album-store:0.1 # use the cluster internal name to reference registry
+      imagePullPolicy: IfNotPresent
       resources:
         requests:
           memory: "64Mi"
@@ -37,36 +64,9 @@ spec:
           value: "99"
         - name: GRPC_GO_LOG_SEVERITY_LEVEL
           value: "info"
-  restartPolicy: Never
-  hostname: "album-store"
-  serviceAccountName: default
   dnsPolicy: ClusterFirst # must be `ClusterFirst` to allow nginx to route to it via the ingress
-  enableServiceLinks: true
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: "album-store"
-  name: "album-store"
-  annotations:
-    prometheus.io/probe: "true"
-    prometheus.io/probe-path: /
-  labels:
-    app.kubernetes.io/name: "album-store"
-    app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "0.1"
-spec:
-  ports:
-    - protocol: TCP
-      name: http
-      port: 9080
-      targetPort: 9080
-  selector:
-    app.kubernetes.io/name: "album-store"
-    app.kubernetes.io/instance: "album-store"
-    app.kubernetes.io/version: "0.1"
-  sessionAffinity: None
-  type: ClusterIP
+  restartPolicy: Always
+  terminationGracePeriodSeconds: 30
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -77,8 +77,8 @@ metadata:
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
     app.kubernetes.io/name: "album-store"
   labels:
-    app.kubernetes.io/name: "album-store"
     app.kubernetes.io/instance: "album-store"
+    app.kubernetes.io/name: "album-store"
     app.kubernetes.io/version: "0.1"
   name: "album-store"
   namespace: "album-store"
