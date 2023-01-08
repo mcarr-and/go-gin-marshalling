@@ -31,6 +31,12 @@ Run the project with a local Kubernetes cluster with K3D.
 
 [Local Kubernetes with Microk8s instructions](docs/Microk8s-Install.md)
 
+## [WIP] Proxy-Service
+
+Standalone server that proxies calls to the album-store
+
+[proxy-service](docs/Proxy-Service.md)
+
 
 ## TODO
 * Create proxy service that shows nested spans and calls.
