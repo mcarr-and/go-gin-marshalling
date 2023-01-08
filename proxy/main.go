@@ -56,7 +56,6 @@ func getAlbums(c *gin.Context) {
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		return
 	}
-
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
@@ -87,9 +86,9 @@ func getAlbumByID(c *gin.Context) {
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		return
 	}
-	span.SetStatus(codes.Ok, "")
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	span.SetStatus(codes.Ok, "")
 	c.JSON(http.StatusOK, j)
 
 }
@@ -114,7 +113,6 @@ func postAlbum(c *gin.Context) {
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		return
 	}
-	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	var j interface{}
 	err = json.NewDecoder(resp.Body).Decode(&j)
 	if err != nil {
@@ -129,6 +127,7 @@ func postAlbum(c *gin.Context) {
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		return
 	}
+	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
 	c.JSON(http.StatusOK, j)
