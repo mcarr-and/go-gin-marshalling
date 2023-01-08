@@ -93,6 +93,6 @@ make k3d-proxy-undeploy-deployment;
 ## 9. Delete Cluster
 
 ```bash
-make k3d-cluster-delete
+../make k3d-cluster-delete
 ```
 
