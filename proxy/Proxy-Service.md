@@ -6,9 +6,15 @@ This uses the opentelemetry instrumented http client[otelhttp](https://github.co
 
 This is a simple pass through service that calls the Album service.
 
+## Prerequisites 
+Cluster must have the following deployed
+* Jaeger
+* Opentelemetry-collector
+* Album-Store
+
 # Local Run
 ## 0. Start Locally
-`GRPC_GO_LOG_SEVERITY_LEVEL=info;GRPC_GO_LOG_VERBOSITY_LEVEL=99;INSTANCE_NAME=proxy-service;NAMESPACE=no-namespace;OTEL_LOCATION=localhost:4327;ALBUM_STORE_URL=localhost:9080 go run main.go`
+`GRPC_GO_LOG_SEVERITY_LEVEL=info;GRPC_GO_LOG_VERBOSITY_LEVEL=99;INSTANCE_NAME=proxy-service;NAMESPACE=no-namespace;OTEL_LOCATION=localhost:4327;ALBUM_STORE_LOCATION=localhost:9080 go run main.go`
 
 ## 1. hit albums url 
 
@@ -27,7 +33,7 @@ This is a simple pass through service that calls the Album service.
 
 ## 0. K3D install
 
-[k3D install ](K3D-Install.md)
+[k3D install service ](K3D-Install.md)
 
 ## 1. Setup Env
 

@@ -59,3 +59,19 @@ services:
       - default
     depends_on:
       - otel-collector
+  proxy-service:
+    image: proxy-service:latest
+    restart: always
+    environment:
+      - OTEL_LOCATION=otel-collector:4317
+      - NAMESPACE=default
+      - INSTANCE_NAME=album-store-1
+      - GRPC_GO_LOG_SEVERITY_LEVEL=99
+      - GRPC_GO_LOG_VERBOSITY_LEVEL=info
+      - ALBUM_STORE_LOCATION=album-store:9080
+    ports:
+      - "9080:9080"
+    networks:
+      - default
+    depends_on:
+      - otel-collector

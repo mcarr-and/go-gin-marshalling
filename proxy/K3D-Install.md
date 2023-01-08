@@ -9,7 +9,9 @@
 
 local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
-```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local```
+`proxy-service.local` is included in this configuration if you are following the album-store config changes.
+
+`127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local proxy-service.local`
 
 ### 0.1 K3D Registry info
 
@@ -18,7 +20,7 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 ## 1. Create K3d Kubernetes Cluster with Internal Registry
 
 ```bash
-make k3d-cluster-create
+../make k3d-cluster-create
 ```
 
 ## 2. Build the application in Docker and deploy Docker image to the  K3D Internal Registry
@@ -31,17 +33,17 @@ make k3d-docker-registry;
 ## 3. Start All Observability & Log Viewing Services
  
 ```bash
-make skaffold-dev-k3d;
+../make skaffold-dev-k3d;
 ```
 
 ## 4. Deploy Album-Store to the K3D Kubernetes Cluster
 
-This will deploy 3 replicas of album-store into the cluster. 
+This will deploy 3 replicas of proxy-service into the cluster. 
 
 You will see different instance names in the Jaeger Process for the 3 pods.
 
 ```bash
-make k3d-album-deploy-deployment;
+make k3d-proxy-deploy-deployment;
 ```
 
 **Note: the application will hang after printing its version number if  OpenTelemetry collector is not running**
@@ -61,7 +63,7 @@ make k3d-album-deploy-deployment;
 ### 6.1 curl
 
 ```bash
-curl --insecure --location 'http://album-store.local:8070/albums/'; 
+curl --insecure --location 'http://proxy-service.local:8070/albums/'; 
 ```
 
 ### 6.3 Run Test Suite
@@ -75,7 +77,7 @@ make k3d-test;
 [Postman files](../test/postman_collection.json)
 
 1. Import the folder `../test`
-1. Set Environment to `album-store.local`
+1. Set Environment to `proxy-service.local`
 1. Open a test in the `Album-Store` collection and run it.
 
 ## 7. Stop album-store server & Services  
@@ -85,7 +87,7 @@ Ctr + C on the terminal window where you started `make skaffold-dev`
 ## 8. Delete Album-Store
 
 ```bash
-make k3d-album-undeploy-deployment;
+make k3d-proxy-undeploy-deployment;
 ```
 
 ## 9. Delete Cluster

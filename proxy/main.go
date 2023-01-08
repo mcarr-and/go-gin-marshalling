@@ -229,7 +229,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	albumStoreUrlEnv := os.Getenv("ALBUM_STORE_URL")
+	albumStoreUrlEnv := os.Getenv("ALBUM_STORE_LOCATION")
 	if albumStoreUrl != "" {
 		albumStoreUrl = albumStoreUrlEnv
 	}

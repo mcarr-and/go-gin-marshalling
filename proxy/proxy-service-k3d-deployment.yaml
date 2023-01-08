@@ -21,8 +21,8 @@ items:
     ports:
       - protocol: TCP
         name: http
-        port: 9080
-        targetPort: 9080
+        port: 9070
+        targetPort: 9070
     selector:
       app.kubernetes.io/instance: "proxy-service"
       app.kubernetes.io/name: "proxy-service"
@@ -82,8 +82,10 @@ items:
                   value: "99"
                 - name: GRPC_GO_LOG_SEVERITY_LEVEL
                   value: "info"
+                - name: ALBUM_STORE_LOCATION
+                  value: "album-store.album-store.svc.cluster.local:4317"
               ports:
-                - containerPort: 9080
+                - containerPort: 9070
                   name: http
                   protocol: TCP
               resources:
@@ -124,6 +126,6 @@ items:
                   service:
                     name: proxy-service
                     port:
-                      number: 9080
+                      number: 9070
                 path: /
                 pathType: ImplementationSpecific

@@ -54,25 +54,37 @@ run-tests:
 docker-build:
 	docker build -t album-store.local:0.1 -t album-store.local:latest .
 
+.PHONY: docker-build-proxy
+docker-build:
+	cd proxy && $(MAKE) docker-build && cd ..
+
+.PHONY: docker-build-proxy
+docker-build-proxy:
+	cd proxy && $(MAKE) docker-build && cd ..
+
 .PHONY: k3d-docker-registry
-k3d-docker-registry:
+k3d-docker-registry: docker-build
 	docker tag album-store:latest localhost:54094/album-store:0.1
 	docker push localhost:54094/album-store:0.1
 
-.PHONY: k3d-internal-deploy-deployment
-k3d-internal-deploy-deployment:
+.PHONY: k3d-docker-registry-proxy
+k3d-docker-registry-proxy: docker-build-proxy
+	cd proxy && $(MAKE) k3d-docker-registry && cd ..
+
+.PHONY: k3d-album-deploy-deployment
+k3d-album-deploy-deployment:
 	kubectl apply -f album-store-k3d-deployment.yaml
 
-.PHONY: k3d-internal-undeploy-deployment
-k3d-internal-undeploy-deployment:
+.PHONY: k3d-album-undeploy-deployment
+k3d-album-undeploy-deployment:
 	kubectl delete -f album-store-k3d-deployment.yaml
 
-.PHONY: k3d-internal-pod
-k3d-internal-deploy-pod:
+.PHONY: k3d-album-deploy-pod
+k3d-album-deploy-pod:
 	kubectl apply -f album-store-k3d-pod.yaml
 
-.PHONY: k3d-internal-undeploy-pod
-k3d-internal-undeploy-pod:
+.PHONY: k3d-album-undeploy-pod
+k3d-album-undeploy-pod:
 	kubectl delete -f album-store-k3d-pod.yaml
 
 setup-album-properties:
@@ -103,7 +115,7 @@ docker-stop:
 	docker stop album-store;
 
 .PHONY: docker-compose-full-start
-docker-compose-full-start:
+docker-compose-full-start: docker-build
 	docker-compose up -d;
 
 .PHONY: docker-compose-full-stop

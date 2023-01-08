@@ -51,44 +51,44 @@ k3d-docker-registry:
 	docker tag proxy-service:latest localhost:54094/proxy-service:0.1
 	docker push localhost:54094/proxy-service:0.1
 
-.PHONY: k3d-internal-deploy-deployment
-k3d-internal-deploy-deployment:
+.PHONY: k3d-proxy-deploy-deployment
+k3d-proxy-deploy-deployment:
 	kubectl apply -f proxy-service-k3d-deployment.yaml
 
-.PHONY: k3d-internal-undeploy-deployment
-k3d-internal-undeploy-deployment:
+.PHONY: k3d-proxy-undeploy-deployment
+k3d-proxy-undeploy-deployment:
 	kubectl delete -f proxy-service-k3d-deployment.yaml
 
-.PHONY: k3d-internal-pod
-k3d-internal-deploy-pod:
+.PHONY: k3d-proxy-deploy-pod
+k3d-proxy-deploy-pod:
 	kubectl apply -f proxy-service-k3d-pod.yaml
 
-.PHONY: k3d-internal-undeploy-pod
-k3d-internal-undeploy-pod:
+.PHONY: k3d-proxy-undeploy-pod
+k3d-proxy-undeploy-pod:
 	kubectl delete -f proxy-service-k3d-pod.yaml
 
 setup-album-properties:
-	$(eval album_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=proxy-service-1)
+	$(eval proxy_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=proxy-service-1)
 
 .PHONY: docker-k3d-start
 docker-k3d-start: setup-album-properties
-	$(album_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_URL=localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
+	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_LOCATION=localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
 
 .PHONY: docker-local-start
 docker-local-start: setup-album-properties
-	$(album_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_URL=localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
+	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
 
 .PHONY: local-start-k3d
 local-start-k3d: build setup-album-properties
-	$(album_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_URL=album-store.album-store.svc.cluster.local:9080 ./proxy-service
+	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_LOCATION=album-store.album-store.svc.cluster.local:9080 ./proxy-service
 
 .PHONY: local-start-grpc
 local-start-grpc: build setup-album-properties
-	$(album_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_URL=localhost:9080 ./proxy-service
+	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=localhost:9080 ./proxy-service
 
 .PHONY: local-start-http
 local-start-http: build setup-album-properties
-	$(album_setup) OTEL_LOCATION=localhost:4328 ALBUM_STORE_URL=localhost:9080 ./proxy-service
+	$(proxy_setup) OTEL_LOCATION=localhost:4328 ALBUM_STORE_LOCATION=localhost:9080 ./proxy-service
 
 .PHONY: docker-stop
 docker-stop:

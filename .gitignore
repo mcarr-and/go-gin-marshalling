@@ -30,3 +30,4 @@ coverage.*
 # vscode file
 __debug_bin
 /album-store
+/proxy/proxy-service
