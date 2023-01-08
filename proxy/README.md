@@ -2,7 +2,7 @@
 
 This is an example Go-gin application that demonstrates nested spans. 
 
-This uses the opentelemetry instrumented http client[otelhttp](https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/net/http/otelhttp) 
+This uses the opentelemetry instrumented http client [otelhttp](https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/net/http/otelhttp) 
 
 This is a simple pass through service that calls the Album service.
 
@@ -25,8 +25,6 @@ Cluster must have the following deployed
 [Jaeger proxy-service spans ](http://localhost:16696/search?service=proxy-service)
 
 ## TODO:
-* Add to Makefile 
-* Add to Docker-compose
 * Unit test with mocked out album-store serving different responses.
 
 # Docker Run
