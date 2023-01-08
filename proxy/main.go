@@ -59,7 +59,8 @@ func setupRouter() *gin.Engine {
 }
 
 const (
-	serviceName = "proxy-service"
+	serviceName  = "proxy-service"
+	startAddress = "0.0.0.0:9070"
 )
 
 var version = "No-Version"
@@ -144,8 +145,9 @@ func main() {
 
 	router := setupRouter()
 	//serve requests until termination signal is sent.
+
 	srv := &http.Server{
-		Addr:    "0.0.0.0:9070",
+		Addr:    startAddress,
 		Handler: h2c.NewHandler(router, &http2.Server{}),
 	}
 

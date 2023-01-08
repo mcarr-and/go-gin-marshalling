@@ -173,7 +173,8 @@ func setupRouter() *gin.Engine {
 }
 
 const (
-	serviceName = "album-store"
+	serviceName  = "album-store"
+	startAddress = "0.0.0.0:9080"
 )
 
 var version = "No-Version"
@@ -287,7 +288,7 @@ func main() {
 	router := setupRouter()
 	//serve requests until termination signal is sent.
 	srv := &http.Server{
-		Addr:    "0.0.0.0:9080",
+		Addr:    startAddress,
 		Handler: h2c.NewHandler(router, &http2.Server{}),
 	}
 
