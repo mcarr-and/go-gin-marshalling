@@ -6,9 +6,9 @@ This uses the opentelemetry instrumented http client[otelhttp](https://github.co
 
 This is a simple pass through service that calls the Album service.
 
-
+# Local Run
 ## 0. Start Locally
-`GRPC_GO_LOG_SEVERITY_LEVEL=info;GRPC_GO_LOG_VERBOSITY_LEVEL=99;INSTANCE_NAME=proxy-service;NAMESPACE=no-namespace;OTEL_LOCATION=localhost:4327;ALBUM_STORE_URL=http://localhost:9080 go run main.go`
+`GRPC_GO_LOG_SEVERITY_LEVEL=info;GRPC_GO_LOG_VERBOSITY_LEVEL=99;INSTANCE_NAME=proxy-service;NAMESPACE=no-namespace;OTEL_LOCATION=localhost:4327;ALBUM_STORE_URL=localhost:9080 go run main.go`
 
 ## 1. hit albums url 
 
@@ -22,3 +22,18 @@ This is a simple pass through service that calls the Album service.
 * Add to Makefile 
 * Add to Docker-compose
 * Unit test with mocked out album-store serving different responses.
+
+# Docker Run
+
+## 0. K3D install
+
+[k3D install ](K3D-Install.md)
+
+## 1. Setup Env
+
+local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
+
+add `proxy-service.local` to your list of *.local environments 
+
+`127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local proxy-service.local`
+

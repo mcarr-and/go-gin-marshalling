@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -35,30 +36,110 @@ func getAlbums(c *gin.Context) {
 	span.SetName("/albums GET")
 	defer span.End()
 	span.SetStatus(codes.Ok, "")
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	// proxy call to album-Store
 	resp, err := otelhttp.Get(c.Request.Context(), albumStoreUrl+"/albums")
 	if err != nil {
 		log.Println(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		return
 	}
-	span.SetAttributes(attribute.Key("album-store.response").Int(resp.StatusCode))
 	var j interface{}
 	err = json.NewDecoder(resp.Body).Decode(&j)
 	if err != nil {
 		panic(err)
 	}
-	c.JSON(http.StatusOK, j)
 	err = resp.Body.Close()
 	if err != nil {
 		log.Println(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("eror parsing album-service body %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		return
 	}
+
+	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	span.SetStatus(codes.Ok, "")
+	c.JSON(http.StatusOK, j)
+}
+
+func getAlbumByID(c *gin.Context) {
+	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/albums/:id GET")
+	defer span.End()
+	id := c.Param("id")
+	span.SetAttributes(attribute.Key("http.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
+	// proxy call to album-Store
+	resp, err := otelhttp.Get(c.Request.Context(), albumStoreUrl+"/albums/"+id)
+	if err != nil {
+		log.Println(err)
+	}
+	var j interface{}
+	err = json.NewDecoder(resp.Body).Decode(&j)
+	if err != nil {
+		panic(err)
+	}
+
+	err = resp.Body.Close()
+	if err != nil {
+		log.Println(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		return
+	}
+	span.SetStatus(codes.Ok, "")
+	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	c.JSON(http.StatusOK, j)
+
+}
+
+func postAlbum(c *gin.Context) {
+	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/albums POST")
+	defer span.End()
+
+	byteArray := make([]byte, 500)
+	_, err := c.Request.Body.Read(byteArray)
+	if err != nil {
+		log.Println(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("could not get Post body %v", err))
+	}
+	str1 := string(byteArray[:])
+	// proxy call to album-Store
+	resp, err := otelhttp.Post(c.Request.Context(), albumStoreUrl+"/albums/", "application/json", strings.NewReader(str1))
+	if err != nil {
+		log.Println(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		return
+	}
+	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
+	var j interface{}
+	err = json.NewDecoder(resp.Body).Decode(&j)
+	if err != nil {
+		span.SetStatus(codes.Error, fmt.Sprintf("could not parse album-service Body %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		return
+	}
+	err = resp.Body.Close()
+	if err != nil {
+		log.Println(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("eror conacting album-store %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		return
+	}
+	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	span.SetStatus(codes.Ok, "")
+	c.JSON(http.StatusOK, j)
 }
 
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Gin
 	router.GET("/albums", getAlbums)
-	//router.GET("/albums/:id"id, getAlbumByID)
-	//router.POST("/albums", postAlbum)
+	router.GET("/albums/:id", getAlbumByID)
+	router.POST("/albums", postAlbum)
 	return router
 }
 
@@ -69,7 +150,7 @@ const (
 
 var version = "No-Version"
 var gitHash = "No-Hash"
-var albumStoreUrl = "http://localhost:9080"
+var albumStoreUrl = "localhost:9080"
 
 // Set up the context for this Application in Open Telemetry
 // application name, application version, k8s namespace , k8s instance name (horizontal scaling)
