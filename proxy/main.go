@@ -36,8 +36,7 @@ func getAlbums(c *gin.Context) {
 	defer span.End()
 	span.SetStatus(codes.Ok, "")
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
-	resp, err := otelhttp.Get(c.Request.Context(), "http://localhost:9080/albums")
-	defer resp.Body.Close()
+	resp, err := otelhttp.Get(c.Request.Context(), albumStoreUrl+"/albums")
 	if err != nil {
 		log.Println(err)
 	}
@@ -48,6 +47,10 @@ func getAlbums(c *gin.Context) {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, j)
+	err = resp.Body.Close()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func setupRouter() *gin.Engine {
@@ -66,6 +69,7 @@ const (
 
 var version = "No-Version"
 var gitHash = "No-Hash"
+var albumStoreUrl = "http://localhost:9080"
 
 // Set up the context for this Application in Open Telemetry
 // application name, application version, k8s namespace , k8s instance name (horizontal scaling)
@@ -142,6 +146,11 @@ func main() {
 	shutdownTraceProvider, err := initOtelProvider()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	albumStoreUrlEnv := os.Getenv("ALBUM_STORE_URL")
+	if albumStoreUrl != "" {
+		albumStoreUrl = albumStoreUrlEnv
 	}
 
 	router := setupRouter()
