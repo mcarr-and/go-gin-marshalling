@@ -39,16 +39,13 @@ Standalone server that proxies calls to the album-store
 
 
 ## TODO
-* Create proxy service that shows nested spans and calls.
 * after front end is in place create sub span from current span to have nested spans. 
 * liveness endpoint & wire to album-store
 * health endpoint & wire into album-store
 * Add prometheus and grafana to cluster
-* Log in JSON format
+* Write Logs in JSON format
 * add all request and response headers and request parameters to the otel attributes.
-*
 * Adding CI server integration
-* Docker cache layers to save on build time for go dependencies
 * Add open-telmetry to the ingress-nginx so spans are created from the entry point to the cluster.
 * prometheus endpoint
 * Create status endpoint that says if service is up or down.
