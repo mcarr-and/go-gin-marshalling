@@ -13,15 +13,15 @@ Send data to the following services:
 
 ### Docker Compose
 
-[Docker-Compose fully inclusive instructions](docs/Docker-Compose-Install-Full.md)
+[Docker-Compose fully inclusive instructions](docs/Run-Docker-Compose-Install-Full.md)
 
-[Docker-Compose with album-store as an external application instructions](docs/Docker-Compose-Install-External.md)
+[Docker-Compose with album-store as an external application instructions](docs/Run-Docker-Compose-Install-External.md)
 
 ## K3D cluster
 
 Run the project with a local Kubernetes cluster with K3D. 
 
-[Local Kubernetes with K3D instructions](docs/K3D-Install.md)
+[Local Kubernetes with K3D instructions](docs/Run-K3D.md)
 
 [K3D and using local registry](docs/K3D-registry.md)
 
