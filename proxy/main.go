@@ -16,6 +16,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -35,7 +36,7 @@ func getAlbums(c *gin.Context) {
 	defer span.End()
 	span.SetStatus(codes.Ok, "")
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
-	resp, err := http.Get("http://localhost:9080/albums")
+	resp, err := otelhttp.Get(c.Request.Context(), "http://localhost:9080/albums")
 	defer resp.Body.Close()
 	if err != nil {
 		log.Println(err)
