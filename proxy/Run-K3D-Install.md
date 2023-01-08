@@ -15,7 +15,7 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
 ### 0.1 K3D Registry info
 
-[K3d Registry info](K3D-registry.md)
+[K3d Registry info](../docs/K3D-registry.md)
 
 ## 1. Create K3d Kubernetes Cluster with Internal Registry
 
@@ -38,6 +38,16 @@ make k3d-docker-registry;
 
 ## 4. Deploy Album-Store to the K3D Kubernetes Cluster
 
+This will deploy 3 replicas of album-store into the cluster.
+
+You will see different instance names in the Jaeger Process for the 3 pods.
+
+```bash
+../make k3d-album-deploy-deployment;
+```
+
+## 5. Deploy Proxy-Service to the K3D Kubernetes Cluster
+
 This will deploy 3 replicas of proxy-service into the cluster. 
 
 You will see different instance names in the Jaeger Process for the 3 pods.
@@ -48,25 +58,28 @@ make k3d-proxy-deploy-deployment;
 
 **Note: the application will hang after printing its version number if  OpenTelemetry collector is not running**
 
-### 4.1 Debugging Advice  
+### 5.1 Debugging Advice  
 
-[Debugging commands for cluster](K3D-Debugging.md)
+[Debugging commands for cluster](../docs/K3D-Debugging.md)
 
-## 5. View the events in the different Services in K3D
+## 6. View the events in the different Services in K3D
 
-[View Jaeger](http://jaeger.local:8070/search?limit=20&service=album-store)
+These will have 2 spans.
+
+* 1 for Proxy-Service
+* 1 for Album-Store
+
+[View Jaeger](http://jaeger.local:8070/search?limit=20&service=proxy-service)
 
 [View Kubernetes environment](http://k-dashboard:8070/)
 
 ## 6. Run Some Tests
 
-### 6.1 curl
+### 6.1 Command line
 
 ```bash
 curl --insecure --location 'http://proxy-service.local:8070/albums/'; 
 ```
-
-### 6.3 Run Test Suite
 
 ```bash
 make k3d-test;
@@ -79,6 +92,10 @@ make k3d-test;
 1. Import the folder `../test`
 1. Set Environment to `proxy-service.local`
 1. Open a test in the `Album-Store` collection and run it.
+
+### 6.3 Browser
+
+[view proxy-service albums](http://album-service:8070/albums)
 
 ## 7. Stop album-store server & Services  
 
@@ -95,4 +112,3 @@ make k3d-proxy-undeploy-deployment;
 ```bash
 ../make k3d-cluster-delete
 ```
-
