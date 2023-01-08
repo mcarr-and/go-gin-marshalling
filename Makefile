@@ -87,6 +87,22 @@ k3d-album-deploy-pod:
 k3d-album-undeploy-pod:
 	kubectl delete -f album-store-k3d-pod.yaml
 
+.PHONY: k3d-proxy-deploy-deployment
+k3d-proxy-deploy-deployment:
+	kubectl apply -f proxy/proxy-service-k3d-deployment.yaml
+
+.PHONY: k3d-proxy-undeploy-deployment
+k3d-proxy-undeploy-deployment:
+	kubectl delete -f proxy/proxy-service-k3d-deployment.yaml
+
+.PHONY: k3d-proxy-deploy-pod
+k3d-proxy-deploy-pod:
+	kubectl apply -f proxy/proxy-service-k3d-pod.yaml
+
+.PHONY: k3d-proxy-undeploy-pod
+k3d-proxy-undeploy-pod:
+	kubectl delete -f proxy/proxy-service-k3d-pod.yaml
+
 setup-album-properties:
 	$(eval album_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)
 
