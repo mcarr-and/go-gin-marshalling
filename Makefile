@@ -50,9 +50,9 @@ run-tests:
         --data-raw '{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}';
 	curl --location --request GET '$(url_value)/v3/api-docs';
 
-.PHONY: docker-build
-docker-build:
-	docker build -t album-store.local:0.1 -t album-store.local:latest .
+.PHONY: docker-build-album
+docker-build-album:
+	DOCKER_BUILDKIT=1 docker build -t album-store.local:0.1 -t album-store.local:latest .
 
 .PHONY: docker-build-proxy
 docker-build:

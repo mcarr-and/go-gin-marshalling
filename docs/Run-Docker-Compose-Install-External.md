@@ -11,7 +11,7 @@ You start the server from another command prompt or within your IDE.
 ## 1. Build the docker image
 
 ```bash
-make docker-build
+make docker-build-album
 ```
 
 ## 2. Start All Observability & Log Viewing Services

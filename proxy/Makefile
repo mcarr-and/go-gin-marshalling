@@ -42,9 +42,9 @@ run-tests:
         --data-raw '{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}';
 	curl --location --request GET '$(url_value)/v3/api-docs';
 
-.PHONY: docker-build
-docker-build:
-	docker build -t proxy-service.local:0.1 -t proxy-service.local:latest .
+.PHONY: docker-build-proxy
+docker-build-proxy:
+	DOCKER_BUILDKIT=1 docker build -t proxy-service.local:0.1 -t proxy-service.local:latest .
 
 .PHONY: k3d-docker-registry
 k3d-docker-registry:

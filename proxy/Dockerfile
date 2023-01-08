@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# syntax = docker/dockerfile:1-experimental
 FROM golang:1.19 as build
 WORKDIR /app/
+copy go.* ./
+RUN go mod download
 COPY . .
-RUN go env -w GOPROXY=direct
-RUN CGO_ENABLED=0 go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o proxy-service main.go
+RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o proxy-service main.go
 FROM alpine:3.17.0
 COPY --from=build /app/proxy-service  /app/proxy-service
 CMD ["/app/proxy-service"]

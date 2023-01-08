@@ -24,7 +24,7 @@ make k3d-cluster-create
 ## 2. Build the application in Docker and deploy Docker image to the  K3D Internal Registry
 
 ```bash
-make docker-build;
+make docker-build-album;
 make k3d-docker-registry;
 ```
 
