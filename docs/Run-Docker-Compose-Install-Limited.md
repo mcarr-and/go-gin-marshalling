@@ -51,7 +51,7 @@ make local-test;
 
 ### 4.2 Using Postman
 
-[Postman files](../test/postman_collection.json)
+[Postman files](../test/)
 
 1. Import the collection and environment into your postman
 1. Set Environment to `localhost`
