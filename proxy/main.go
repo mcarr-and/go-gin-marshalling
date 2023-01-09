@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -31,30 +32,46 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+type OtelHttpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var (
+	DefaultClient OtelHttpClient
+)
+
+func init() {
+	DefaultClient = otelhttp.DefaultClient
+}
+
 func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
 	defer span.End()
-	span.SetStatus(codes.Ok, "")
+
 	// proxy call to album-Store
-	resp, err := otelhttp.Get(c.Request.Context(), albumStoreUrl+"/albums")
+	resp, err := Get(c.Request.Context(), albumStoreUrl+"/albums")
 	if err != nil {
-		log.Println(err)
 		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
 		return
 	}
 	var j interface{}
 	err = json.NewDecoder(resp.Body).Decode(&j)
 	if err != nil {
-		panic(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
+		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		log.Println(err)
-		span.SetStatus(codes.Error, fmt.Sprintf("eror parsing album-service body %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
 		return
+
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
@@ -69,28 +86,34 @@ func getAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 	span.SetAttributes(attribute.Key("http.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
 	// proxy call to album-Store
-	resp, err := otelhttp.Get(c.Request.Context(), albumStoreUrl+"/albums/"+id)
+	resp, err := Get(c.Request.Context(), albumStoreUrl+"/albums/"+id)
 	if err != nil {
-		log.Println(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
+		return
 	}
 	var j interface{}
 	err = json.NewDecoder(resp.Body).Decode(&j)
 	if err != nil {
-		panic(err)
+		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store getAlbumById %v", err))
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store getAlbumById"})
+		return
 	}
 
 	err = resp.Body.Close()
 	if err != nil {
 		log.Println(err)
-		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store getAlbums %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store getAlbumById"})
 		return
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
 	c.JSON(http.StatusOK, j)
-
 }
 
 func postAlbum(c *gin.Context) {
@@ -106,25 +129,26 @@ func postAlbum(c *gin.Context) {
 	}
 	str1 := string(byteArray[:])
 	// proxy call to album-Store
-	resp, err := otelhttp.Post(c.Request.Context(), albumStoreUrl+"/albums/", "application/json", strings.NewReader(str1))
+	resp, err := Post(c.Request.Context(), albumStoreUrl+"/albums/", "application/json", strings.NewReader(str1))
 	if err != nil {
-		log.Println(err)
-		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store postAlbum %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error contacting album-store postAlbum"})
 		return
 	}
 	var j interface{}
 	err = json.NewDecoder(resp.Body).Decode(&j)
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("could not parse album-service Body %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store postAlbum %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store postAlbum"})
 		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		log.Println(err)
-		span.SetStatus(codes.Error, fmt.Sprintf("eror conacting album-store %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store postAlbum %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store postAlbum"})
 		return
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
@@ -267,4 +291,22 @@ func main() {
 	<-ctxServer.Done()
 
 	log.Println("Server exiting")
+}
+
+func Get(ctx context.Context, targetURL string) (resp *http.Response, err error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", targetURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	return DefaultClient.Do(req)
+}
+
+// Post is a convenient replacement for http.Post that adds a span around the request.
+func Post(ctx context.Context, targetURL, contentType string, body io.Reader) (resp *http.Response, err error) {
+	req, err := http.NewRequestWithContext(ctx, "POST", targetURL, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", contentType)
+	return DefaultClient.Do(req)
 }
