@@ -15,7 +15,7 @@ Send data to the following services:
 
 [Docker-Compose fully inclusive instructions](docs/Run-Docker-Compose-Install-Full.md)
 
-[Docker-Compose with album-store as an external application instructions](docs/Run-Docker-Compose-Install-External.md)
+[Docker-Compose with album-store as an external application instructions](docs/Run-Docker-Compose-Install-Limited.md)
 
 ## K3D cluster
 

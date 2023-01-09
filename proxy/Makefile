@@ -46,8 +46,8 @@ run-tests:
 docker-build-proxy:
 	DOCKER_BUILDKIT=1 docker build -t proxy-service.local:0.1 -t proxy-service.local:latest .
 
-.PHONY: k3d-docker-registry
-k3d-docker-registry:
+.PHONY: docker-tag-k3d-registry
+docker-tag-k3d-registry:
 	docker tag proxy-service:latest localhost:54094/proxy-service:0.1
 	docker push localhost:54094/proxy-service:0.1
 
@@ -82,17 +82,41 @@ docker-local-start: setup-album-properties
 local-start-k3d: build setup-album-properties
 	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_LOCATION=album-store.album-store.svc.cluster.local:9080 ./proxy-service
 
-.PHONY: local-start-grpc
-local-start-grpc: build setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=localhost:9080 ./proxy-service
+.PHONY: local-start-proxy-grpc
+local-start-proxy-grpc: build setup-album-properties
+	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=localhost:9080 ./proxy-service && cd proxy
 
-.PHONY: local-start-http
-local-start-http: build setup-album-properties
+.PHONY: local-start-album-grpc
+local-start-album-grpc: build setup-album-properties
+	cd ../ && $(proxy_setup) OTEL_LOCATION=localhost:4327 ./album-store && cd proxy
+
+.PHONY: local-start-proxy-http
+local-start-proxy-http: build setup-album-properties
 	$(proxy_setup) OTEL_LOCATION=localhost:4328 ALBUM_STORE_LOCATION=localhost:9080 ./proxy-service
 
 .PHONY: docker-stop
 docker-stop:
 	docker stop proxy-service;
+
+.PHONY: docker-compose-limited-start
+docker-compose-limited-start:
+	cd .. && $(MAKE) docker-compose-limited-start && cd proxy
+
+.PHONY: skaffold-dev-k3d
+skaffold-dev-k3d:
+	cd .. && $(MAKE) skaffold-dev-k3d && cd proxy
+
+.PHONY: k3d-cluster-create
+k3d-cluster-create:
+	cd .. && $(MAKE) k3d-cluster-create && cd proxy
+
+.PHONY: k3d-album-deploy-deployment
+k3d-album-deploy-deployment:
+	cd .. && $(MAKE) k3d-album-deploy-deployment && cd proxy
+
+.PHONY: k3d-album-undeploy-deployment
+k3d-album-undeploy-deployment:
+	cd .. && $(MAKE) k3d-album-undeploy-deployment && cd proxy
 
 .PHONY: coverage
 coverage:

@@ -25,7 +25,7 @@ make k3d-cluster-create
 
 ```bash
 make docker-build-album;
-make k3d-docker-registry;
+make docker-tag-k3d-registry;
 ```
 
 ## 3. Start All Observability & Log Viewing Services

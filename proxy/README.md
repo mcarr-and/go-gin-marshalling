@@ -17,10 +17,6 @@ Cluster must have the following deployed
 
 # Run 
 
-## Local
-
-[local run](Run-Local.md)
-
 ## Docker-Compose
 
 [Docker-Compose](Run-Docker-Compose-Limited.md)

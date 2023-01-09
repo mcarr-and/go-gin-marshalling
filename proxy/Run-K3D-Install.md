@@ -20,20 +20,20 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 ## 1. Create K3d Kubernetes Cluster with Internal Registry
 
 ```bash
-../make k3d-cluster-create
+  make k3d-cluster-create;
 ```
 
 ## 2. Build the application in Docker and deploy Docker image to the  K3D Internal Registry
 
 ```bash
-make docker-build-proxy;
-make k3d-docker-registry;
+  make docker-build-proxy;
+  make docker-tag-k3d-registry;
 ```
 
 ## 3. Start All Observability & Log Viewing Services
  
 ```bash
-../make skaffold-dev-k3d;
+  make skaffold-dev-k3d;
 ```
 
 ## 4. Deploy Album-Store to the K3D Kubernetes Cluster
@@ -43,7 +43,7 @@ This will deploy 3 replicas of album-store into the cluster.
 You will see different instance names in the Jaeger Process for the 3 pods.
 
 ```bash
-../make k3d-album-deploy-deployment;
+  make k3d-album-deploy-deployment;
 ```
 
 ## 5. Deploy Proxy-Service to the K3D Kubernetes Cluster
@@ -97,18 +97,18 @@ make k3d-test;
 
 [view proxy-service albums](http://album-service:8070/albums)
 
-## 7. Stop album-store server & Services  
+## 7. Stop the Services  
 
 Ctr + C on the terminal window where you started `make skaffold-dev`
 
-## 8. Delete Album-Store
+## 8. Delete Proxy-Service from Kubernetes
 
 ```bash
-make k3d-proxy-undeploy-deployment;
+  make k3d-proxy-undeploy-deployment;
 ```
 
-## 9. Delete Cluster
+## 9. Delete ProxyAlbum-Service from Kubernetes
 
 ```bash
-../make k3d-cluster-delete
+  make k3d-album-undeploy-deployment;
 ```

@@ -54,22 +54,18 @@ run-tests:
 docker-build-album:
 	DOCKER_BUILDKIT=1 docker build -t album-store.local:0.1 -t album-store.local:latest .
 
-.PHONY: docker-build-proxy
-docker-build:
-	cd proxy && $(MAKE) docker-build && cd ..
-
-.PHONY: docker-build-proxy
-docker-build-proxy:
-	cd proxy && $(MAKE) docker-build && cd ..
-
-.PHONY: k3d-docker-registry
-k3d-docker-registry: docker-build
+.PHONY: docker-tag-k3d-registry
+docker-tag-k3d-registry: docker-build-album
 	docker tag album-store:latest localhost:54094/album-store:0.1
 	docker push localhost:54094/album-store:0.1
 
-.PHONY: k3d-docker-registry-proxy
-k3d-docker-registry-proxy: docker-build-proxy
-	cd proxy && $(MAKE) k3d-docker-registry && cd ..
+.PHONY: docker-build-proxy
+docker-build-proxy:
+	cd proxy && $(MAKE) docker-build-proxy && cd ..
+
+.PHONY: docker-tag-k3d-registry-proxy
+docker-tag-k3d-registry-proxy: docker-build-proxy
+	cd proxy && $(MAKE) docker-tag-k3d-registry && cd ..
 
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment:

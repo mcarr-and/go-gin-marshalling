@@ -7,16 +7,16 @@
 This version everything is running inside the docker-compose.
 
 
-## 1. Build the docker image
+## 1. Build the docker images for Album-Store and Proxy-Service
 
 ```bash
-make docker-build-album;
+  make docker-build-album && make docker-build-proxy;
 ```
 
 ## 2. Start All Observability & Log Viewing Services
  
 ```bash
-make docker-compose-full-start;
+  make docker-compose-full-start;
 ```
 
 #### Note: the application will not start without the OpenTelemetry collector running
@@ -26,7 +26,7 @@ make docker-compose-full-start;
 ### 3.1 from the command line
 
 ```bash
-make local-test;
+  make local-test;
 ```
 
 ### 3.2 Using Postman
@@ -52,5 +52,5 @@ make local-test;
 ### 2. Stop Observability and Log Viewing Services
 
 ```bash
-make docker-compose-stop;
+  make docker-compose-stop;
 ```
