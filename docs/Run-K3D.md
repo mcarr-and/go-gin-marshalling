@@ -72,7 +72,7 @@ make k3d-test;
 
 ### 6.2 Postman
 
-[Postman files](../test/postman_collection.json)
+[Postman files](../test/)
 
 1. Import the folder `../test`
 1. Set Environment to `album-store.local`
