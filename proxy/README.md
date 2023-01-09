@@ -13,7 +13,9 @@ Cluster must have the following deployed
 * Album-Store
 
 ## TODO:
-* Unit test with mocked out album-store serving different responses.
+* FLush out unit tests for examples.
+* need to improve how the mock interacts with the code under test to have correct number of spans. 
+  * 1 successful call has 3 spans.  
 
 # Run 
 
