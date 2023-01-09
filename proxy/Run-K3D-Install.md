@@ -97,7 +97,7 @@ Ctr + C on the terminal window where you started `make skaffold-dev`
   make k3d-proxy-undeploy-deployment;
 ```
 
-## 9. Delete ProxyAlbum-Service from Kubernetes
+## 9. Delete Album-Store from Kubernetes
 
 ```bash
   make k3d-album-undeploy-deployment;
