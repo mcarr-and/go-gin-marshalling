@@ -35,7 +35,7 @@ Run the project with a local Kubernetes cluster with K3D.
 
 Standalone server that proxies calls to the album-store
 
-[proxy-service](proxy/README.md)
+[proxy-service](proxy/)
 
 
 ## TODO
