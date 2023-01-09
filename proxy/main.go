@@ -57,8 +57,8 @@ func getAlbums(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
 		return
 	}
-	var j interface{}
-	err = json.NewDecoder(resp.Body).Decode(&j)
+	var albumStoreResponseBodyJson interface{}
+	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
 		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
@@ -71,12 +71,11 @@ func getAlbums(c *gin.Context) {
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
 		return
-
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
-	c.JSON(http.StatusOK, j)
+	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
 }
 
 func getAlbumByID(c *gin.Context) {
@@ -93,8 +92,8 @@ func getAlbumByID(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
 		return
 	}
-	var j interface{}
-	err = json.NewDecoder(resp.Body).Decode(&j)
+	var albumStoreResponseBodyJson interface{}
+	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
 		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store getAlbumById %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
@@ -113,7 +112,7 @@ func getAlbumByID(c *gin.Context) {
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
-	c.JSON(http.StatusOK, j)
+	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
 }
 
 func postAlbum(c *gin.Context) {
@@ -136,8 +135,8 @@ func postAlbum(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error contacting album-store postAlbum"})
 		return
 	}
-	var j interface{}
-	err = json.NewDecoder(resp.Body).Decode(&j)
+	var albumStoreResponseBodyJson interface{}
+	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
 		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store postAlbum %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
@@ -154,7 +153,7 @@ func postAlbum(c *gin.Context) {
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
-	c.JSON(http.StatusOK, j)
+	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
 }
 
 func setupRouter() *gin.Engine {
@@ -292,6 +291,9 @@ func main() {
 
 	log.Println("Server exiting")
 }
+
+// Extracted methods from "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp" 0.37.0
+// this is to allow use of interface for httpClient and be able to mock out responses
 
 func Get(ctx context.Context, targetURL string) (resp *http.Response, err error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", targetURL, nil)

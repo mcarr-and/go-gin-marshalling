@@ -68,6 +68,8 @@ func Test_getAllAlbums_Success(t *testing.T) {
 
 	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
 	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+
+	//inject a success message from the server and return a json blob that represents an album
 	GetDoFunc = func(*http.Request) (*http.Response, error) {
 		return &http.Response{
 			StatusCode: 200,
@@ -100,6 +102,7 @@ func Test_getAllAlbums_Failure(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 	DefaultClient = &MockClient{}
 
+	//inject in failure message to respond with that we could not get to the album-store
 	GetDoFunc = func(*http.Request) (*http.Response, error) {
 		return nil, errors.New(
 			"Error from web server",
