@@ -23,11 +23,11 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
   make k3d-cluster-create;
 ```
 
-## 2. Build the application in Docker and deploy Docker image to the  K3D Internal Registry
+## 2. Build the applications in Docker and push Docker image to the  K3D Internal Registry
 
 ```bash
-  make docker-build-proxy;
-  make docker-tag-k3d-registry;
+  make docker-build-proxy && make docker-tag-k3d-registry;
+  make docker-build-album && make docker-tag-k3d-registry-album;
 ```
 
 ## 3. Start All Observability & Log Viewing Services
@@ -43,26 +43,16 @@ This will deploy 3 replicas of album-store into the cluster.
 You will see different instance names in the Jaeger Process for the 3 pods.
 
 ```bash
-  make k3d-album-deploy-deployment;
-```
-
-## 5. Deploy Proxy-Service to the K3D Kubernetes Cluster
-
-This will deploy 3 replicas of proxy-service into the cluster. 
-
-You will see different instance names in the Jaeger Process for the 3 pods.
-
-```bash
-make k3d-proxy-deploy-deployment;
+  make k3d-album-deploy-deployment && make k3d-proxy-deploy-deployment;
 ```
 
 **Note: the application will hang after printing its version number if  OpenTelemetry collector is not running**
 
-### 5.1 Debugging Advice  
+### 4.1 Debugging Advice  
 
 [Debugging commands for cluster](../docs/K3D-Debugging.md)
 
-## 6. View the events in the different Services in K3D
+## 5. View the events in the different Services in K3D
 
 These will have 2 spans.
 

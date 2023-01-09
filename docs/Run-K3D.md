@@ -21,7 +21,7 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 make k3d-cluster-create
 ```
 
-## 2. Build the application in Docker and deploy Docker image to the  K3D Internal Registry
+## 2. Build the application in Docker and push Docker image to the  K3D Internal Registry
 
 ```bash
 make docker-build-album;

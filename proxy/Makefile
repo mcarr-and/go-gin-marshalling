@@ -46,6 +46,14 @@ run-tests:
 docker-build-proxy:
 	DOCKER_BUILDKIT=1 docker build -t proxy-service.local:0.1 -t proxy-service.local:latest .
 
+.PHONY: docker-build-album
+docker-build-album:
+	cd .. && $(MAKE) docker-build-album && cd proxy
+
+.PHONY: docker-tag-k3d-registry-album
+docker-tag-k3d-registry-album:
+	cd .. && $(MAKE) docker-tag-k3d-registry && cd proxy
+
 .PHONY: docker-tag-k3d-registry
 docker-tag-k3d-registry:
 	docker tag proxy-service:latest localhost:54094/proxy-service:0.1
