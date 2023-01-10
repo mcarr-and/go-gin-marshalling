@@ -292,7 +292,7 @@ func main() {
 	log.Println("Server exiting")
 }
 
-// Extracted methods from "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp" 0.37.0
+// Extracted methods from https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/net/http/otelhttp/client.go v0.37.0
 // this is to allow use of interface for httpClient and be able to mock out responses
 
 func Get(ctx context.Context, targetURL string) (resp *http.Response, err error) {
