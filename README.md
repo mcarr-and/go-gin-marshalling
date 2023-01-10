@@ -45,7 +45,6 @@ Proxy-Service uses the `otelhttp.client` to make requests and it will create 3 s
 * liveness endpoint & wire to deployment files
 * health endpoint & wire into deployment files
 * prometheus endpoint for album-store 
-* Cluster - add prometheus and grafana
 * Write Logs in JSON format
 * add all request and response headers and request parameters to the otel attributes.
 * Adding CI server integration
