@@ -122,14 +122,14 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "error contacting album-store Error from web server", finishedSpans[0].Status().Description)
+	assert.Equal(t, "error contacting album-store getAlbums Error from web server", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error calling Album-Store"}`, returnedBody)
+	assert.Equal(t, `{"message":"error calling album-store getAlbums"}`, returnedBody)
 }
 
 func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
@@ -159,27 +159,64 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "error from Album-Store malformed JSON", finishedSpans[0].Status().Description)
+	assert.Equal(t, "error from album-store getAlbums malformed JSON", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error from Album-Store malformed JSON"}`, returnedBody)
+	assert.Equal(t, `{"message":"error from album-store getAlbums malformed JSON"}`, returnedBody)
 }
 
-func Test_getAllAlbums_Failure_Album_Not_reachable(t *testing.T) {
+func Test_getAlbumById_Success(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	jsonBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
+	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+
+	//inject a success message from the server and return a json blob that represents an album
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: 200,
+			Body:       body,
+		}, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
+	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, jsonBody, returnedBody)
+}
+
+func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 	DefaultClient = &MockClient{}
 
 	//inject in failure message to respond with that we could not get to the album-store
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
-		return nil, errors.New("(Client.Timeout exceeded while awaiting headers)")
+		return nil, errors.New(
+			"Error from web server",
+		)
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
-
+	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	b, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(b)
@@ -190,12 +227,163 @@ func Test_getAllAlbums_Failure_Album_Not_reachable(t *testing.T) {
 	assert.Len(t, finishedSpans, 1)
 
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
-	assert.Equal(t, "error contacting album-store (Client.Timeout exceeded while awaiting headers)", finishedSpans[0].Status().Description)
+	assert.Equal(t, "error contacting album-store getAlbumById Error from web server", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error calling Album-Store"}`, returnedBody)
+	assert.Equal(t, `{"message":"error calling album-store"}`, returnedBody)
+}
+
+func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	//inject in failure message to respond with that we could not get to the album-store
+	jsonBody := `{"artist":"Black Sabbath","id":10,"price":66.6`
+	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+
+	//inject a failure message from the server and return a json blob that represents an album
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: 200,
+			Body:       body,
+		}, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "error from album-store getAlbumById malformed JSON", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, `{"message":"error getting body from album-store getAlbumById malformed JSON"}`, returnedBody)
+}
+
+func Test_postAlbums_Success(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	requestBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
+	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
+
+	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
+	responseBodyReader := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+
+	//inject a success message from the server and return a json blob that represents an album
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: 200,
+			Body:       responseBodyReader,
+		}, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
+	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, jsonBody, returnedBody)
+}
+
+func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	requestBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
+	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
+
+	//inject in failure message to respond with that we could not get to the album-store
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return nil, errors.New(
+			"Error from web server",
+		)
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "error contacting album-store postAlbum Error from web server", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, `{"message":"error contacting album-store postAlbum"}`, returnedBody)
+}
+
+func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	requestBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
+	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
+
+	//inject in failure message to respond with that we could not get to the album-store
+	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6`
+	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+
+	//inject a failure message from the server and return a json blob that represents an album
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: 200,
+			Body:       body,
+		}, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "error from album-store postAlbum malformed JSON", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, `{"message":"error getting body from album-store postAlbum malformed JSON"}`, returnedBody)
 }

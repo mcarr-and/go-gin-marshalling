@@ -44,22 +44,22 @@ func getAlbums(c *gin.Context) {
 	// proxy call to album-Store
 	resp, err := Get(c.Request.Context(), albumStoreURL+"/albums")
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store getAlbums %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling album-store getAlbums"})
 		return
 	}
 	var albumStoreResponseBodyJson interface{}
 	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error from Album-Store malformed JSON"))
+		span.SetStatus(codes.Error, "error from album-store getAlbums malformed JSON")
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error from Album-Store malformed JSON"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error from album-store getAlbums malformed JSON"})
 		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error album-store closing response%v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error album-store closing response %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error album-store closing response"})
 		return
@@ -79,23 +79,23 @@ func getAlbumByID(c *gin.Context) {
 	// proxy call to album-Store
 	resp, err := Get(c.Request.Context(), albumStoreURL+"/albums/"+id)
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store getAlbumById %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling Album-Store"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling album-store"})
 		return
 	}
 	var albumStoreResponseBodyJson interface{}
 	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store getAlbumById %v", err))
+		span.SetStatus(codes.Error, "error from album-store getAlbumById malformed JSON")
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store getAlbumById"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store getAlbumById malformed JSON"})
 		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
 		log.Println(err)
-		span.SetStatus(codes.Error, fmt.Sprintf("error closing body from album-store getAlbumsById %v", err))
+		span.SetStatus(codes.Error, fmt.Sprintf("error closing body from album-store getAlbumById %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store getAlbumById"})
 		return
@@ -129,9 +129,9 @@ func postAlbum(c *gin.Context) {
 	var albumStoreResponseBodyJson interface{}
 	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error getting body from album-store postAlbum %v", err))
+		span.SetStatus(codes.Error, "error from album-store postAlbum malformed JSON")
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store postAlbum"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store postAlbum malformed JSON"})
 		return
 	}
 	err = resp.Body.Close()
