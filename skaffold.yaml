@@ -19,6 +19,42 @@ profiles:
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
+  name: grafana
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: grafana
+            remoteChart: grafana
+            repo: https://grafana.github.io/helm-charts
+            namespace: monitoring
+            createNamespace: true
+            valuesFiles: ["./values/local/grafana.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: prometheus
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: prometheus
+            remoteChart: prometheus
+            repo: https://prometheus-community.github.io/helm-charts
+            namespace: monitoring
+            createNamespace: true
+            valuesFiles: ["./values/local/prometheus.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
   name: jaeger
 profiles:
   - name: k3d

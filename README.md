@@ -3,13 +3,13 @@ Use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework) &
 
 The project is a backend service that represents a music store with an in-memory database.
 
-### OpenTelemetry collector 
+## OpenTelemetry collector 
 
 Send data to the following services:
 * Jaeger
 * Prometheus[TODO]
 
-## 1. Running Project
+## Running Project
 
 ### Docker Compose
 
@@ -17,7 +17,7 @@ Send data to the following services:
 
 [Docker-Compose with album-store as an external application instructions](docs/Run-Docker-Compose-Install-Limited.md)
 
-## K3D cluster
+### K3D cluster
 
 Run the project with a local Kubernetes cluster with K3D. 
 
@@ -27,22 +27,25 @@ Run the project with a local Kubernetes cluster with K3D.
 
 [Debugging useful commands](docs/K3D-Debugging.md)
 
-## [WIP & NON-FUNCTIONING] Microk8s Cluster
+### [WIP & NON-FUNCTIONING] Microk8s Cluster
 
 [Local Kubernetes with Microk8s instructions](docs/Microk8s-Install.md)
 
-## [WIP] Proxy-Service
+## Proxy-Service
 
-Standalone server that proxies calls to the album-store
+Standalone server that proxies calls to the album-store.
+
+Used for showing nested spans in open-telemetry.
+
+Proxy-Service uses the `otelhttp.client` to make requests and it will create 3 spans.  
 
 [proxy-service](proxy/)
-
 
 ## TODO 
 * liveness endpoint & wire to deployment files
 * health endpoint & wire into deployment files
-* prometheus endpoint to service 
-* Add prometheus and grafana to cluster
+* prometheus endpoint for album-store 
+* Cluster - add prometheus and grafana
 * Write Logs in JSON format
 * add all request and response headers and request parameters to the otel attributes.
 * Adding CI server integration
