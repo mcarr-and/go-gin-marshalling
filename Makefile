@@ -146,6 +146,7 @@ docker-compose-limited-stop:
 k3d-cluster-create:
 	k3d cluster create k3s-default --config k3d-config.yaml
 	kubectl create namespace album-store
+	kubectl create namespace proxy-service
 
 .PHONY: k3d-cluster-delete
 k3d-cluster-delete:

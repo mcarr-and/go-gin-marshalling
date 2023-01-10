@@ -43,7 +43,7 @@ run-tests:
 
 .PHONY: docker-build-proxy
 docker-build-proxy:
-	DOCKER_BUILDKIT=1 docker build -t proxy-service.local:0.1 -t proxy-service.local:latest .
+	DOCKER_BUILDKIT=1 docker build -t proxy-service.local:0.1 -t proxy-service:latest .
 
 .PHONY: docker-build-album
 docker-build-album:
