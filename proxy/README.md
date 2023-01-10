@@ -13,8 +13,8 @@ Cluster must have the following deployed
 * Album-Store
 
 ## TODO:
-* heath endpoint, liveness endpoint
-* prometheus endpoint
+* heath endpoint, liveness endpoint & wire into deployment files
+* prometheus endpoint to service 
 * version file for go?
 
 # Run 
