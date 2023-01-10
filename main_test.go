@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"example/album-store/models"
+	"example.com/album-store/models"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
