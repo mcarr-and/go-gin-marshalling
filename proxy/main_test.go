@@ -69,8 +69,8 @@ func Test_getAllAlbums_Success(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 	DefaultClient = &MockClient{}
 
-	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
-	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+	responseBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
+	body := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
 	//inject a success message from the server and return a json blob that represents an album
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
@@ -98,7 +98,7 @@ func Test_getAllAlbums_Success(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, jsonBody, returnedBody)
+	assert.Equal(t, responseBody, returnedBody)
 }
 
 func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
@@ -139,8 +139,8 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	DefaultClient = &MockClient{}
 
 	//inject in failure message to respond with that we could not get to the album-store
-	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6`
-	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+	responseBody := `[{"artist":"Black Sabbath","id":10,"price":66.6`
+	body := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
 	//inject a failure message from the server and return a json blob that represents an album
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
@@ -168,6 +168,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, responseBody, attributeMap["http.response.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store getAlbums malformed JSON"}`, returnedBody)
 }
@@ -176,8 +177,8 @@ func Test_getAlbumById_Success(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 	DefaultClient = &MockClient{}
 
-	jsonBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
-	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+	responseBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
+	body := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
 	//inject a success message from the server and return a json blob that represents an album
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
@@ -206,7 +207,7 @@ func Test_getAlbumById_Success(t *testing.T) {
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
 
-	assert.Equal(t, jsonBody, returnedBody)
+	assert.Equal(t, responseBody, returnedBody)
 }
 
 func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
@@ -280,8 +281,8 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	DefaultClient = &MockClient{}
 
 	//inject in failure message to respond with that we could not get to the album-store
-	jsonBody := `{"artist":"Black Sabbath","id":10,"price":66.6`
-	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+	responseBody := `{"artist":"Black Sabbath","id":10,"price":66.6`
+	body := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
 	//inject a failure message from the server and return a json blob that represents an album
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
@@ -310,6 +311,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
+	assert.Equal(t, responseBody, attributeMap["http.response.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store getAlbumById malformed JSON"}`, returnedBody)
 }
@@ -321,8 +323,8 @@ func Test_postAlbums_Success(t *testing.T) {
 	requestBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
 	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
 
-	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
-	responseBodyReader := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+	responseBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
+	responseBodyReader := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
 	//inject a success message from the server and return a json blob that represents an album
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
@@ -350,7 +352,7 @@ func Test_postAlbums_Success(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, jsonBody, returnedBody)
+	assert.Equal(t, responseBody, returnedBody)
 }
 
 func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
@@ -467,8 +469,8 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
 
 	//inject in failure message to respond with that we could not get to the album-store
-	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6`
-	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+	responseBody := `[{"artist":"Black Sabbath","id":10,"price":66.6`
+	body := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
 	//inject a failure message from the server and return a json blob that represents an album
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
@@ -496,6 +498,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, responseBody, attributeMap["http.response.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store postAlbum malformed JSON"}`, returnedBody)
 }

@@ -53,12 +53,15 @@ func getAlbums(c *gin.Context) {
 		return
 	}
 	var albumStoreResponseBodyJson interface{}
-	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
+	byteArray, err := io.ReadAll(resp.Body)
+	responseBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
 		errorMessage := "error from album-store getAlbums malformed JSON"
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		span.SetAttributes(attribute.Key("http.response.body").String(responseBodyString))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
@@ -83,8 +86,8 @@ func getAlbumByID(c *gin.Context) {
 	defer span.End()
 	id := c.Param("id")
 	span.SetAttributes(attribute.Key("http.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
-	// proxy call to album-Store
 	albumID, err := strconv.Atoi(id)
+	// param ID is expected to be a number so fail if cannot covert to integer
 	if err != nil {
 		errorMessage := fmt.Sprintf("%s [%s] %s", "error invalid ID", id, "requested")
 		span.SetStatus(codes.Error, errorMessage)
@@ -93,6 +96,7 @@ func getAlbumByID(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
+	// proxy call to album-Store
 	resp, err := Get(c.Request.Context(), fmt.Sprintf("%v/albums/%v", albumStoreURL, albumID))
 	if err != nil {
 		errorMessage := fmt.Sprintf("error contacting album-store getAlbumById %v", err)
@@ -103,12 +107,15 @@ func getAlbumByID(c *gin.Context) {
 		return
 	}
 	var albumStoreResponseBodyJson interface{}
-	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
+	byteArray, err := io.ReadAll(resp.Body)
+	responseBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
 		errorMessage := "error from album-store getAlbumById malformed JSON"
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		span.SetAttributes(attribute.Key("http.response.body").String(responseBodyString))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
@@ -136,6 +143,7 @@ func postAlbum(c *gin.Context) {
 	byteArray, err := io.ReadAll(c.Request.Body)
 	requestBodyString := string(byteArray[:])
 	err = json.NewDecoder(strings.NewReader(requestBodyString)).Decode(&requestBody)
+	//any problems with conversion of request body to JSON then return failure
 	if err != nil {
 		log.Println(err)
 		errorMessage := fmt.Sprintf("invalid request json body %v", requestBodyString)
@@ -146,7 +154,7 @@ func postAlbum(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
-	// proxy call to album-Store
+	// proxy call to album-Store post album
 	resp, err := Post(c.Request.Context(), albumStoreURL+"/albums/", "application/json", strings.NewReader(fmt.Sprintf("%v", requestBody)))
 	if err != nil {
 		errorMessage := fmt.Sprintf("error contacting album-store postAlbum %v", err)
@@ -157,11 +165,14 @@ func postAlbum(c *gin.Context) {
 		return
 	}
 	var responseBody interface{}
-	err = json.NewDecoder(resp.Body).Decode(&responseBody)
+	byteArray, err = io.ReadAll(resp.Body)
+	responseBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&responseBody)
 	if err != nil {
 		errorMessage := "error from album-store postAlbum malformed JSON"
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
+		span.SetAttributes(attribute.Key("http.response.body").String(responseBodyString))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
