@@ -13,9 +13,9 @@ Cluster must have the following deployed
 * Album-Store
 
 ## TODO:
-* FLush out unit tests for examples.
-* need to improve how the mock interacts with the code under test to have correct number of spans. 
-  * 1 successful call has 3 spans.  
+* heath endpoint, liveness endpoint
+* prometheus endpoint
+* version file for go?
 
 # Run 
 
