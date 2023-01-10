@@ -6,7 +6,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -55,15 +54,6 @@ func InitOtelProvider(serviceName string, version string, gitHash string) (func(
 		return nil, err
 	}
 
-	//setup for HTTP
-	//NOT WORKING - http post of span fails with a EOF????
-	/*
-		otelTraceExporter, err := setupOtelHttpTrace(ctx, otelLocation)
-		if err != nil {
-			return nil, err
-		}
-	*/
-
 	traceProvider := setupOtelTraceProvider(otelTraceExporter, otelResource)
 	return traceProvider.Shutdown, nil //return shutdown signal so the application can trigger shutting itself down
 }
@@ -79,25 +69,6 @@ func setupOtelTraceProvider(traceExporter *otlptrace.Exporter, otelResource *res
 	otel.SetTracerProvider(tracerProvider)
 	otel.SetTextMapPropagator(propagation.TraceContext{}) // set global propagator to tracecontext (the default is no-op).
 	return tracerProvider
-}
-
-// NOT WORKING - http post of span fails with an EOF????
-func setupOtelHttpTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
-	// insecure transport here DO NOT USE IN PROD
-	client := otlptracehttp.NewClient(
-		otlptracehttp.WithInsecure(),
-		otlptracehttp.WithEndpoint(*otelLocation),
-		otlptracehttp.WithCompression(otlptracehttp.GzipCompression),
-	)
-	err := client.Start(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create http connection to opentelemetry-collector: %w", err)
-	}
-	traceExporter, err := otlptrace.New(ctx, client)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create opentelemetry trace exporter: %w", err)
-	}
-	return traceExporter, nil
 }
 
 func setupOtelProtoBuffGrpcTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
