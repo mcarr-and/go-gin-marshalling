@@ -204,6 +204,7 @@ func Test_getAlbumById_Success(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
 
 	assert.Equal(t, jsonBody, returnedBody)
 }
@@ -237,6 +238,7 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
 
 	assert.Equal(t, `{"message":"error contacting album-store getAlbumById Error from web server"}`, returnedBody)
 }
@@ -268,6 +270,7 @@ func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "ID=X", attributeMap["http.request.parameters"].Emit())
 
 	assert.Equal(t, `{"message":"error invalid ID [X] requested"}`, returnedBody)
 }
@@ -306,6 +309,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store getAlbumById malformed JSON"}`, returnedBody)
 }
