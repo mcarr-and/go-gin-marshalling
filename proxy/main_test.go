@@ -36,13 +36,13 @@ type MockClient struct {
 }
 
 var (
-	// GetDoFunc fetches the mock client's `Do` func
-	GetDoFunc func(req *http.Request) (*http.Response, error)
+	// MockResponseFunc fetches the mock client's `Do` func
+	MockResponseFunc func(req *http.Request) (*http.Response, error)
 )
 
 // Do is the mock client's `Do` func
 func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
-	return GetDoFunc(req)
+	return MockResponseFunc(req)
 }
 
 func setupTestRouter() (*httptest.ResponseRecorder, *tracetest.SpanRecorder, *gin.Engine) {
@@ -70,7 +70,7 @@ func Test_getAllAlbums_Success(t *testing.T) {
 	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
 
 	//inject a success message from the server and return a json blob that represents an album
-	GetDoFunc = func(*http.Request) (*http.Response, error) {
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
 		return &http.Response{
 			StatusCode: 200,
 			Body:       body,
@@ -98,12 +98,12 @@ func Test_getAllAlbums_Success(t *testing.T) {
 	assert.Equal(t, jsonBody, returnedBody)
 }
 
-func Test_getAllAlbums_Failure(t *testing.T) {
+func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 	DefaultClient = &MockClient{}
 
 	//inject in failure message to respond with that we could not get to the album-store
-	GetDoFunc = func(*http.Request) (*http.Response, error) {
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
 		return nil, errors.New(
 			"Error from web server",
 		)
@@ -128,4 +128,41 @@ func Test_getAllAlbums_Failure(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
 	assert.Equal(t, `{"message":"error calling Album-Store"}`, returnedBody)
+}
+
+func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	//inject in failure message to respond with that we could not get to the album-store
+	jsonBody := `[{"artist":"Black Sabbath","id":10,"price":66.6`
+	body := io.NopCloser(bytes.NewReader([]byte(jsonBody)))
+
+	//inject a failure message from the server and return a json blob that represents an album
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return &http.Response{
+			StatusCode: 200,
+			Body:       body,
+		}, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "error from Album-Store malformed JSON", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, `{"message":"error from Album-Store malformed JSON"}`, returnedBody)
 }
