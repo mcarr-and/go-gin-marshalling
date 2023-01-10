@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"io"
@@ -96,7 +99,7 @@ func Test_getAllAlbums_Success(t *testing.T) {
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "200", attributeMap["proxy-service.status_code"].Emit())
 
 	assert.Equal(t, responseBody, returnedBody)
 }
@@ -129,7 +132,7 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "error contacting album-store getAlbums Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
 
 	assert.Equal(t, `{"message":"error contacting album-store getAlbums Error from web server"}`, returnedBody)
 }
@@ -167,8 +170,8 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store getAlbums malformed JSON", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, responseBody, attributeMap["http.response.body"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store getAlbums malformed JSON"}`, returnedBody)
 }
@@ -204,9 +207,9 @@ func Test_getAlbumById_Success(t *testing.T) {
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
-
+	assert.Equal(t, "200", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, "ID=1", attributeMap["proxy-service.request.parameters"].Emit())
+	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 	assert.Equal(t, responseBody, returnedBody)
 }
 
@@ -238,8 +241,8 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "error contacting album-store getAlbumById Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, "ID=1", attributeMap["proxy-service.request.parameters"].Emit())
 
 	assert.Equal(t, `{"message":"error contacting album-store getAlbumById Error from web server"}`, returnedBody)
 }
@@ -270,9 +273,8 @@ func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
 	assert.Equal(t, "error invalid ID [X] requested", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, "ID=X", attributeMap["http.request.parameters"].Emit())
-
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, "ID=X", attributeMap["proxy-service.request.parameters"].Emit())
 	assert.Equal(t, `{"message":"error invalid ID [X] requested"}`, returnedBody)
 }
 
@@ -309,9 +311,9 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store getAlbumById malformed JSON", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, "ID=1", attributeMap["http.request.parameters"].Emit())
-	assert.Equal(t, responseBody, attributeMap["http.response.body"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, "ID=1", attributeMap["proxy-service.request.parameters"].Emit())
+	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store getAlbumById malformed JSON"}`, returnedBody)
 }
@@ -323,7 +325,7 @@ func Test_postAlbums_Success(t *testing.T) {
 	requestBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
 	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
 
-	responseBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
+	responseBody := `{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}`
 	responseBodyReader := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
 	//inject a success message from the server and return a json blob that represents an album
@@ -350,7 +352,9 @@ func Test_postAlbums_Success(t *testing.T) {
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "200", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "200", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
+	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
 	assert.Equal(t, responseBody, returnedBody)
 }
@@ -384,8 +388,8 @@ func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
 	assert.Equal(t, "invalid request json body ", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, "", attributeMap["http.request.body"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, "", attributeMap["proxy-service.request.body"].Emit())
 
 	assert.Equal(t, `{"message":"invalid request json body "}`, returnedBody)
 }
@@ -419,8 +423,8 @@ func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("invalid request json body %v", requestBody), finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, requestBody, attributeMap["http.request.body"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 
 	assert.Equal(t, `{"message":"invalid request json body {\"title\":\"Ozzman Cometh\""}`, returnedBody)
 }
@@ -456,7 +460,8 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "error contacting album-store postAlbum Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 
 	assert.Equal(t, `{"message":"error contacting album-store postAlbum Error from web server"}`, returnedBody)
 }
@@ -497,8 +502,220 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store postAlbum malformed JSON", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
-	assert.Equal(t, responseBody, attributeMap["http.response.body"].Emit())
+	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
+	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
+	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store postAlbum malformed JSON"}`, returnedBody)
+}
+
+func TestGet(t *testing.T) {
+	type args struct {
+		ctx       context.Context
+		targetURL string
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantResp *http.Response
+		wantErr  assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResp, err := Get(tt.args.ctx, tt.args.targetURL)
+			if !tt.wantErr(t, err, fmt.Sprintf("Get(%v, %v)", tt.args.ctx, tt.args.targetURL)) {
+				return
+			}
+			assert.Equalf(t, tt.wantResp, gotResp, "Get(%v, %v)", tt.args.ctx, tt.args.targetURL)
+		})
+	}
+}
+
+func TestPost(t *testing.T) {
+	type args struct {
+		ctx         context.Context
+		targetURL   string
+		contentType string
+		body        io.Reader
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantResp *http.Response
+		wantErr  assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotResp, err := Post(tt.args.ctx, tt.args.targetURL, tt.args.contentType, tt.args.body)
+			if !tt.wantErr(t, err, fmt.Sprintf("Post(%v, %v, %v, %v)", tt.args.ctx, tt.args.targetURL, tt.args.contentType, tt.args.body)) {
+				return
+			}
+			assert.Equalf(t, tt.wantResp, gotResp, "Post(%v, %v, %v, %v)", tt.args.ctx, tt.args.targetURL, tt.args.contentType, tt.args.body)
+		})
+	}
+}
+
+func Test_getAlbumByID(t *testing.T) {
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			getAlbumByID(tt.args.c)
+		})
+	}
+}
+
+func Test_getAlbums(t *testing.T) {
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			getAlbums(tt.args.c)
+		})
+	}
+}
+
+func Test_initOtelProvider(t *testing.T) {
+	type args struct {
+		serviceName string
+		version     string
+		gitHash     string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    func(context.Context) error
+		wantErr assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := initOtelProvider(tt.args.serviceName, tt.args.version, tt.args.gitHash)
+			if !tt.wantErr(t, err, fmt.Sprintf("initOtelProvider(%v, %v, %v)", tt.args.serviceName, tt.args.version, tt.args.gitHash)) {
+				return
+			}
+			assert.Equalf(t, tt.want, got, "initOtelProvider(%v, %v, %v)", tt.args.serviceName, tt.args.version, tt.args.gitHash)
+		})
+	}
+}
+
+func Test_postAlbum(t *testing.T) {
+	type args struct {
+		c *gin.Context
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postAlbum(tt.args.c)
+		})
+	}
+}
+
+func Test_setupOtelProtoBuffGrpcTrace(t *testing.T) {
+	type args struct {
+		ctx          context.Context
+		otelLocation *string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *otlptrace.Exporter
+		wantErr assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := setupOtelProtoBuffGrpcTrace(tt.args.ctx, tt.args.otelLocation)
+			if !tt.wantErr(t, err, fmt.Sprintf("setupOtelProtoBuffGrpcTrace(%v, %v)", tt.args.ctx, tt.args.otelLocation)) {
+				return
+			}
+			assert.Equalf(t, tt.want, got, "setupOtelProtoBuffGrpcTrace(%v, %v)", tt.args.ctx, tt.args.otelLocation)
+		})
+	}
+}
+
+func Test_setupOtelResource(t *testing.T) {
+	type args struct {
+		serviceName  string
+		version      string
+		gitHash      string
+		ctx          context.Context
+		namespace    *string
+		instanceName *string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *resource.Resource
+		wantErr assert.ErrorAssertionFunc
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := setupOtelResource(tt.args.serviceName, tt.args.version, tt.args.gitHash, tt.args.ctx, tt.args.namespace, tt.args.instanceName)
+			if !tt.wantErr(t, err, fmt.Sprintf("setupOtelResource(%v, %v, %v, %v, %v, %v)", tt.args.serviceName, tt.args.version, tt.args.gitHash, tt.args.ctx, tt.args.namespace, tt.args.instanceName)) {
+				return
+			}
+			assert.Equalf(t, tt.want, got, "setupOtelResource(%v, %v, %v, %v, %v, %v)", tt.args.serviceName, tt.args.version, tt.args.gitHash, tt.args.ctx, tt.args.namespace, tt.args.instanceName)
+		})
+	}
+}
+
+func Test_setupOtelTraceProvider(t *testing.T) {
+	type args struct {
+		traceExporter *otlptrace.Exporter
+		otelResource  *resource.Resource
+	}
+	tests := []struct {
+		name string
+		args args
+		want *sdktrace.TracerProvider
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, setupOtelTraceProvider(tt.args.traceExporter, tt.args.otelResource), "setupOtelTraceProvider(%v, %v)", tt.args.traceExporter, tt.args.otelResource)
+		})
+	}
+}
+
+func Test_setupRouter(t *testing.T) {
+	tests := []struct {
+		name string
+		want *gin.Engine
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, setupRouter(), "setupRouter()")
+		})
+	}
 }

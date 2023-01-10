@@ -58,7 +58,7 @@ func getAlbums(c *gin.Context) {
 	span.SetName("/albums GET")
 	defer span.End()
 	span.SetStatus(codes.Ok, "")
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+	span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusOK))
 	c.JSON(http.StatusOK, albums)
 }
 
@@ -67,7 +67,7 @@ func getAlbumByID(c *gin.Context) {
 	span.SetName("/albums/:id GET")
 	defer span.End()
 	id := c.Param("id")
-	span.SetAttributes(attribute.Key("http.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
+	span.SetAttributes(attribute.Key("album-store.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
 
 	albumId, err := strconv.Atoi(id)
 	if err != nil {
@@ -75,7 +75,7 @@ func getAlbumByID(c *gin.Context) {
 		serverError := models.ServerError{Message: errorMessage}
 		span.SetStatus(codes.Error, serverError.Message)
 		span.AddEvent(errorMessage)
-		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return
 	}
@@ -83,9 +83,9 @@ func getAlbumByID(c *gin.Context) {
 	for _, album := range albums {
 		if album.ID == albumId {
 			span.SetStatus(codes.Ok, "")
-			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
+			span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusOK))
 			jsonVal, _ := json.Marshal(album)
-			span.SetAttributes(attribute.Key("http.response.body").String(string(jsonVal)))
+			span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
 			c.JSON(http.StatusOK, album)
 			return
 		}
@@ -95,7 +95,7 @@ func getAlbumByID(c *gin.Context) {
 	serverError := models.ServerError{Message: errorMessage}
 	span.SetStatus(codes.Error, serverError.Message)
 	span.AddEvent(errorMessage)
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+	span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusBadRequest))
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
@@ -121,26 +121,26 @@ func postAlbum(c *gin.Context) {
 			requestBodyJSON, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 			span.SetStatus(codes.Error, "Album JSON field validation failed")
 			span.AddEvent(string(bindingErrorMessage))
-			span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
-			span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+			span.SetAttributes(attribute.Key("album-store.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
+			span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusBadRequest))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
 			return
 		}
 		requestBodyJSON, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 		span.SetStatus(codes.Error, "Malformed JSON. Not valid for Album")
 		span.AddEvent(fmt.Sprintf("Malformed JSON. %s", err))
-		span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
-		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		span.SetAttributes(attribute.Key("album-store.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
+		span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
 		return
 	}
 	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
 	albums = append(albums, newAlbum)
 	span.SetStatus(codes.Ok, "")
-	span.SetAttributes(attribute.Key("http.request.body").String(fmt.Sprintf("%s", value)))
-	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusCreated))
+	span.SetAttributes(attribute.Key("album-store.request.body").String(fmt.Sprintf("%s", value)))
+	span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusCreated))
 	jsonVal, _ := json.Marshal(newAlbum)
-	span.SetAttributes(attribute.Key("http.response.body").String(string(jsonVal)))
+	span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
