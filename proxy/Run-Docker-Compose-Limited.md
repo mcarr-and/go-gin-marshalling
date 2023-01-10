@@ -28,7 +28,7 @@ Terminal window 3:
 
 ### Start via IDE 
 
-`GRPC_GO_LOG_SEVERITY_LEVEL=info;GRPC_GO_LOG_VERBOSITY_LEVEL=99;INSTANCE_NAME=proxy-service;NAMESPACE=no-namespace;OTEL_LOCATION=localhost:4327;ALBUM_STORE_LOCATION=localhost:9080 go run main.go`
+`GRPC_GO_LOG_SEVERITY_LEVEL=info;GRPC_GO_LOG_VERBOSITY_LEVEL=99;INSTANCE_NAME=proxy-service;NAMESPACE=no-namespace;OTEL_LOCATION=localhost:4327;ALBUM_STORE_LOCATION=http://localhost:9080 go run main.go`
 
 
 ## 3. Run tests

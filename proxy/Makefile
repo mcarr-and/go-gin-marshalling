@@ -80,19 +80,19 @@ setup-album-properties:
 
 .PHONY: docker-k3d-start
 docker-k3d-start: setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_LOCATION=localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
+	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_LOCATION=http://localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
 
 .PHONY: docker-local-start
 docker-local-start: setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
+	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=http://localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
 
 .PHONY: local-start-k3d
 local-start-k3d: build setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_LOCATION=album-store.album-store.svc.cluster.local:9080 ./proxy-service
+	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_LOCATION=http://album-store.album-store.svc.cluster.local:9080 ./proxy-service
 
 .PHONY: local-start-proxy-grpc
 local-start-proxy-grpc: build setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=localhost:9080 ./proxy-service && cd proxy
+	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_LOCATION=http://localhost:9080 ./proxy-service && cd proxy
 
 .PHONY: local-start-album-grpc
 local-start-album-grpc: build setup-album-properties
