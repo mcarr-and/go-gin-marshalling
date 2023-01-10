@@ -82,8 +82,8 @@ items:
                   value: "99"
                 - name: GRPC_GO_LOG_SEVERITY_LEVEL
                   value: "info"
-                - name: ALBUM_STORE_LOCATION
-                  value: "album-store.album-store.svc.cluster.local:4317"
+                - name: ALBUM_STORE_URL
+                  value: "http://album-store.album-store.svc.cluster.local:4317"
               ports:
                 - containerPort: 9070
                   name: http

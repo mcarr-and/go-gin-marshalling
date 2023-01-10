@@ -50,7 +50,7 @@ func getAlbums(c *gin.Context) {
 	defer span.End()
 
 	// proxy call to album-Store
-	resp, err := Get(c.Request.Context(), albumStoreLocation+"/albums")
+	resp, err := Get(c.Request.Context(), albumStoreURL+"/albums")
 	if err != nil {
 		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
@@ -85,7 +85,7 @@ func getAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 	span.SetAttributes(attribute.Key("http.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
 	// proxy call to album-Store
-	resp, err := Get(c.Request.Context(), albumStoreLocation+"/albums/"+id)
+	resp, err := Get(c.Request.Context(), albumStoreURL+"/albums/"+id)
 	if err != nil {
 		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
@@ -128,7 +128,7 @@ func postAlbum(c *gin.Context) {
 	}
 	str1 := string(byteArray[:])
 	// proxy call to album-Store
-	resp, err := Post(c.Request.Context(), albumStoreLocation+"/albums/", "application/json", strings.NewReader(str1))
+	resp, err := Post(c.Request.Context(), albumStoreURL+"/albums/", "application/json", strings.NewReader(str1))
 	if err != nil {
 		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store postAlbum %v", err))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
@@ -172,7 +172,7 @@ const (
 
 var version = "No-Version"
 var gitHash = "No-Hash"
-var albumStoreLocation = "http://localhost:9080"
+var albumStoreURL = "http://localhost:9080"
 
 // Set up the context for this Application in Open Telemetry
 // application name, application version, k8s namespace , k8s instance name (horizontal scaling)
@@ -251,9 +251,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	albumStoreUrlEnv := os.Getenv("ALBUM_STORE_LOCATION")
-	if albumStoreLocation != "" {
-		albumStoreLocation = albumStoreUrlEnv
+	albumStoreUrlEnv := os.Getenv("ALBUM_STORE_URL")
+	if albumStoreURL != "" {
+		albumStoreURL = albumStoreUrlEnv
 	}
 
 	router := setupRouter()
