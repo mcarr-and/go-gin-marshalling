@@ -11,7 +11,7 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
 `proxy-service.local` is included in this configuration if you are following the album-store config changes.
 
-`127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local proxy-service.local`
+`127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local album-store.local proxy-service.local`
 
 ### 0.1 K3D Registry info
 
@@ -77,7 +77,7 @@ make k3d-test;
 
 ### 6.2 Postman
 
-[Postman files](../test/)
+[Postman files](../test/.)
 
 1. Import the folder `../test`
 1. Set Environment to `proxy-service.local`
