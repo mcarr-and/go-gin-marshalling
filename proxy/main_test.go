@@ -16,6 +16,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 )
 
 // inspired by this for setting up gin & otel to test spans
@@ -32,7 +33,8 @@ func TestMain(m *testing.M) {
 
 // MockClient is the mock client
 type MockClient struct {
-	DoFunc func(req *http.Request) (*http.Response, error)
+	Timeout time.Duration
+	DoFunc  func(req *http.Request) (*http.Response, error)
 }
 
 var (
@@ -165,4 +167,35 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
 	assert.Equal(t, `{"message":"error from Album-Store malformed JSON"}`, returnedBody)
+}
+
+func Test_getAllAlbums_Failure_Album_Not_reachable(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	//inject in failure message to respond with that we could not get to the album-store
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return nil, errors.New("(Client.Timeout exceeded while awaiting headers)")
+	}
+
+	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "error contacting album-store (Client.Timeout exceeded while awaiting headers)", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, `{"message":"error calling Album-Store"}`, returnedBody)
 }
