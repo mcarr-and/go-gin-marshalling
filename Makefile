@@ -128,7 +128,7 @@ docker-stop:
 
 .PHONY: docker-compose-full-start
 docker-compose-full-start: docker-build
-	docker-compose up -d;
+	docker-compose up -d --remove-orphans;
 
 .PHONY: docker-compose-full-stop
 docker-compose-full-stop:
@@ -136,7 +136,7 @@ docker-compose-full-stop:
 
 .PHONY: docker-compose-limited-start
 docker-compose-limited-start:
-	docker-compose -f docker-compose-limited.yaml up -d;
+	docker-compose -f docker-compose-limited.yaml up -d --remove-orphans;
 
 .PHONY: docker-compose-limited-stop
 docker-compose-limited-stop:

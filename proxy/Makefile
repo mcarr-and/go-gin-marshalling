@@ -40,7 +40,6 @@ run-tests:
 	curl --location --request POST '$(url_value)/albums' \
         --header 'Content-Type: application/json' --header 'Accept: application/json' \
         --data-raw '{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}';
-	curl --location --request GET '$(url_value)/v3/api-docs';
 
 .PHONY: docker-build-proxy
 docker-build-proxy:
