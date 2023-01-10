@@ -43,7 +43,14 @@ run-tests:
 
 .PHONY: docker-build-proxy
 docker-build-proxy:
-	DOCKER_BUILDKIT=1 docker build -t proxy-service.local:0.1 -t proxy-service:latest .
+	DOCKER_BUILDKIT=1 docker build -t proxy-service:0.1 -t proxy-service:latest  .
+
+.PHONY: docker-tag-k3d-registry-proxy
+docker-tag-k3d-registry-proxy: docker-build-proxy
+	docker tag proxy-service:latest localhost:54094/proxy-service:latest
+	docker tag proxy-service:0.1 localhost:54094/proxy-service:0.1
+	docker push localhost:54094/proxy-service:latest
+	docker push localhost:54094/proxy-service:0.1
 
 .PHONY: docker-build-album
 docker-build-album:
@@ -51,12 +58,7 @@ docker-build-album:
 
 .PHONY: docker-tag-k3d-registry-album
 docker-tag-k3d-registry-album:
-	cd .. && $(MAKE) docker-tag-k3d-registry && cd proxy
-
-.PHONY: docker-tag-k3d-registry
-docker-tag-k3d-registry:
-	docker tag proxy-service:latest localhost:54094/proxy-service:0.1
-	docker push localhost:54094/proxy-service:0.1
+	cd .. && $(MAKE) docker-tag-k3d-registry-album && cd proxy
 
 .PHONY: k3d-proxy-deploy-deployment
 k3d-proxy-deploy-deployment:

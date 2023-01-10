@@ -70,7 +70,7 @@ services:
       - GRPC_GO_LOG_VERBOSITY_LEVEL=info
       - ALBUM_STORE_URL=album-store:9080
     ports:
-      - "9080:9080"
+      - "9070:9070"
     networks:
       - default
     depends_on:

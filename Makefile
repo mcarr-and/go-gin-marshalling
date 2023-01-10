@@ -52,11 +52,13 @@ run-tests:
 
 .PHONY: docker-build-album
 docker-build-album:
-	DOCKER_BUILDKIT=1 docker build -t album-store.local:0.1 -t album-store.local:latest .
+	DOCKER_BUILDKIT=1 docker build -t album-store:0.1 -t album-store:latest .
 
-.PHONY: docker-tag-k3d-registry
-docker-tag-k3d-registry: docker-build-album
-	docker tag album-store:latest localhost:54094/album-store:0.1
+.PHONY: docker-tag-k3d-registry-album
+docker-tag-k3d-registry-album: docker-build-album
+	docker tag album-store:latest localhost:54094/album-store:latest
+	docker tag album-store:0.1 localhost:54094/album-store:0.1
+	docker push localhost:54094/album-store:latest
 	docker push localhost:54094/album-store:0.1
 
 .PHONY: docker-build-proxy
@@ -65,7 +67,7 @@ docker-build-proxy:
 
 .PHONY: docker-tag-k3d-registry-proxy
 docker-tag-k3d-registry-proxy: docker-build-proxy
-	cd proxy && $(MAKE) docker-tag-k3d-registry && cd ..
+	cd proxy && $(MAKE) docker-tag-k3d-registry-proxy && cd ..
 
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment:
@@ -127,7 +129,7 @@ docker-stop:
 	docker stop album-store;
 
 .PHONY: docker-compose-full-start
-docker-compose-full-start: docker-build
+docker-compose-full-start: docker-build-album
 	docker-compose up -d --remove-orphans;
 
 .PHONY: docker-compose-full-stop

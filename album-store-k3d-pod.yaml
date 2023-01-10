@@ -41,7 +41,7 @@ spec:
   containers:
     - name: "album-store"
       image: registry.local:54094/album-store:0.1 # use the cluster internal name to reference registry
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
       env:
         - name: INSTANCE_NAME
           valueFrom:
