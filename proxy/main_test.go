@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
@@ -124,12 +125,13 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "error contacting album-store getAlbums Error from web server", finishedSpans[0].Status().Description)
 
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "error contacting album-store getAlbums Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error calling album-store getAlbums"}`, returnedBody)
+	assert.Equal(t, `{"message":"error contacting album-store getAlbums Error from web server"}`, returnedBody)
 }
 
 func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
@@ -161,7 +163,8 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "error from album-store getAlbums malformed JSON", finishedSpans[0].Status().Description)
 
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "error from album-store getAlbums malformed JSON", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
@@ -229,12 +232,44 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "error contacting album-store getAlbumById Error from web server", finishedSpans[0].Status().Description)
 
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "error contacting album-store getAlbumById Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error calling album-store"}`, returnedBody)
+	assert.Equal(t, `{"message":"error contacting album-store getAlbumById Error from web server"}`, returnedBody)
+}
+
+func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	//inject in failure message to respond with that we could not get to the album-store
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return nil, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodGet, "/albums/X", nil)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "error invalid ID [X] requested", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "error invalid ID [X] requested", finishedSpans[0].Events()[0].Name)
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+
+	assert.Equal(t, `{"message":"error invalid ID [X] requested"}`, returnedBody)
 }
 
 func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
@@ -266,12 +301,13 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "error from album-store getAlbumById malformed JSON", finishedSpans[0].Status().Description)
 
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "error from album-store getAlbumById malformed JSON", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error getting body from album-store getAlbumById malformed JSON"}`, returnedBody)
+	assert.Equal(t, `{"message":"error from album-store getAlbumById malformed JSON"}`, returnedBody)
 }
 
 func Test_postAlbums_Success(t *testing.T) {
@@ -313,6 +349,76 @@ func Test_postAlbums_Success(t *testing.T) {
 	assert.Equal(t, jsonBody, returnedBody)
 }
 
+func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	requestBody := ``
+	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
+
+	//Mock not used so setup as ignored
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return nil, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "invalid request json body ", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "invalid request json body ", finishedSpans[0].Events()[0].Name)
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, "", attributeMap["http.request.body"].Emit())
+
+	assert.Equal(t, `{"message":"invalid request json body "}`, returnedBody)
+}
+
+func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+	DefaultClient = &MockClient{}
+
+	requestBody := `{"title":"Ozzman Cometh"`
+	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
+
+	//Mock not used so setup as ignored
+	MockResponseFunc = func(*http.Request) (*http.Response, error) {
+		return nil, nil
+	}
+
+	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	router.ServeHTTP(testRecorder, req)
+	b, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(b)
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, fmt.Sprintf("invalid request json body %v", requestBody), finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, fmt.Sprintf("invalid request json body %v", requestBody), finishedSpans[0].Events()[0].Name)
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
+	assert.Equal(t, requestBody, attributeMap["http.request.body"].Emit())
+
+	assert.Equal(t, `{"message":"invalid request json body {\"title\":\"Ozzman Cometh\""}`, returnedBody)
+}
+
 func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 	DefaultClient = &MockClient{}
@@ -340,12 +446,13 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "error contacting album-store postAlbum Error from web server", finishedSpans[0].Status().Description)
 
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "error contacting album-store postAlbum Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error contacting album-store postAlbum"}`, returnedBody)
+	assert.Equal(t, `{"message":"error contacting album-store postAlbum Error from web server"}`, returnedBody)
 }
 
 func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
@@ -380,10 +487,11 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, "error from album-store postAlbum malformed JSON", finishedSpans[0].Status().Description)
 
-	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, "error from album-store postAlbum malformed JSON", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["http.status_code"].Emit())
 
-	assert.Equal(t, `{"message":"error getting body from album-store postAlbum malformed JSON"}`, returnedBody)
+	assert.Equal(t, `{"message":"error from album-store postAlbum malformed JSON"}`, returnedBody)
 }

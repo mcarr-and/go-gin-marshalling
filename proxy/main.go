@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -44,24 +45,30 @@ func getAlbums(c *gin.Context) {
 	// proxy call to album-Store
 	resp, err := Get(c.Request.Context(), albumStoreURL+"/albums")
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store getAlbums %v", err))
+		errorMessage := fmt.Sprintf("error contacting album-store getAlbums %v", err)
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling album-store getAlbums"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	var albumStoreResponseBodyJson interface{}
 	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
-		span.SetStatus(codes.Error, "error from album-store getAlbums malformed JSON")
+		errorMessage := "error from album-store getAlbums malformed JSON"
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error from album-store getAlbums malformed JSON"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error album-store closing response %v", err))
+		errorMessage := fmt.Sprintf("error album-store closing response %v", err)
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error album-store closing response"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
@@ -77,27 +84,42 @@ func getAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 	span.SetAttributes(attribute.Key("http.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
 	// proxy call to album-Store
-	resp, err := Get(c.Request.Context(), albumStoreURL+"/albums/"+id)
+	albumID, err := strconv.Atoi(id)
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store getAlbumById %v", err))
+		errorMessage := fmt.Sprintf("%s [%s] %s", "error invalid ID", id, "requested")
+		span.SetStatus(codes.Error, errorMessage)
+		span.AddEvent(errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error calling album-store"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
+		return
+	}
+	resp, err := Get(c.Request.Context(), fmt.Sprintf("%v/albums/%v", albumStoreURL, albumID))
+	if err != nil {
+		errorMessage := fmt.Sprintf("error contacting album-store getAlbumById %v", err)
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	var albumStoreResponseBodyJson interface{}
 	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
 	if err != nil {
-		span.SetStatus(codes.Error, "error from album-store getAlbumById malformed JSON")
+		errorMessage := "error from album-store getAlbumById malformed JSON"
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store getAlbumById malformed JSON"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
 		log.Println(err)
-		span.SetStatus(codes.Error, fmt.Sprintf("error closing body from album-store getAlbumById %v", err))
+		errorMessage := fmt.Sprintf("error closing body from album-store getAlbumById %v", err)
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store getAlbumById"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
@@ -110,41 +132,53 @@ func postAlbum(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums POST")
 	defer span.End()
-
-	byteArray := make([]byte, 500)
-	_, err := c.Request.Body.Read(byteArray)
+	var requestBody interface{}
+	byteArray, err := io.ReadAll(c.Request.Body)
+	requestBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(requestBodyString)).Decode(&requestBody)
 	if err != nil {
 		log.Println(err)
-		span.SetStatus(codes.Error, fmt.Sprintf("could not get Post body %v", err))
-	}
-	str1 := string(byteArray[:])
-	// proxy call to album-Store
-	resp, err := Post(c.Request.Context(), albumStoreURL+"/albums/", "application/json", strings.NewReader(str1))
-	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error contacting album-store postAlbum %v", err))
+		errorMessage := fmt.Sprintf("invalid request json body %v", requestBodyString)
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
+		span.SetAttributes(attribute.Key("http.request.body").String(requestBodyString))
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error contacting album-store postAlbum"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
-	var albumStoreResponseBodyJson interface{}
-	err = json.NewDecoder(resp.Body).Decode(&albumStoreResponseBodyJson)
+	// proxy call to album-Store
+	resp, err := Post(c.Request.Context(), albumStoreURL+"/albums/", "application/json", strings.NewReader(fmt.Sprintf("%v", requestBody)))
 	if err != nil {
-		span.SetStatus(codes.Error, "error from album-store postAlbum malformed JSON")
+		errorMessage := fmt.Sprintf("error contacting album-store postAlbum %v", err)
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error getting body from album-store postAlbum malformed JSON"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
+		return
+	}
+	var responseBody interface{}
+	err = json.NewDecoder(resp.Body).Decode(&responseBody)
+	if err != nil {
+		errorMessage := "error from album-store postAlbum malformed JSON"
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
+		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	err = resp.Body.Close()
 	if err != nil {
-		span.SetStatus(codes.Error, fmt.Sprintf("error closing body from album-store postAlbum %v", err))
+		errorMessage := fmt.Sprintf("error closing body from album-store postAlbum %v", err)
+		span.AddEvent(errorMessage)
+		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error closing body from album-store postAlbum"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response").Int(resp.StatusCode))
 	span.SetAttributes(attribute.Key("http.status_code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
-	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
+	c.JSON(http.StatusOK, responseBody)
 }
 
 func setupRouter() *gin.Engine {
