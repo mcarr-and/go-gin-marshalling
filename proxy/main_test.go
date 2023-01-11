@@ -425,8 +425,8 @@ func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.status_code"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
-
 	assert.Equal(t, `{"message":"invalid request json body {\"title\":\"Ozzman Cometh\""}`, returnedBody)
+	assert.Equal(t, `{"message":"invalid request json body {"title":"Ozzman Cometh""}`, attributeMap["proxy-service.response.body"].Emit())
 }
 
 func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {

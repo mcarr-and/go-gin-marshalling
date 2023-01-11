@@ -159,6 +159,7 @@ func postAlbum(c *gin.Context) {
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("proxy-service.request.body").String(requestBodyString))
+		span.SetAttributes(attribute.Key("proxy-service.response.body").String(fmt.Sprintf("{\"message\":\"%v\"}", errorMessage)))
 		span.SetAttributes(attribute.Key("proxy-service.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return
