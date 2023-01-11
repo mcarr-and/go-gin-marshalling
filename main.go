@@ -147,6 +147,10 @@ func postAlbum(c *gin.Context) {
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
+func status(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func getErrorMsg(fe validator.FieldError) string {
 	switch fe.Tag() {
 	case "required":
@@ -170,8 +174,9 @@ func setupRouter() *gin.Engine {
 	router.Static("/v3/api-docs/", "cmd/api/swaggerui")
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
-	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	router.POST("/albums", postAlbum)
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	router.GET("/status", status)
 	return router
 }
 

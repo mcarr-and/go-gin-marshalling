@@ -204,6 +204,10 @@ func postAlbum(c *gin.Context) {
 	c.JSON(http.StatusOK, responseBody)
 }
 
+func status(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Gin
@@ -211,6 +215,7 @@ func setupRouter() *gin.Engine {
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	router.GET("/status", status)
 	return router
 }
 
