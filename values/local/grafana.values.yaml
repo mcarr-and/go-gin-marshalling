@@ -526,11 +526,11 @@ datasources:
       url: http://prometheus-server.monitoring.svc.cluster.local:80
       access: proxy
       isDefault: true
-    - name: CloudWatch
-      type: cloudwatch
-      access: proxy
-      uid: cloudwatch
-      editable: true
+#    - name: CloudWatch
+#      type: cloudwatch
+#      access: proxy
+#      uid: cloudwatch
+#      editable: true
 #      jsonData:
 #        authType: default
 #        defaultRegion: us-east-1
