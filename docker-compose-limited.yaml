@@ -22,7 +22,7 @@ services:
         "--config=/etc/otel-collector-config.yaml",
       ]
     volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./values/docker-compose/otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
       - "1888:1888" # pprof extension
       - "8888:8888" # Prometheus metrics exposed by the collector
@@ -40,7 +40,7 @@ services:
     image: prom/prometheus:latest
     restart: always
     volumes:
-      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./values/docker-compose/prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     networks:
@@ -50,8 +50,8 @@ services:
     image: grafana/grafana:9.1.0
     container_name: grafana-gin-opentelemetry
     volumes:
-      - ./values/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./values/grafana/provisioning/:/etc/grafana/provisioning/
+      - ./values/docker-compose/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./values/docker-compose/grafana/provisioning/:/etc/grafana/provisioning/
     ports:
       - "3000:3000"
 #    logging: *logging
