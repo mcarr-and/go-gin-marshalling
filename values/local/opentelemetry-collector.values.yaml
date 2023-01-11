@@ -264,7 +264,7 @@ dnsPolicy: "ClusterFirst"
 # only used with deployment mode
 replicaCount: 1
 
-annotations: { }
+annotations: {}
 
 # List of extra sidecars to add
 extraContainers: [ ]
@@ -307,7 +307,9 @@ service:
   type: ClusterIP
   # type: LoadBalancer
   # loadBalancerIP: 1.2.3.4
-  annotations: { }
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8888"
 
 ingress:
   ingressClassName: nginx # required to get nginx-ingress to open up an ingress to the service
@@ -388,11 +390,11 @@ rollout:
   strategy: RollingUpdate
 
 prometheusRule:
-  enabled: false
+  enabled: true
   groups: [ ]
   # Create default rules for monitoring the collector
   defaultRules:
-    enabled: false
+    enabled: true
 
   # additional labels for the PrometheusRule
   extraLabels: { }
