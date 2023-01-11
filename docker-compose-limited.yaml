@@ -1,8 +1,9 @@
 version: "3.9"
+#x-default-logging: &logging
 services:
   jaeger-all-in-one:
     image: jaegertracing/all-in-one:latest
-    container_name: jaeger-gin-go
+    container_name: jaeger-gin-opentelemetry
     restart: always
     ports:
       - "16696:16686"
@@ -14,7 +15,7 @@ services:
       - default
   otel-collector:
     image: otel/opentelemetry-collector:latest
-    container_name: otel-gin-go
+    container_name: otel-gin-opentelemetry
     restart: always
     command:
       [
@@ -35,7 +36,7 @@ services:
     networks:
       - default
   prometheus:
-    container_name: prometheus-gin-go
+    container_name: prometheus-gin-opentelemetry
     image: prom/prometheus:latest
     restart: always
     volumes:
@@ -44,3 +45,13 @@ services:
       - "9090:9090"
     networks:
       - default
+#    logging: *logging
+  grafana:
+    image: grafana/grafana:9.1.0
+    container_name: grafana-gin-opentelemetry
+    volumes:
+      - ./values/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./values/grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - "3000:3000"
+#    logging: *logging

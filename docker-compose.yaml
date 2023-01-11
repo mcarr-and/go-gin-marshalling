@@ -44,6 +44,14 @@ services:
       - "9090:9090"
     networks:
       - default
+  grafana:
+    image: grafana/grafana:9.1.0
+    container_name: grafana
+    volumes:
+      - ./values/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./values/grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - "3000:3000"
   album-store:
     image: album-store:latest
     restart: always
