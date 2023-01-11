@@ -37,5 +37,11 @@ curl --insecure --location 'http://album-store.local:8070/albums/';
 ## Opentelemetry-collector Logs(follow)
 
 ```bash
-kubectl logs -f -n opentelemetry $(kubectl -n opentelemetry get pods  -l app.kubernetes.io/name=opentelemetry-collector -o jsonpath="{.items[0].metadata.name}")
+kubectl logs -f -n observability $(kubectl -n observability get pods  -l app.kubernetes.io/name=opentelemetry-collector -o jsonpath="{.items[0].metadata.name}")
+```
+
+# Get Prometheus admin password
+
+```bash
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo;
 ```
