@@ -632,15 +632,6 @@ serverFiles:
         static_configs:
           - targets:
               - localhost:9090
-      - job_name: open-telemetry
-        static_configs:
-          - targets:
-              - otel-collector.observability.svc.cluster.local:8888
-      - job_name: jaeger
-        static_configs:
-          - targets:
-              - jaeger-all-in-one.observability.svc.cluster.local:14269
-              - jaeger-all-in-one.observability.svc.cluster.local:16686
       # A scrape configuration for running Prometheus on a Kubernetes cluster.
       # This uses separate scrape configs for cluster components (i.e. API server, node)
       # and services to allow each to use different authentication configs.

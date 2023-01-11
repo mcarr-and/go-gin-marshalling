@@ -67,14 +67,6 @@ config:
       endpoint: jaeger-all-in-one.observability.svc.cluster.local:14250
       tls:
         insecure: true
-    prometheus: # currently not working need to expose 8889 like in the docker-compose.yaml file
-      endpoint: "0.0.0.0:8889"
-      namespace: monitoring
-      send_timestamps: true
-      metric_expiration: 180m
-      enable_open_metrics: true
-      resource_to_telemetry_conversion:
-        enabled: true
   extensions:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
@@ -127,7 +119,6 @@ config:
       metrics:
         exporters:
           - logging
-          - prometheus
         processors:
           - memory_limiter
           - batch
