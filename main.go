@@ -6,6 +6,7 @@ import (
 	"errors"
 	"example.com/album-store/models"
 	"fmt"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -169,6 +170,7 @@ func setupRouter() *gin.Engine {
 	router.Static("/v3/api-docs/", "cmd/api/swaggerui")
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	router.POST("/albums", postAlbum)
 	return router
 }

@@ -39,12 +39,12 @@ Used for showing nested spans in open-telemetry.
 
 Proxy-Service uses the `otelhttp.client` to make requests and it will create 3 spans.  
 
-[proxy-service](proxy/)
+[proxy-service](proxy/.)
 
 ## TODO 
 * liveness endpoint & wire to deployment files
 * health endpoint & wire into deployment files
-* prometheus endpoint for album-store 
+* wire in prometheus endpoint to cluster 
 * Write Logs in JSON format
 * add all request and response headers and request parameters to the otel attributes.
 * Adding CI server integration

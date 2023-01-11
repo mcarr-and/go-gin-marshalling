@@ -14,7 +14,6 @@ Cluster must have the following deployed
 
 ## TODO:
 * heath endpoint, liveness endpoint & wire into deployment files
-* prometheus endpoint to service 
 * version file for go?
 
 # Run 
