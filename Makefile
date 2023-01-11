@@ -50,9 +50,15 @@ run-tests:
         --data-raw '{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}';
 	curl --location --request GET '$(url_value)/v3/api-docs';
 
+.PHONY: eval-git-hash
+eval-git-hash:
+	$(eval GIT_HASH:= $(shell git rev-parse --short HEAD))
+	echo $(GIT_HASH)
+
+
 .PHONY: docker-build-album
-docker-build-album:
-	DOCKER_BUILDKIT=1 docker build -t album-store:0.1 -t album-store:latest .
+docker-build-album: eval-git-hash
+	DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t album-store:0.1 -t album-store:latest .
 
 .PHONY: docker-tag-k3d-registry-album
 docker-tag-k3d-registry-album: docker-build-album
@@ -104,13 +110,16 @@ k3d-proxy-undeploy-pod:
 setup-album-properties:
 	$(eval album_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)
 
+setup-album-docker-properties:
+	$(eval album_setup := -e GRPC_GO_LOG_SEVERITY_LEVEL=info -e GRPC_GO_LOG_VERBOSITY_LEVEL=99 -e NAMESPACE=no-namespace -e INSTANCE_NAME=album-store-1)
+
 .PHONY: docker-k3d-start
-docker-k3d-start: setup-album-properties
-	$(album_setup) OTEL_LOCATION=otel-collector.local:8070 docker run -d -p 9080:9080 --name album-store album-store:0.1
+docker-k3d-start: setup-album-docker-properties
+	$(album_setup) -e OTEL_LOCATION=otel-collector.local:8070 docker run -d -p 9080:9080 --name album-store album-store:0.1
 
 .PHONY: docker-local-start
-docker-local-start: setup-album-properties
-	$(album_setup) OTEL_LOCATION=localhost:4327 docker run -d -p 9080:9080 --name album-store album-store:0.1
+docker-local-start: setup-album-docker-properties
+	$(album_setup) -e OTEL_LOCATION=localhost:4327 docker run -d -p 9080:9080 --name album-store album-store:0.1
 
 .PHONY: local-start-k3d
 local-start-k3d: build setup-album-properties

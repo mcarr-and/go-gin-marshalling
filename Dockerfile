@@ -13,11 +13,12 @@
 # limitations under the License.
 # syntax = docker/dockerfile:1-experimental
 FROM golang:1.19 as build
+ARG GIT_HASH
 WORKDIR /app/
 copy go.* ./
 RUN go mod download
 COPY . .
-RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o album-store main.go
+RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags "-X main.version=0.1 -X main.gitHash=${GIT_HASH}" -v -o album-store main.go
 FROM alpine:3.17.0
 COPY --from=build /app/album-store  /app/album-store
 CMD ["/app/album-store"]

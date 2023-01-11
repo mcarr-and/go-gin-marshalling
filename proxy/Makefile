@@ -41,9 +41,14 @@ run-tests:
         --header 'Content-Type: application/json' --header 'Accept: application/json' \
         --data-raw '{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}';
 
+.PHONY: eval-git-hash
+eval-git-hash:
+	$(eval GIT_HASH:= $(shell git rev-parse --short HEAD))
+	echo $(GIT_HASH)
+
 .PHONY: docker-build-proxy
-docker-build-proxy:
-	DOCKER_BUILDKIT=1 docker build -t proxy-service:0.1 -t proxy-service:latest  .
+docker-build-proxy:eval-git-hash
+	 DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t proxy-service:0.1 -t proxy-service:latest  .
 
 .PHONY: docker-tag-k3d-registry-proxy
 docker-tag-k3d-registry-proxy: docker-build-proxy
@@ -76,31 +81,34 @@ k3d-proxy-deploy-pod:
 k3d-proxy-undeploy-pod:
 	kubectl delete -f proxy-service-k3d-pod.yaml
 
-setup-album-properties:
+setup-proxy-properties:
 	$(eval proxy_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=proxy-service-1)
 
+setup-proxy-docker-properties:
+	$(eval proxy_setup := -e GRPC_GO_LOG_SEVERITY_LEVEL=info -e GRPC_GO_LOG_VERBOSITY_LEVEL=99 -e NAMESPACE=no-namespace -e INSTANCE_NAME=proxy-service-1)
+
 .PHONY: docker-k3d-start
-docker-k3d-start: setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_URL=http://localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
+docker-k3d-start: setup-proxy-docker-properties
+	$(proxy_setup) -e OTEL_LOCATION=otel-collector.local:8070 -e ALBUM_STORE_URL=http://localhost:9080 docker run -d -p 9070:9070 --name proxy-service proxy-service:0.1
 
 .PHONY: docker-local-start
-docker-local-start: setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_URL=http://localhost:9080 docker run -d -p 9080:9080 --name proxy-service proxy-service:0.1
+docker-local-start: setup-proxy-docker-properties
+	 docker run -d -p 9070:9070 $(proxy_setup) -e OTEL_LOCATION=localhost:4327 -e ALBUM_STORE_URL=http://localhost:9080 --name proxy-service proxy-service:latest
 
 .PHONY: local-start-k3d
-local-start-k3d: build setup-album-properties
+local-start-k3d: build setup-proxy-properties
 	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_URL=http://album-store.album-store.svc.cluster.local:9080 ./proxy-service
 
 .PHONY: local-start-proxy-grpc
-local-start-proxy-grpc: build setup-album-properties
-	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_URL=http://localhost:9080 ./proxy-service && cd proxy
+local-start-proxy-grpc: build setup-proxy-properties
+	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_URL=http://localhost:9080 ./proxy-service
 
 .PHONY: local-start-album-grpc
-local-start-album-grpc: build setup-album-properties
+local-start-album-grpc: build setup-proxy-properties
 	cd ../ && $(proxy_setup) OTEL_LOCATION=localhost:4327 ./album-store && cd proxy
 
 .PHONY: local-start-proxy-http
-local-start-proxy-http: build setup-album-properties
+local-start-proxy-http: build setup-proxy-properties
 	$(proxy_setup) OTEL_LOCATION=localhost:4328 ALBUM_STORE_URL=localhost:9080 ./proxy-service
 
 .PHONY: docker-stop

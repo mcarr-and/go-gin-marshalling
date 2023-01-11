@@ -222,6 +222,7 @@ var gitHash = "No-Hash"
 var albumStoreURL = "http://localhost:9080"
 
 func main() {
+	log.Println(fmt.Sprintf("version: %v-%v", version, gitHash))
 	shutdownTraceProvider, err := initOtelProvider(serviceName, version, gitHash)
 	if err != nil {
 		log.Fatal(err)
@@ -292,7 +293,6 @@ func Post(ctx context.Context, targetURL, contentType string, body io.Reader) (r
 // Set up the context for this Application in Open Telemetry
 // application name, application version, k8s namespace , k8s instance name (horizontal scaling)
 func setupOtelResource(serviceName string, version string, gitHash string, ctx context.Context, namespace *string, instanceName *string) (*resource.Resource, error) {
-	log.Println("version: " + version)
 
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
