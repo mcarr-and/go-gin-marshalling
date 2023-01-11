@@ -67,6 +67,14 @@ config:
       endpoint: jaeger-all-in-one.observability.svc.cluster.local:14250
       tls:
         insecure: true
+    prometheus: # currently not working need to expose 8889 like in the docker-compose.yaml file
+      endpoint: "0.0.0.0:8889"
+      namespace: monitoring
+      send_timestamps: true
+      metric_expiration: 180m
+      enable_open_metrics: true
+      resource_to_telemetry_conversion:
+        enabled: true
   extensions:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
@@ -100,8 +108,6 @@ config:
             static_configs:
               - targets:
                   - ${MY_POD_IP}:8888
-  #    zipkin:
-  #      endpoint: 0.0.0.0:9411
   service:
     telemetry:
       metrics:
@@ -121,6 +127,7 @@ config:
       metrics:
         exporters:
           - logging
+          - prometheus
         processors:
           - memory_limiter
           - batch
@@ -137,7 +144,6 @@ config:
         receivers:
           - otlp
           - jaeger
-#          - zipkin
 
 image:
   # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
@@ -243,7 +249,7 @@ ports:
   metrics:
     # The metrics port is disabled by default. However you need to enable the port
     # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
-    enabled: false
+    enabled: true
     containerPort: 8888
     servicePort: 8888
     protocol: TCP
@@ -319,9 +325,6 @@ ingress:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "660"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "660"
   hosts:
     - host: otel-collector.local
       paths:
