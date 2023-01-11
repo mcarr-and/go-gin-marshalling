@@ -194,8 +194,8 @@ func Test_postAlbum(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`, attributeMap["album-store.request.body"].Emit())
-	assert.Equal(t, "201", attributeMap["album-store.status_code"].Emit())
 	assert.Equal(t, `{"id":10,"title":"The Ozzman Cometh","artist":"Black Sabbath","price":66.6}`, attributeMap["album-store.response.body"].Emit())
+	assert.Equal(t, "201", attributeMap["album-store.status_code"].Emit())
 
 	assert.Equal(t, album, expectedAlbum)
 	assert.Equal(t, len(listAlbums()), 4)
@@ -207,6 +207,7 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 
 	var serverError models.ServerError
 	album := `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`
+	bindingErrorMessage := `[{"field":"id","message":"below minimum value"},{"field":"title","message":"required field"},{"field":"artist","message":"required field"},{"field":"price","message":"required field"}]`
 
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(testRecorder, req)
@@ -225,10 +226,12 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	assert.Equal(t, "Album JSON field validation failed", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"required field"},{"field":"artist","message":"required field"},{"field":"price","message":"required field"}]`, finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, bindingErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, album, attributeMap["album-store.request.body"].Emit())
+	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
 	assert.Equal(t, `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`, attributeMap["album-store.request.body"].Emit())
 
 	assert.Equal(t, 4, len(serverError.BindingErrors))
@@ -247,6 +250,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
 	album := `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`
+	bindingErrorMessage := `[{"field":"id","message":"below minimum value"},{"field":"title","message":"below minimum value"},{"field":"artist","message":"below minimum value"},{"field":"price","message":"below minimum value"}]`
 	var serverError models.ServerError
 
 	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
@@ -266,11 +270,12 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	assert.Equal(t, "Album JSON field validation failed", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, `[{"field":"id","message":"below minimum value"},{"field":"title","message":"below minimum value"},{"field":"artist","message":"below minimum value"},{"field":"price","message":"below minimum value"}]`, finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, bindingErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
 	assert.Equal(t, `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`, attributeMap["album-store.request.body"].Emit())
+	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
 
 	assert.Equal(t, 4, len(serverError.BindingErrors))
 	assert.Equal(t, "id", serverError.BindingErrors[0].Field)
@@ -290,9 +295,9 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
 	var serverError models.ServerError
-	album := `{"id": -1,`
+	requestBody := `{"id": -1,`
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
+	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(requestBody))
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		assert.Fail(t, "", "should be ServerError ")
@@ -311,7 +316,8 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
-	assert.Equal(t, `{"id": -1,`, attributeMap["album-store.request.body"].Emit())
+	assert.Equal(t, requestBody, attributeMap["album-store.request.body"].Emit())
+	assert.Equal(t, `{"message":"Malformed JSON. Not valid for Album"`, attributeMap["album-store.response.body"].Emit())
 
 	assert.Equal(t, "Malformed JSON. Not valid for Album", serverError.Message)
 	assert.Equal(t, 0, len(serverError.BindingErrors))
