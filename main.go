@@ -131,7 +131,7 @@ func postAlbum(c *gin.Context) {
 		span.SetStatus(codes.Error, "Malformed JSON. Not valid for Album")
 		span.AddEvent(fmt.Sprintf("Malformed JSON. %s", err))
 		span.SetAttributes(attribute.Key("album-store.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
-		span.SetAttributes(attribute.Key("album-store.response.body").String(`{"message":"Malformed JSON. Not valid for Album"`))
+		span.SetAttributes(attribute.Key("album-store.response.body").String(`{"message":"Malformed JSON. Not valid for Album"}`))
 		span.SetAttributes(attribute.Key("album-store.status_code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
 		return

@@ -317,7 +317,7 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
 	assert.Equal(t, requestBody, attributeMap["album-store.request.body"].Emit())
-	assert.Equal(t, `{"message":"Malformed JSON. Not valid for Album"`, attributeMap["album-store.response.body"].Emit())
+	assert.Equal(t, `{"message":"Malformed JSON. Not valid for Album"}`, attributeMap["album-store.response.body"].Emit())
 
 	assert.Equal(t, "Malformed JSON. Not valid for Album", serverError.Message)
 	assert.Equal(t, 0, len(serverError.BindingErrors))
