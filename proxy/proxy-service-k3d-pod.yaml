@@ -63,8 +63,8 @@ spec:
         - name: ALBUM_STORE_URL
           value: "http://album-store.album-store.svc.cluster.local:9080"
       ports:
-        - containerPort: 9070
-          name: http
+        - name: http
+          containerPort: 9070
           protocol: TCP
       resources:
         requests:
@@ -73,6 +73,12 @@ spec:
         limits:
           memory: "128Mi"
           cpu: "500m"
+      livenessProbe:
+        httpGet:
+          path: /status
+          port: http
+        initialDelaySeconds: 1
+        periodSeconds: 5
   dnsPolicy: ClusterFirst # must be `ClusterFirst` to allow nginx to route to it via the ingress
   restartPolicy: Always
   terminationGracePeriodSeconds: 30

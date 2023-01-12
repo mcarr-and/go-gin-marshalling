@@ -86,8 +86,8 @@ items:
                 - name: GRPC_GO_LOG_SEVERITY_LEVEL
                   value: "info"
               ports:
-                - containerPort: 9080
-                  name: http
+                - name: http
+                  containerPort: 9080
                   protocol: TCP
               resources:
                 requests:
@@ -96,6 +96,12 @@ items:
                 limits:
                   memory: "128Mi"
                   cpu: "500m"
+              livenessProbe:
+                httpGet:
+                  path: /status
+                  port: http
+                initialDelaySeconds: 1
+                periodSeconds: 5
           dnsPolicy: ClusterFirst # must be `ClusterFirst` to allow nginx to route to it via the ingress
           restartPolicy: Always
           terminationGracePeriodSeconds: 30

@@ -42,14 +42,10 @@ Proxy-Service uses the `otelhttp.client` to make requests and it will create 3 s
 [proxy-service](proxy/.)
 
 ## TODO 
-* liveness endpoint & wire to deployment files
-* health endpoint & wire into deployment files
-* wire in prometheus endpoint to cluster 
 * Write Logs in JSON format
 * add all request and response headers and request parameters to the otel attributes.
 * Adding CI server integration
-* Add open-telmetry to the ingress-nginx so spans are created from the entry point to the cluster.
-* Create status endpoint that says if service is up or down.
+* Add open-telemetry to the ingress-nginx so spans are created from the entry point to the cluster.
 * Contract tests compare swagger output to actual output
 * Async processing of requests 
 * Back pressure on APIs & rate limiting
