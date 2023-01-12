@@ -1029,7 +1029,7 @@ imageRenderer:
     pullPolicy: Always
   # extra environment variables
   env:
-    HTTP_HOST: "0.0.0.0"
+    HTTP_HOST: "grafana.monitoring.svc.cluster.local"
     # RENDERING_ARGS: --no-sandbox,--disable-gpu,--window-size=1280x758
     # RENDERING_MODE: clustered
     # IGNORE_HTTPS_ERRORS: true

@@ -71,7 +71,14 @@ config:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
     # The health_check extension can be modified, but should never be removed.
-    health_check: { }
+    health_check:
+      endpoint: "localhost:13133"
+      path: "/"
+      #include_metadata: false
+      check_collector_pipeline:
+        enabled: false
+        interval: "5m"
+        exporter_failure_threshold: 5
     memory_ballast: { }
   processors:
     batch: { }
@@ -81,17 +88,17 @@ config:
     jaeger:
       protocols:
         grpc:
-          endpoint: 0.0.0.0:14250
+          endpoint: localhost:14250
         thrift_http:
-          endpoint: 0.0.0.0:14268
+          endpoint: localhost:14268
         thrift_compact:
-          endpoint: 0.0.0.0:6831
+          endpoint: localhost:6831
     otlp:
       protocols:
         grpc:
-          endpoint: 0.0.0.0:4317
+          endpoint: localhost:4317
         http:
-          endpoint: 0.0.0.0:4318
+          endpoint: localhost:4318
     prometheus:
       config:
         scrape_configs:
@@ -103,7 +110,7 @@ config:
   service:
     telemetry:
       metrics:
-        address: 0.0.0.0:8888
+        address: localhost:8888
     extensions:
       - health_check
       - memory_ballast
@@ -264,7 +271,7 @@ dnsPolicy: "ClusterFirst"
 # only used with deployment mode
 replicaCount: 1
 
-annotations: {}
+annotations: { }
 
 # List of extra sidecars to add
 extraContainers: [ ]
