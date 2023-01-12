@@ -9,7 +9,7 @@
 
 local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
-```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local album-store.local```
+```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local grafana.local album-store.local```
 
 ### 0.1 K3D Registry info
 
