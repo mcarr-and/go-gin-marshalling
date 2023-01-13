@@ -14,8 +14,6 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
-	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -345,13 +343,7 @@ func Test_getStatus(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/status", nil)
 	router.ServeHTTP(testRecorder, req)
 
-	var responseBody interface{}
-	byteArray, err := io.ReadAll(testRecorder.Body)
-	if err != nil {
-		log.Fatal("could not read body")
-	}
-	responseBodyString := string(byteArray[:])
-	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&responseBody)
+	responseBodyString := string(testRecorder.Body.Bytes())
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, `{"status":"OK"}`, responseBodyString)
@@ -372,13 +364,7 @@ func Test_getMetrics(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/metrics", nil)
 	router.ServeHTTP(testRecorder, req)
 
-	var responseBody interface{}
-	byteArray, err := io.ReadAll(testRecorder.Body)
-	if err != nil {
-		log.Fatal("could not read body")
-	}
-	responseBodyString := string(byteArray[:])
-	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&responseBody)
+	responseBodyString := string(testRecorder.Body.Bytes())
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Contains(t, responseBodyString, `go_gc_duration_seconds`)
