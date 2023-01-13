@@ -71,13 +71,7 @@ config:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
     # The health_check extension can be modified, but should never be removed.
-    health_check:
-      endpoint: "0.0.0.0:13133"
-      path: "/"
-      check_collector_pipeline:
-        enabled: false
-        interval: "5m"
-        exporter_failure_threshold: 5
+    health_check: {}
     memory_ballast: { }
   processors:
     batch: { }
