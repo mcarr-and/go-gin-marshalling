@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -16,9 +17,11 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -507,6 +510,59 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store postAlbum malformed JSON"}`, returnedBody)
+}
+
+func Test_getStatus(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+
+	req, _ := http.NewRequest(http.MethodGet, "/status", nil)
+	router.ServeHTTP(testRecorder, req)
+
+	var responseBody interface{}
+	byteArray, err := io.ReadAll(testRecorder.Body)
+	if err != nil {
+		log.Fatal("could not read body")
+	}
+	responseBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&responseBody)
+
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
+	assert.Equal(t, `{"status":"OK"}`, responseBodyString)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
+	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+}
+
+func Test_getMetrics(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+
+	req, _ := http.NewRequest(http.MethodGet, "/metrics", nil)
+	router.ServeHTTP(testRecorder, req)
+
+	var responseBody interface{}
+	byteArray, err := io.ReadAll(testRecorder.Body)
+	if err != nil {
+		log.Fatal("could not read body")
+	}
+	responseBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&responseBody)
+
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
+	assert.Contains(t, responseBodyString, `go_gc_duration_seconds`)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
+	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 }
 
 func TestGet(t *testing.T) {

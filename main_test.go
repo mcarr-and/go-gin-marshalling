@@ -14,6 +14,8 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -335,6 +337,59 @@ func Test_getSwagger(t *testing.T) {
 
 	assert.Contains(t, bodyString, "swagger-initializer.js")
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
+}
+
+func Test_getStatus(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+
+	req, _ := http.NewRequest(http.MethodGet, "/status", nil)
+	router.ServeHTTP(testRecorder, req)
+
+	var responseBody interface{}
+	byteArray, err := io.ReadAll(testRecorder.Body)
+	if err != nil {
+		log.Fatal("could not read body")
+	}
+	responseBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&responseBody)
+
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
+	assert.Equal(t, `{"status":"OK"}`, responseBodyString)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
+	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+}
+
+func Test_getMetrics(t *testing.T) {
+	testRecorder, spanRecorder, router := setupTestRouter()
+
+	req, _ := http.NewRequest(http.MethodGet, "/metrics", nil)
+	router.ServeHTTP(testRecorder, req)
+
+	var responseBody interface{}
+	byteArray, err := io.ReadAll(testRecorder.Body)
+	if err != nil {
+		log.Fatal("could not read body")
+	}
+	responseBodyString := string(byteArray[:])
+	err = json.NewDecoder(strings.NewReader(responseBodyString)).Decode(&responseBody)
+
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
+	assert.Contains(t, responseBodyString, `go_gc_duration_seconds`)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Ok, finishedSpans[0].Status().Code)
+	assert.Equal(t, "", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 }
 
 func Benchmark_getAllAlbums(b *testing.B) {

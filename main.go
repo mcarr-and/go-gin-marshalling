@@ -148,7 +148,17 @@ func postAlbum(c *gin.Context) {
 }
 
 func status(c *gin.Context) {
+	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/status")
+	span.SetStatus(codes.Ok, "")
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
+func metrics(c *gin.Context) {
+	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/metrics")
+	span.SetStatus(codes.Ok, "")
+	promhttp.Handler().ServeHTTP(c.Writer, c.Request)
 }
 
 func getErrorMsg(fe validator.FieldError) string {
@@ -175,8 +185,8 @@ func setupRouter() *gin.Engine {
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
-	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	router.GET("/status", status)
+	router.GET("/metrics", metrics)
 	return router
 }
 
