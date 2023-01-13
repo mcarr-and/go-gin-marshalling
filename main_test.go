@@ -71,7 +71,7 @@ func Test_getAllAlbums(t *testing.T) {
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "200", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "200", attributeMap["album-store.response.code"].Emit())
 
 	assert.Equal(t, listAlbums(), albums)
 }
@@ -98,7 +98,7 @@ func Test_getAlbumById(t *testing.T) {
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "200", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "200", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, `{"id":2,"title":"Jeru","artist":"Gerry Mulligan","price":17.99}`, attributeMap["album-store.response.body"].Emit())
 
 	assert.Equal(t, listAlbums()[1], album)
@@ -130,7 +130,7 @@ func Test_getAlbumById_BadId(t *testing.T) {
 	assert.Equal(t, expectedErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, "ID=X", attributeMap["album-store.request.parameters"].Emit())
 
 	assert.Equal(t, expectedErrorMessage, serverError.Message)
@@ -162,7 +162,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	assert.Equal(t, expectedErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 
 	assert.Equal(t, expectedErrorMessage, serverError.Message)
 }
@@ -195,7 +195,7 @@ func Test_postAlbum(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, `{"id":10,"title":"The Ozzman Cometh","artist":"Black Sabbath","price":66.6}`, attributeMap["album-store.response.body"].Emit())
-	assert.Equal(t, "201", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "201", attributeMap["album-store.response.code"].Emit())
 
 	assert.Equal(t, album, expectedAlbum)
 	assert.Equal(t, len(listAlbums()), 4)
@@ -229,7 +229,7 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	assert.Equal(t, bindingErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, album, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
 	assert.Equal(t, `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`, attributeMap["album-store.request.body"].Emit())
@@ -273,7 +273,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	assert.Equal(t, bindingErrorMessage, finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
 
@@ -315,7 +315,7 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	assert.Equal(t, "Malformed JSON. unexpected EOF", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["album-store.status_code"].Emit())
+	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, requestBody, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, `{"message":"Malformed JSON. Not valid for Album"}`, attributeMap["album-store.response.body"].Emit())
 
