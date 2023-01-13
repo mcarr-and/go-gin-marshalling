@@ -74,7 +74,6 @@ config:
     health_check:
       endpoint: "0.0.0.0:13133"
       path: "/"
-      #include_metadata: false
       check_collector_pipeline:
         enabled: false
         interval: "5m"
