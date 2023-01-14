@@ -6,6 +6,7 @@ import (
 	"errors"
 	"example.com/album-store/models"
 	"fmt"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -18,17 +19,18 @@ import (
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"reflect"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel/attribute"
@@ -71,27 +73,18 @@ func getAlbumByID(c *gin.Context) {
 	span.SetAttributes(attribute.Key("album-store.request.parameters").String(fmt.Sprintf("%s=%s", "ID", id)))
 
 	albumId, err := strconv.Atoi(id)
-	if err != nil {
-		errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found, invalid request")
-		serverError := models.ServerError{Message: errorMessage}
-		span.SetStatus(codes.Error, serverError.Message)
-		span.AddEvent(errorMessage)
-		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+	if bindJsonToModelFails(c, err, id, span) {
 		return
 	}
 
-	for _, album := range albums {
-		if album.ID == albumId {
-			span.SetStatus(codes.Ok, "")
-			span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusOK))
-			jsonVal, _ := json.Marshal(album)
-			span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
-			c.JSON(http.StatusOK, album)
-			return
-		}
+	if findAlbumFromCacheReturnIfFound(c, albumId, span) {
+		return
 	}
 
+	albumNotFoundResponse(c, id, span)
+}
+
+func albumNotFoundResponse(c *gin.Context, id string, span trace.Span) {
 	errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found")
 	serverError := models.ServerError{Message: errorMessage}
 	span.SetStatus(codes.Error, serverError.Message)
@@ -100,51 +93,116 @@ func getAlbumByID(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 }
 
+func findAlbumFromCacheReturnIfFound(c *gin.Context, albumId int, span trace.Span) bool {
+	for _, album := range albums {
+		if album.ID == albumId {
+			span.SetStatus(codes.Ok, "")
+			span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusOK))
+			jsonVal, _ := json.Marshal(album)
+			span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
+			c.JSON(http.StatusOK, album)
+			return true
+		}
+	}
+	return false
+}
+
+func bindJsonToModelFails(c *gin.Context, err error, id string, span trace.Span) bool {
+	if err != nil {
+		errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found, invalid request")
+		serverError := models.ServerError{Message: errorMessage}
+		span.SetStatus(codes.Error, serverError.Message)
+		span.AddEvent(errorMessage)
+		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+		return true
+	}
+	return false
+}
+
 func postAlbum(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums POST")
 	defer span.End()
-	var newAlbum models.Album
 
-	if err := c.ShouldBindBodyWith(&newAlbum, binding.JSON); err != nil {
-		var ve validator.ValidationErrors
-		if errors.As(err, &ve) {
-			bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
-			for i, fe := range ve {
-				field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fe.Field())
-				fieldJSONName, okay := field.Tag.Lookup("json")
-				if !okay {
-					log.Fatal(fmt.Sprintf("No json type on Struct model.Album %s Expecting : `json:\"title\" ...`", fe.Field()))
-				}
-				bindingErrorMessages[i] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fe)}
-			}
-			bindingErrorMessage, _ := json.Marshal(bindingErrorMessages)
-			requestBodyJSON, _ := c.Get(gin.BodyBytesKey) // get body from gin context
-			span.SetStatus(codes.Error, "Album JSON field validation failed")
-			span.AddEvent(string(bindingErrorMessage))
-			span.SetAttributes(attribute.Key("album-store.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
-			span.SetAttributes(attribute.Key("album-store.response.body").String(fmt.Sprintf("{\"errors\":%s}", bindingErrorMessage)))
-			span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
-			return
-		}
-		requestBodyJSON, _ := c.Get(gin.BodyBytesKey) // get body from gin context
-		span.SetStatus(codes.Error, "Malformed JSON. Not valid for Album")
-		span.AddEvent(fmt.Sprintf("Malformed JSON. %s", err))
-		span.SetAttributes(attribute.Key("album-store.request.body").String(fmt.Sprintf("%s", requestBodyJSON)))
-		span.SetAttributes(attribute.Key("album-store.response.body").String(`{"message":"Malformed JSON. Not valid for Album"}`))
-		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
+	requestBodyString, err := getRequestBody(c, span)
+	if err {
 		return
 	}
-	value, _ := c.Get(gin.BodyBytesKey) // get body from gin context
-	albums = append(albums, newAlbum)
+
+	hadError, albumValue := bindJsonBodyToModelFails(c, span, requestBodyString)
+	if hadError {
+		return
+	}
+
+	albums = append(albums, albumValue)
+	buildSuccessResponse(c, span, requestBodyString, albumValue)
+}
+
+func getRequestBody(c *gin.Context, span trace.Span) (string, bool) {
+	var requestBody interface{}
+	byteArray, err := io.ReadAll(c.Request.Body)
+	requestBodyString := string(byteArray[:])
+	if err = json.NewDecoder(strings.NewReader(requestBodyString)).Decode(&requestBody); err != nil {
+		buildMalformedJsonErrorResponse(c, span, err, requestBodyString)
+		return "", true
+	}
+	return requestBodyString, false
+}
+
+func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString string, responseAlbum models.Album) {
 	span.SetStatus(codes.Ok, "")
-	span.SetAttributes(attribute.Key("album-store.request.body").String(fmt.Sprintf("%s", value)))
+	span.SetAttributes(attribute.Key("album-store.request.body").String(requestBodyString))
 	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusCreated))
-	jsonVal, _ := json.Marshal(newAlbum)
+	jsonVal, _ := json.Marshal(responseAlbum)
 	span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
-	c.JSON(http.StatusCreated, newAlbum)
+	c.JSON(http.StatusCreated, responseAlbum)
+}
+
+func bindJsonBodyToModelFails(c *gin.Context, span trace.Span, requestBodyString string) (bool, models.Album) {
+	var newAlbum models.Album
+
+	if err := binding.JSON.BindBody([]byte(requestBodyString), &newAlbum); err != nil {
+		var ve validator.ValidationErrors
+		if validationBindingError(c, err, ve, span, requestBodyString) {
+			return true, newAlbum
+		}
+	}
+	return false, newAlbum
+}
+
+func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error, requestBodyJSON string) bool {
+	span.SetStatus(codes.Error, "Malformed JSON. Not valid for Album")
+	span.AddEvent(fmt.Sprintf("Malformed JSON. %s", err))
+	span.SetAttributes(attribute.Key("album-store.request.body").String(requestBodyJSON))
+	span.SetAttributes(attribute.Key("album-store.response.body").String(`{"message":"Malformed JSON. Not valid for Album"}`))
+	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
+	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
+	return true
+}
+
+func validationBindingError(c *gin.Context, err error, ve validator.ValidationErrors, span trace.Span, requestBodyJSON string) bool {
+	var newAlbum models.Album
+	if errors.As(err, &ve) {
+		bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
+		for i, fe := range ve {
+			field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fe.Field())
+			fieldJSONName, okay := field.Tag.Lookup("json")
+			if !okay {
+				log.Fatal(fmt.Sprintf("No json type on Struct model.Album %s Expecting : `json:\"title\" ...`", fe.Field()))
+			}
+			bindingErrorMessages[i] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fe)}
+		}
+		bindingErrorMessage, _ := json.Marshal(bindingErrorMessages)
+		span.SetStatus(codes.Error, "Album JSON field validation failed")
+		span.AddEvent(string(bindingErrorMessage))
+		span.SetAttributes(attribute.Key("album-store.request.body").String(requestBodyJSON))
+		span.SetAttributes(attribute.Key("album-store.response.body").String(fmt.Sprintf(`{"errors":%s}`, bindingErrorMessage)))
+		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
+		return true
+	}
+	return false
 }
 
 func status(c *gin.Context) {
