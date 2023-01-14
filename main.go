@@ -76,48 +76,7 @@ func getAlbumByID(c *gin.Context) {
 	if bindJsonToModelFails(c, err, id, span) {
 		return
 	}
-
-	if findAlbumFromCacheReturnIfFound(c, albumId, span) {
-		return
-	}
-
-	albumNotFoundResponse(c, id, span)
-}
-
-func albumNotFoundResponse(c *gin.Context, id string, span trace.Span) {
-	errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found")
-	serverError := models.ServerError{Message: errorMessage}
-	span.SetStatus(codes.Error, serverError.Message)
-	span.AddEvent(errorMessage)
-	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
-}
-
-func findAlbumFromCacheReturnIfFound(c *gin.Context, albumId int, span trace.Span) bool {
-	for _, album := range albums {
-		if album.ID == albumId {
-			span.SetStatus(codes.Ok, "")
-			span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusOK))
-			jsonVal, _ := json.Marshal(album)
-			span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
-			c.JSON(http.StatusOK, album)
-			return true
-		}
-	}
-	return false
-}
-
-func bindJsonToModelFails(c *gin.Context, err error, id string, span trace.Span) bool {
-	if err != nil {
-		errorMessage := fmt.Sprintf("%s [%s] %s", "Album", id, "not found, invalid request")
-		serverError := models.ServerError{Message: errorMessage}
-		span.SetStatus(codes.Error, serverError.Message)
-		span.AddEvent(errorMessage)
-		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
-		return true
-	}
-	return false
+	findAlbum(c, albumId, span)
 }
 
 func postAlbum(c *gin.Context) {
@@ -129,14 +88,58 @@ func postAlbum(c *gin.Context) {
 	if err {
 		return
 	}
-
-	hadError, albumValue := bindJsonBodyToModelFails(c, span, requestBodyString)
-	if hadError {
+	hasError, albumValue := bindJsonBodyToModelFails(c, span, requestBodyString)
+	if hasError {
 		return
 	}
-
 	albums = append(albums, albumValue)
 	buildSuccessResponse(c, span, requestBodyString, albumValue)
+}
+
+func status(c *gin.Context) {
+	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/status")
+	span.SetStatus(codes.Ok, "")
+	c.JSON(http.StatusOK, gin.H{"status": "OK"})
+}
+
+func metrics(c *gin.Context) {
+	span := trace.SpanFromContext(c.Request.Context())
+	span.SetName("/metrics")
+	span.SetStatus(codes.Ok, "")
+	promhttp.Handler().ServeHTTP(c.Writer, c.Request)
+}
+
+func findAlbum(c *gin.Context, albumId int, span trace.Span) {
+	for _, album := range albums {
+		if album.ID == albumId {
+			span.SetStatus(codes.Ok, "")
+			span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusOK))
+			jsonVal, _ := json.Marshal(album)
+			span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
+			c.JSON(http.StatusOK, album)
+			return
+		}
+	}
+	errorMessage := fmt.Sprintf("Album [%v] not found", albumId)
+	serverError := models.ServerError{Message: errorMessage}
+	span.SetStatus(codes.Error, serverError.Message)
+	span.AddEvent(errorMessage)
+	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
+	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+}
+
+func bindJsonToModelFails(c *gin.Context, err error, id string, span trace.Span) bool {
+	if err != nil {
+		errorMessage := fmt.Sprintf("Album [%s] not found, invalid request", id)
+		serverError := models.ServerError{Message: errorMessage}
+		span.SetStatus(codes.Error, serverError.Message)
+		span.AddEvent(errorMessage)
+		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+		return true
+	}
+	return false
 }
 
 func getRequestBody(c *gin.Context, span trace.Span) (string, bool) {
@@ -203,20 +206,6 @@ func validationBindingError(c *gin.Context, err error, ve validator.ValidationEr
 		return true
 	}
 	return false
-}
-
-func status(c *gin.Context) {
-	span := trace.SpanFromContext(c.Request.Context())
-	span.SetName("/status")
-	span.SetStatus(codes.Ok, "")
-	c.JSON(http.StatusOK, gin.H{"status": "OK"})
-}
-
-func metrics(c *gin.Context) {
-	span := trace.SpanFromContext(c.Request.Context())
-	span.SetName("/metrics")
-	span.SetStatus(codes.Ok, "")
-	promhttp.Handler().ServeHTTP(c.Writer, c.Request)
 }
 
 func getErrorMsg(fe validator.FieldError) string {
