@@ -164,7 +164,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Malformed JSON. unexpected EOF", finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
@@ -305,7 +305,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Malformed JSON. unexpected EOF", finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
@@ -496,7 +496,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 1, len(finishedSpans[0].Events()))
-	assert.Equal(t, "Malformed JSON. unexpected EOF", finishedSpans[0].Events()[0].Name)
+	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
