@@ -170,7 +170,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error album-store returned malformed JSON"}`, returnedBody)
+	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
 
 func Test_getAlbumById_Success(t *testing.T) {
@@ -312,7 +312,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "ID=1", attributeMap["proxy-service.request.parameters"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error album-store returned malformed JSON"}`, returnedBody)
+	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
 
 func Test_postAlbums_Success(t *testing.T) {
@@ -503,7 +503,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 
-	assert.Equal(t, `{"message":"error album-store returned malformed JSON"}`, returnedBody)
+	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
 
 func Test_getStatus(t *testing.T) {
