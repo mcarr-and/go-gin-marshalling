@@ -55,7 +55,7 @@ func getAlbums(c *gin.Context) {
 	if handleRequestHasError(c, err, "getAlbums", span) {
 		return
 	}
-	albumStoreResponseBodyJson, failed := getResponseBody(c, span, resp.Body)
+	albumStoreResponseBodyJson, failed := processResponseBody(c, span, resp.Body)
 	if failed {
 		return
 	}
@@ -78,7 +78,7 @@ func getAlbumByID(c *gin.Context) {
 	if handleRequestHasError(c, err, "getAlbumById", span) {
 		return
 	}
-	albumStoreResponseBodyJson, failed := getResponseBody(c, span, resp.Body)
+	albumStoreResponseBodyJson, failed := processResponseBody(c, span, resp.Body)
 	if failed {
 		return
 	}
@@ -89,7 +89,7 @@ func postAlbum(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums POST")
 	defer span.End()
-	requestBodyString, failed := getRequestBody(c, span, c.Request.Body)
+	requestBodyString, failed := processRequestBody(c, span, c.Request.Body)
 	if failed {
 		return
 	}
@@ -98,7 +98,7 @@ func postAlbum(c *gin.Context) {
 	if handleRequestHasError(c, err, "postAlbum", span) {
 		return
 	}
-	albumStoreResponseBodyJson, failed := getResponseBody(c, span, resp.Body)
+	albumStoreResponseBodyJson, failed := processResponseBody(c, span, resp.Body)
 	if failed {
 		return
 	}
@@ -119,7 +119,7 @@ func metrics(c *gin.Context) {
 	promhttp.Handler().ServeHTTP(c.Writer, c.Request)
 }
 
-func getResponseBody(c *gin.Context, span trace.Span, body io.ReadCloser) (interface{}, bool) {
+func processResponseBody(c *gin.Context, span trace.Span, body io.ReadCloser) (interface{}, bool) {
 	var jsonBody interface{}
 	byteArray, err := io.ReadAll(body)
 	jsonBodyString := string(byteArray[:])
@@ -144,7 +144,7 @@ func getResponseBody(c *gin.Context, span trace.Span, body io.ReadCloser) (inter
 	return jsonBody, false
 }
 
-func getRequestBody(c *gin.Context, span trace.Span, reader io.ReadCloser) (string, bool) {
+func processRequestBody(c *gin.Context, span trace.Span, reader io.ReadCloser) (string, bool) {
 	var requestBody interface{}
 	byteArray, err := io.ReadAll(reader)
 	jsonBodyString := string(byteArray[:])
