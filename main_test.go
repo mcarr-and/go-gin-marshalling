@@ -140,9 +140,9 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
 	var serverError models.ServerError
-	albumID := 5666
+	invalidAlbumID := -1666
 
-	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%v", "/albums/", albumID), nil)
+	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%v", "/albums/", invalidAlbumID), nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", string(testRecorder.Body.Bytes()))
@@ -153,7 +153,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
 
-	expectedErrorMessage := "Album [5666] not found"
+	expectedErrorMessage := fmt.Sprintf("Album [%v] not found", invalidAlbumID)
 
 	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
 	assert.Equal(t, expectedErrorMessage, finishedSpans[0].Status().Description)

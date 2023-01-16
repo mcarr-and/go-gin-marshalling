@@ -88,7 +88,7 @@ func postAlbum(c *gin.Context) {
 	if err {
 		return
 	}
-	hasError, albumValue := bindJsonBodyToModelFails(c, span, requestBodyString)
+	hasError, albumValue := bindJsonBody(c, span, requestBodyString)
 	if hasError {
 		return
 	}
@@ -162,12 +162,12 @@ func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString str
 	c.JSON(http.StatusCreated, responseAlbum)
 }
 
-func bindJsonBodyToModelFails(c *gin.Context, span trace.Span, requestBodyString string) (bool, models.Album) {
+func bindJsonBody(c *gin.Context, span trace.Span, requestBodyString string) (bool, models.Album) {
 	var newAlbum models.Album
 
 	if err := binding.JSON.BindBody([]byte(requestBodyString), &newAlbum); err != nil {
 		var ve validator.ValidationErrors
-		if validationBindingError(c, err, ve, span, requestBodyString) {
+		if processValidationBindingError(c, err, ve, span, requestBodyString) {
 			return true, newAlbum
 		}
 	}
@@ -184,7 +184,7 @@ func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error,
 	return true
 }
 
-func validationBindingError(c *gin.Context, err error, ve validator.ValidationErrors, span trace.Span, requestBodyJSON string) bool {
+func processValidationBindingError(c *gin.Context, err error, ve validator.ValidationErrors, span trace.Span, requestBodyJSON string) bool {
 	var newAlbum models.Album
 	if errors.As(err, &ve) {
 		bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
