@@ -157,8 +157,8 @@ func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString str
 	span.SetStatus(codes.Ok, "")
 	span.SetAttributes(attribute.Key("album-store.request.body").String(requestBodyString))
 	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusCreated))
-	jsonVal, _ := json.Marshal(responseAlbum)
-	span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonVal)))
+	jsonByteArr, _ := json.Marshal(responseAlbum)
+	span.SetAttributes(attribute.Key("album-store.response.body").String(string(jsonByteArr)))
 	c.JSON(http.StatusCreated, responseAlbum)
 }
 

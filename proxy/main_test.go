@@ -17,7 +17,6 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-	"time"
 )
 
 // inspired by this for setting up gin & otel to test spans
@@ -34,19 +33,18 @@ func TestMain(m *testing.M) {
 
 // MockClient is the mock client
 type MockClient struct {
-	Timeout time.Duration
-	DoFunc  func(req *http.Request) (*http.Response, error)
+	DoFunc func(req *http.Request) (*http.Response, error)
+}
+
+// Do is the mock client's `Do` func
+func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
+	return MockResponseFunc(req)
 }
 
 var (
 	// MockResponseFunc fetches the mock client's `Do` func
 	MockResponseFunc func(req *http.Request) (*http.Response, error)
 )
-
-// Do is the mock client's `Do` func
-func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
-	return MockResponseFunc(req)
-}
 
 func setupTestRouter() (*httptest.ResponseRecorder, *tracetest.SpanRecorder, *gin.Engine) {
 	spanRecorder := tracetest.NewSpanRecorder()
@@ -82,8 +80,8 @@ func Test_getAllAlbums_Success(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	bytesArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(bytesArr)
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 
@@ -114,8 +112,8 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -152,8 +150,8 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -190,8 +188,8 @@ func Test_getAlbumById_Success(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 
@@ -223,8 +221,8 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -255,8 +253,8 @@ func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/X", nil)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -293,8 +291,8 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -335,8 +333,8 @@ func Test_postAlbums_Success(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 
@@ -370,8 +368,8 @@ func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -405,8 +403,8 @@ func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -442,8 +440,8 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
@@ -484,8 +482,8 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 
 	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
-	b, _ := io.ReadAll(testRecorder.Body)
-	returnedBody := string(b)
+	byteArr, _ := io.ReadAll(testRecorder.Body)
+	returnedBody := string(byteArr)
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
 
