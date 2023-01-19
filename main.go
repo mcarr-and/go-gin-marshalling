@@ -83,7 +83,7 @@ func postAlbum(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums POST")
 	defer span.End()
-
+	//c.ShouldBindBodyWith() // the old way to get the JSON body and did get body and bind
 	requestBodyString, err := getRequestBody(c, span)
 	if err {
 		return
@@ -163,15 +163,13 @@ func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString str
 }
 
 func bindJsonBody(c *gin.Context, span trace.Span, requestBodyString string) (bool, models.Album) {
-	var newAlbum models.Album
-
-	if err := binding.JSON.BindBody([]byte(requestBodyString), &newAlbum); err != nil {
-		var ve validator.ValidationErrors
-		if processValidationBindingError(c, err, ve, span, requestBodyString) {
-			return true, newAlbum
+	var album models.Album
+	if err := binding.JSON.BindBody([]byte(requestBodyString), &album); err != nil {
+		if processValidationBindingError(c, err, span, requestBodyString) {
+			return true, album
 		}
 	}
-	return false, newAlbum
+	return false, album
 }
 
 func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error, requestBodyJSON string) bool {
@@ -184,8 +182,9 @@ func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error,
 	return true
 }
 
-func processValidationBindingError(c *gin.Context, err error, ve validator.ValidationErrors, span trace.Span, requestBodyJSON string) bool {
+func processValidationBindingError(c *gin.Context, err error, span trace.Span, requestBodyJSON string) bool {
 	var newAlbum models.Album
+	var ve validator.ValidationErrors
 	if errors.As(err, &ve) {
 		bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
 		for i, fe := range ve {

@@ -7,7 +7,7 @@ The project is a backend service that represents a music store with an in-memory
 
 Send data to the following services:
 * Jaeger
-* Prometheus[TODO]
+* Prometheus
 
 ## Running Project
 
@@ -42,6 +42,7 @@ Proxy-Service uses the `otelhttp.client` to make requests and it will create 3 s
 [proxy-service](proxy/.)
 
 ## TODO 
+* Grafana dashboards to display the GO services, Jaeger, nginx-ingress
 * Write Logs in JSON format
 * add all request and response headers and request parameters to the otel attributes.
 * Adding CI server integration

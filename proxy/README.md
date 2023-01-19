@@ -13,7 +13,6 @@ Cluster must have the following deployed
 * Album-Store
 
 ## TODO:
-* heath endpoint, liveness endpoint & wire into deployment files
 * version file for go?
 
 # Run 
