@@ -78,7 +78,7 @@ func Test_getAllAlbums_Success(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	bytesArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(bytesArr)
@@ -95,6 +95,7 @@ func Test_getAllAlbums_Success(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, responseBody, returnedBody)
 }
@@ -110,7 +111,7 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 		)
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -128,7 +129,7 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
-
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 	assert.Equal(t, `{"message":"error contacting album-store getAlbums Error from web server"}`, returnedBody)
 }
 
@@ -148,7 +149,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -167,6 +168,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
@@ -186,7 +188,7 @@ func Test_getAlbumById_Success(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -203,8 +205,9 @@ func Test_getAlbumById_Success(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["proxy-service.response.code"].Emit())
-	assert.Equal(t, "ID=1", attributeMap["proxy-service.request.parameters"].Emit())
+	assert.Equal(t, "/albums/1", attributeMap["http.target"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
+
 	assert.Equal(t, responseBody, returnedBody)
 }
 
@@ -219,7 +222,7 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 		)
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -237,7 +240,7 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
-	assert.Equal(t, "ID=1", attributeMap["proxy-service.request.parameters"].Emit())
+	assert.Equal(t, "/albums/1", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, `{"message":"error contacting album-store getAlbumById Error from web server"}`, returnedBody)
 }
@@ -251,7 +254,7 @@ func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/X", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums/X", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -269,7 +272,7 @@ func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
-	assert.Equal(t, "ID=X", attributeMap["proxy-service.request.parameters"].Emit())
+	assert.Equal(t, "/albums/X", attributeMap["http.target"].Emit())
 	assert.Equal(t, `{"message":"error invalid ID [X] requested"}`, returnedBody)
 }
 
@@ -289,7 +292,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -307,7 +310,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
-	assert.Equal(t, "ID=1", attributeMap["proxy-service.request.parameters"].Emit())
+	assert.Equal(t, "/albums/1", attributeMap["http.target"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
@@ -331,7 +334,7 @@ func Test_postAlbums_Success(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := newTestHttpRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -348,6 +351,7 @@ func Test_postAlbums_Success(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
@@ -366,7 +370,7 @@ func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := newTestHttpRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -384,6 +388,7 @@ func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 	assert.Equal(t, "", attributeMap["proxy-service.request.body"].Emit())
 
 	assert.Equal(t, `{"message":"invalid request json body "}`, returnedBody)
@@ -401,7 +406,7 @@ func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := newTestHttpRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -420,6 +425,7 @@ func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 	assert.Equal(t, `{"message":"invalid request json body {\"title\":\"Ozzman Cometh\""}`, returnedBody)
 	assert.Equal(t, `{"message":"invalid request json body {"title":"Ozzman Cometh""}`, attributeMap["proxy-service.response.body"].Emit())
 }
@@ -438,7 +444,7 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 		)
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := newTestHttpRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -457,6 +463,7 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, `{"message":"error contacting album-store postAlbum Error from web server"}`, returnedBody)
 }
@@ -480,7 +487,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := newTestHttpRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -500,6 +507,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
@@ -507,7 +515,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 func Test_getStatus(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/status", nil)
+	req := newTestHttpRequest(http.MethodGet, "/status", nil)
 	router.ServeHTTP(testRecorder, req)
 
 	responseBodyString := string(testRecorder.Body.Bytes())
@@ -523,12 +531,14 @@ func Test_getStatus(t *testing.T) {
 
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "/status", attributeMap["http.target"].Emit())
 }
 
 func Test_getMetrics(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/metrics", nil)
+	req := newTestHttpRequest(http.MethodGet, "/metrics", nil)
 	router.ServeHTTP(testRecorder, req)
 
 	responseBodyString := string(testRecorder.Body.Bytes())
@@ -543,4 +553,14 @@ func Test_getMetrics(t *testing.T) {
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "/metrics", attributeMap["http.target"].Emit())
+}
+
+// setup test requests to have the requestURI set as does not by default out of the box. This helps enable the http.target to be set when used
+func newTestHttpRequest(method string, url string, body io.Reader) *http.Request {
+	req, _ := http.NewRequest(method, url, body)
+	req.RequestURI = req.URL.RequestURI()
+	return req
 }

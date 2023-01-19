@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -54,7 +55,7 @@ func Test_getAllAlbums(t *testing.T) {
 
 	var albums []models.Album
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &albums); err != nil {
 		assert.Fail(t, "json unmarshal fail", "should be []Albums ", albums)
@@ -72,6 +73,7 @@ func Test_getAllAlbums(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["album-store.response.code"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, listAlbums(), albums)
 }
@@ -81,7 +83,7 @@ func Test_getAlbumById(t *testing.T) {
 
 	var album models.Album
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/2", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums/2", nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &album); err != nil {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(testRecorder.Body.Bytes()))
@@ -100,6 +102,7 @@ func Test_getAlbumById(t *testing.T) {
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "200", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, `{"id":2,"title":"Jeru","artist":"Gerry Mulligan","price":17.99}`, attributeMap["album-store.response.body"].Emit())
+	assert.Equal(t, "/albums/2", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, listAlbums()[1], album)
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
@@ -110,7 +113,7 @@ func Test_getAlbumById_BadId(t *testing.T) {
 
 	var serverError models.ServerError
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/X", nil)
+	req := newTestHttpRequest(http.MethodGet, "/albums/X", nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(testRecorder.Body.Bytes()))
@@ -131,7 +134,7 @@ func Test_getAlbumById_BadId(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
-	assert.Equal(t, "ID=X", attributeMap["album-store.request.parameters"].Emit())
+	assert.Equal(t, "/albums/X", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, expectedErrorMessage, serverError.Message)
 }
@@ -142,7 +145,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	var serverError models.ServerError
 	invalidAlbumID := -1666
 
-	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%v", "/albums/", invalidAlbumID), nil)
+	req := newTestHttpRequest(http.MethodGet, fmt.Sprintf("%s%v", "/albums/", invalidAlbumID), nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", string(testRecorder.Body.Bytes()))
@@ -163,6 +166,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
+	assert.Equal(t, fmt.Sprintf("/albums/%v", invalidAlbumID), attributeMap["http.target"].Emit())
 
 	assert.Equal(t, expectedErrorMessage, serverError.Message)
 }
@@ -176,7 +180,7 @@ func Test_postAlbum(t *testing.T) {
 	expectedAlbum := models.Album{ID: 10, Title: "The Ozzman Cometh", Artist: "Black Sabbath", Price: 66.60}
 	albumBody := `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
+	req := newTestHttpRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &album); err != nil {
 		assert.Fail(t, "json unmarshalling fail", "Should be a valid Album ", string(testRecorder.Body.Bytes()))
@@ -196,6 +200,7 @@ func Test_postAlbum(t *testing.T) {
 	assert.Equal(t, `{"id": 10, "title": "The Ozzman Cometh", "artist": "Black Sabbath", "price": 66.60}`, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, `{"id":10,"title":"The Ozzman Cometh","artist":"Black Sabbath","price":66.6}`, attributeMap["album-store.response.body"].Emit())
 	assert.Equal(t, "201", attributeMap["album-store.response.code"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, album, expectedAlbum)
 	assert.Equal(t, len(listAlbums()), 4)
@@ -209,7 +214,7 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	album := `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`
 	bindingErrorMessage := `[{"field":"id","message":"below minimum value"},{"field":"title","message":"required field"},{"field":"artist","message":"required field"},{"field":"price","message":"required field"}]`
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
+	req := newTestHttpRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		var ve validator.ValidationErrors
@@ -233,6 +238,7 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	assert.Equal(t, album, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
 	assert.Equal(t, `{"xid": 10, "titlex": "Blue Train", "artistx": "Lead Belly", "pricex": 56.99, "X": "asdf"}`, attributeMap["album-store.request.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, 4, len(serverError.BindingErrors))
 	assert.Equal(t, "title", serverError.BindingErrors[1].Field)
@@ -253,7 +259,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	bindingErrorMessage := `[{"field":"id","message":"below minimum value"},{"field":"title","message":"below minimum value"},{"field":"artist","message":"below minimum value"},{"field":"price","message":"below minimum value"}]`
 	var serverError models.ServerError
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(album))
+	req := newTestHttpRequest(http.MethodPost, "/albums", strings.NewReader(album))
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		var ve validator.ValidationErrors
@@ -276,6 +282,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, 4, len(serverError.BindingErrors))
 	assert.Equal(t, "id", serverError.BindingErrors[0].Field)
@@ -297,7 +304,7 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	var serverError models.ServerError
 	requestBody := `{"id": -1,`
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", strings.NewReader(requestBody))
+	req := newTestHttpRequest(http.MethodPost, "/albums", strings.NewReader(requestBody))
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		assert.Fail(t, "", "should be ServerError ")
@@ -318,6 +325,7 @@ func Test_postAlbum_BadRequest_Malformed_JSON(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, requestBody, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, `{"message":"Malformed JSON. Not valid for Album"}`, attributeMap["album-store.response.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, "Malformed JSON. Not valid for Album", serverError.Message)
 	assert.Equal(t, 0, len(serverError.BindingErrors))
@@ -329,7 +337,7 @@ func Test_getSwagger(t *testing.T) {
 	resetAlbums()
 	testRecorder, _, router := setupTestRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/v3/api-docs/", nil)
+	req := newTestHttpRequest(http.MethodGet, "/v3/api-docs/", nil)
 	router.ServeHTTP(testRecorder, req)
 	bodyString := string(testRecorder.Body.Bytes())
 
@@ -340,7 +348,7 @@ func Test_getSwagger(t *testing.T) {
 func Test_getStatus(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/status", nil)
+	req := newTestHttpRequest(http.MethodGet, "/status", nil)
 	router.ServeHTTP(testRecorder, req)
 
 	responseBodyString := string(testRecorder.Body.Bytes())
@@ -356,12 +364,14 @@ func Test_getStatus(t *testing.T) {
 
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
 
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "/status", attributeMap["http.target"].Emit())
 }
 
 func Test_getMetrics(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/metrics", nil)
+	req := newTestHttpRequest(http.MethodGet, "/metrics", nil)
 	router.ServeHTTP(testRecorder, req)
 
 	responseBodyString := string(testRecorder.Body.Bytes())
@@ -376,6 +386,16 @@ func Test_getMetrics(t *testing.T) {
 	assert.Equal(t, "", finishedSpans[0].Status().Description)
 
 	assert.Equal(t, 0, len(finishedSpans[0].Events()))
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "/metrics", attributeMap["http.target"].Emit())
+}
+
+// setup test requests to have the requestURI. This helps enable the http.target to be set when reading the request in Open-Telemetry
+func newTestHttpRequest(method string, url string, body io.Reader) *http.Request {
+	req, _ := http.NewRequest(method, url, body)
+	req.RequestURI = req.URL.RequestURI()
+	return req
 }
 
 func Benchmark_getAllAlbums(b *testing.B) {
