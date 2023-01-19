@@ -114,12 +114,12 @@ setup-album-docker-properties:
 	$(eval album_setup := -e GRPC_GO_LOG_SEVERITY_LEVEL=info -e GRPC_GO_LOG_VERBOSITY_LEVEL=99 -e NAMESPACE=no-namespace -e INSTANCE_NAME=album-store-1)
 
 .PHONY: docker-k3d-start
-docker-k3d-start: setup-album-docker-properties
-	$(album_setup) -e OTEL_LOCATION=otel-collector.local:8070 docker run -d -p 9080:9080 --name album-store album-store:0.1
+docker-k3d-start: docker-build-album setup-album-docker-properties
+	docker run -d -p 9080:9080 $(album_setup) -e OTEL_LOCATION=otel-collector.local:8070 --name album-store album-store:0.1
 
 .PHONY: docker-local-start
-docker-local-start: setup-album-docker-properties
-	$(album_setup) -e OTEL_LOCATION=localhost:4327 docker run -d -p 9080:9080 --name album-store album-store:0.1
+docker-local-start: docker-build-album setup-album-docker-properties
+	docker run -d -p 9080:9080  $(album_setup) -e OTEL_LOCATION=localhost:4327 --name album-store album-store:0.1
 
 .PHONY: local-start-k3d
 local-start-k3d: build setup-album-properties

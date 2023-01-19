@@ -89,7 +89,7 @@ setup-proxy-docker-properties:
 
 .PHONY: docker-k3d-start
 docker-k3d-start: setup-proxy-docker-properties
-	$(proxy_setup) -e OTEL_LOCATION=otel-collector.local:8070 -e ALBUM_STORE_URL=http://localhost:9080 docker run -d -p 9070:9070 --name proxy-service proxy-service:0.1
+	docker run -d -p 9070:9070 $(proxy_setup) -e OTEL_LOCATION=otel-collector.local:8070 -e ALBUM_STORE_URL=http://localhost:9080  --name proxy-service proxy-service:0.1
 
 .PHONY: docker-local-start
 docker-local-start: setup-proxy-docker-properties
