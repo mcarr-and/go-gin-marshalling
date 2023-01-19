@@ -76,7 +76,7 @@ docker-tag-k3d-registry-proxy: docker-build-proxy
 	cd proxy && $(MAKE) docker-tag-k3d-registry-proxy && cd ..
 
 .PHONY: k3d-album-deploy-deployment
-k3d-album-deploy-deployment:
+k3d-album-deploy-deployment: docker-tag-k3d-registry-album
 	kubectl apply -f album-store-k3d-deployment.yaml
 
 .PHONY: k3d-album-undeploy-deployment
@@ -84,7 +84,7 @@ k3d-album-undeploy-deployment:
 	kubectl delete -f album-store-k3d-deployment.yaml
 
 .PHONY: k3d-album-deploy-pod
-k3d-album-deploy-pod:
+k3d-album-deploy-pod: docker-tag-k3d-registry-album
 	kubectl apply -f album-store-k3d-pod.yaml
 
 .PHONY: k3d-album-undeploy-pod
@@ -92,7 +92,7 @@ k3d-album-undeploy-pod:
 	kubectl delete -f album-store-k3d-pod.yaml
 
 .PHONY: k3d-proxy-deploy-deployment
-k3d-proxy-deploy-deployment:
+k3d-proxy-deploy-deployment: docker-tag-k3d-registry-proxy
 	kubectl apply -f proxy/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-undeploy-deployment
@@ -100,7 +100,7 @@ k3d-proxy-undeploy-deployment:
 	kubectl delete -f proxy/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-deploy-pod
-k3d-proxy-deploy-pod:
+k3d-proxy-deploy-pod: docker-tag-k3d-registry-proxy
 	kubectl apply -f proxy/proxy-service-k3d-pod.yaml
 
 .PHONY: k3d-proxy-undeploy-pod

@@ -17,12 +17,13 @@ make docker-build-album
 ## 2. Start All Observability & Log Viewing Services
  
 ```bash
-make docker-compose-start;
+make docker-compose-limited-start;
 ```
 
 ## 3. Start album-store Go/Gin Server
 
 ### 3.1 From the Command line 
+
 ```bash
 make local-start-grpc;
 ```
@@ -51,7 +52,7 @@ make local-test;
 
 ### 4.2 Using Postman
 
-[Postman files](../test/)
+[Postman files](../test/.)
 
 1. Import the collection and environment into your postman
 1. Set Environment to `localhost`
@@ -72,5 +73,5 @@ make local-test;
 ### 2. Stop Observability and Log Viewing Services
 
 ```bash
-make docker-compose-stop;
+make docker-compose-limited-stop;
 ```
