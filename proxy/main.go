@@ -124,7 +124,7 @@ func processResponseBody(c *gin.Context, span trace.Span, body io.ReadCloser) (i
 	byteArray, err := io.ReadAll(body)
 	jsonBodyString := string(byteArray[:])
 	if err = json.NewDecoder(strings.NewReader(jsonBodyString)).Decode(&jsonBody); err != nil {
-		buildMalformedJsonErrorResponse(c, span, jsonBodyString, "proxy-service.response.body", "error from album-store Malformed JSON returned")
+		buildMalformedJsonErrorResponse(c, span, jsonBodyString, "proxy-service.response.body", "error from album-store Malformed JSON returned", http.StatusInternalServerError)
 		return jsonBody, true
 	}
 
@@ -153,19 +153,19 @@ func processRequestBody(c *gin.Context, span trace.Span, reader io.ReadCloser) (
 
 	if err != nil {
 		errorMessage := fmt.Sprintf("invalid request json body %v", jsonBodyString)
-		buildMalformedJsonErrorResponse(c, span, jsonBodyString, "proxy-service.request.body", errorMessage)
+		buildMalformedJsonErrorResponse(c, span, jsonBodyString, "proxy-service.request.body", errorMessage, http.StatusBadRequest)
 		span.SetAttributes(attribute.Key("proxy-service.response.body").String(fmt.Sprintf("{\"message\":\"%v\"}", errorMessage)))
 		return jsonBodyString, true
 	}
 	return jsonBodyString, false
 }
 
-func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, response string, spanAttributeType string, errorMessage string) bool {
+func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, response string, spanAttributeType string, errorMessage string, errorCode int) bool {
 	//description := "error from album-store Malformed JSON returned"
 	span.SetStatus(codes.Error, errorMessage)
 	span.AddEvent(errorMessage)
 	span.SetAttributes(attribute.Key(spanAttributeType).String(response))
-	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusBadRequest))
+	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(errorCode))
 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 	return true
 }
@@ -175,7 +175,7 @@ func handleRequestHasError(c *gin.Context, err error, methodName string, span tr
 		errorMessage := fmt.Sprintf("error contacting album-store %s %v", methodName, err)
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
-		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusBadRequest))
+		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusInternalServerError))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return true
 	}

@@ -128,7 +128,7 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "error contacting album-store getAlbums Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "500", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 	assert.Equal(t, `{"message":"error contacting album-store getAlbums Error from web server"}`, returnedBody)
 }
@@ -166,7 +166,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "500", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
@@ -239,7 +239,7 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "error contacting album-store getAlbumById Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "500", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, "/albums/1", attributeMap["http.target"].Emit())
 
 	assert.Equal(t, `{"message":"error contacting album-store getAlbumById Error from web server"}`, returnedBody)
@@ -309,7 +309,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "500", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, "/albums/1", attributeMap["http.target"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 
@@ -461,7 +461,7 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "error contacting album-store postAlbum Error from web server", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "500", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
@@ -504,7 +504,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "error from album-store Malformed JSON returned", finishedSpans[0].Events()[0].Name)
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
-	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
+	assert.Equal(t, "500", attributeMap["proxy-service.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
 	assert.Equal(t, requestBody, attributeMap["proxy-service.request.body"].Emit())
 	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
