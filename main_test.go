@@ -3,8 +3,15 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"example.com/album-store/models"
 	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"strings"
+	"testing"
+
+	"example.com/album-store/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -14,12 +21,6 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
-	"io"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"strings"
-	"testing"
 )
 
 // inspired by this for setting up gin & otel to test spans
@@ -86,7 +87,7 @@ func Test_getAlbumById(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, "/albums/2", nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &album); err != nil {
-		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(testRecorder.Body.Bytes()))
+		assert.Fail(t, "json unmarshal fail", "Should be Album ", testRecorder.Body.String())
 	}
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
@@ -116,7 +117,7 @@ func Test_getAlbumById_BadId(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, "/albums/X", nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
-		assert.Fail(t, "json unmarshal fail", "Should be Album ", string(testRecorder.Body.Bytes()))
+		assert.Fail(t, "json unmarshal fail", "Should be Album ", testRecorder.Body.String())
 	}
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
@@ -148,7 +149,7 @@ func Test_getAlbumById_NotFound(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, fmt.Sprintf("%s%v", "/albums/", invalidAlbumID), nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
-		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", string(testRecorder.Body.Bytes()))
+		assert.Fail(t, "json unmarshalling fail", "Should be ServerError ", testRecorder.Body.String())
 	}
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
@@ -183,7 +184,7 @@ func Test_postAlbum(t *testing.T) {
 	req := newTestHttpRequest(http.MethodPost, "/albums", strings.NewReader(albumBody))
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &album); err != nil {
-		assert.Fail(t, "json unmarshalling fail", "Should be a valid Album ", string(testRecorder.Body.Bytes()))
+		assert.Fail(t, "json unmarshalling fail", "Should be a valid Album ", testRecorder.Body.String())
 	}
 
 	assert.Equal(t, http.StatusCreated, testRecorder.Code)
@@ -219,7 +220,7 @@ func Test_postAlbum_BadRequest_BadJSON_MissingValues(t *testing.T) {
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		var ve validator.ValidationErrors
 		errors.As(err, &ve)
-		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(testRecorder.Body.Bytes()))
+		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), testRecorder.Body.String())
 	}
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
@@ -264,7 +265,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
 		var ve validator.ValidationErrors
 		errors.As(err, &ve)
-		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), string(testRecorder.Body.Bytes()))
+		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), testRecorder.Body.String())
 	}
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
@@ -339,7 +340,7 @@ func Test_getSwagger(t *testing.T) {
 
 	req := newTestHttpRequest(http.MethodGet, "/v3/api-docs/", nil)
 	router.ServeHTTP(testRecorder, req)
-	bodyString := string(testRecorder.Body.Bytes())
+	bodyString := testRecorder.Body.String()
 
 	assert.Contains(t, bodyString, "swagger-initializer.js")
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
@@ -351,7 +352,7 @@ func Test_getStatus(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, "/status", nil)
 	router.ServeHTTP(testRecorder, req)
 
-	responseBodyString := string(testRecorder.Body.Bytes())
+	responseBodyString := testRecorder.Body.String()
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, `{"status":"OK"}`, responseBodyString)
@@ -374,7 +375,7 @@ func Test_getMetrics(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, "/metrics", nil)
 	router.ServeHTTP(testRecorder, req)
 
-	responseBodyString := string(testRecorder.Body.Bytes())
+	responseBodyString := testRecorder.Body.String()
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Contains(t, responseBodyString, `go_gc_duration_seconds`)
@@ -407,7 +408,7 @@ func Benchmark_getAllAlbums(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(testRecorder, req)
 		if err := json.Unmarshal(testRecorder.Body.Bytes(), &albums); err != nil {
-			assert.Fail(b, "json unmarshalling fail", "should be []Album ", string(testRecorder.Body.Bytes()))
+			assert.Fail(b, "json unmarshalling fail", "should be []Album ", testRecorder.Body.String())
 		}
 		testRecorder.Body.Reset() //get requests need resets else the returned body is concatenated
 	}
@@ -422,7 +423,7 @@ func Benchmark_getAlbumById(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(testRecorder, req)
 		if err := json.Unmarshal(testRecorder.Body.Bytes(), &album); err != nil {
-			assert.Fail(b, "json unmarshalling fail", "should be Album ", string(testRecorder.Body.Bytes()))
+			assert.Fail(b, "json unmarshalling fail", "should be Album ", testRecorder.Body.String())
 		}
 		testRecorder.Body.Reset() //get requests need resets else the returned body is concatenated
 	}
@@ -437,7 +438,7 @@ func Benchmark_getAlbumById_BadRequest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(testRecorder, req)
 		if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
-			assert.Fail(b, "json unmarshalling fail", "should be ServerError ", string(testRecorder.Body.Bytes()))
+			assert.Fail(b, "json unmarshalling fail", "should be ServerError ", testRecorder.Body.String())
 		}
 		testRecorder.Body.Reset() //get requests need resets else the returned body is concatenated
 	}
@@ -453,7 +454,7 @@ func Benchmark_postAlbum(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(testRecorder, req)
 		if err := json.Unmarshal(testRecorder.Body.Bytes(), &albumReturned); err != nil {
-			assert.Fail(b, "json unmarshalling fail", "should be Album ", string(testRecorder.Body.Bytes()))
+			assert.Fail(b, "json unmarshalling fail", "should be Album ", testRecorder.Body.String())
 		}
 		testRecorder.Body.Reset()
 	}
@@ -469,7 +470,7 @@ func Benchmark_postAlbum_BadRequest_BadJson(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		router.ServeHTTP(testRecorder, req)
 		if err := json.Unmarshal(testRecorder.Body.Bytes(), &returnedError); err != nil {
-			assert.Fail(b, "json unmarshalling fail", "Should be ServerError ", string(testRecorder.Body.Bytes()))
+			assert.Fail(b, "json unmarshalling fail", "Should be ServerError ", testRecorder.Body.String())
 		}
 		testRecorder.Body.Reset()
 	}

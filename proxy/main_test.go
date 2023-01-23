@@ -518,7 +518,7 @@ func Test_getStatus(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, "/status", nil)
 	router.ServeHTTP(testRecorder, req)
 
-	responseBodyString := string(testRecorder.Body.Bytes())
+	responseBodyString := testRecorder.Body.String()
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Equal(t, `{"status":"OK"}`, responseBodyString)
@@ -541,7 +541,7 @@ func Test_getMetrics(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, "/metrics", nil)
 	router.ServeHTTP(testRecorder, req)
 
-	responseBodyString := string(testRecorder.Body.Bytes())
+	responseBodyString := testRecorder.Body.String()
 
 	assert.Equal(t, http.StatusOK, testRecorder.Code)
 	assert.Contains(t, responseBodyString, `go_gc_duration_seconds`)
