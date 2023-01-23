@@ -2,25 +2,47 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "Test Album",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/main_test.go"
+        },
+        {
+            "name": "Test Proxy",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/proxy/main_test.go"
+        },
+        {
+            "name": "Debug Proxy",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "env": {
                 "NAMESPACE": "no-namespace",
-                "OTEL_LOCATION" : "localhost:4327" ,
-                "INSTANCE_NAME" : "go-gin-example-1" ,
-                "GRPC_GO_LOG_VERBOSITY_LEVEL" : "99" ,
-                "GRPC_GO_LOG_SEVERITY_LEVEL" : "info"
+                "OTEL_LOCATION": "localhost:4327",
+                "INSTANCE_NAME": "go-gin-example-1",
+                "GRPC_GO_LOG_VERBOSITY_LEVEL": "99",
+                "GRPC_GO_LOG_SEVERITY_LEVEL": "info"
+            },
+            "program": "${workspaceFolder}/proxy/main.go"
+        },
+        {
+            "name": "Debug Album",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "env": {
+                "NAMESPACE": "no-namespace",
+                "OTEL_LOCATION": "localhost:4327",
+                "INSTANCE_NAME": "go-gin-example-1",
+                "GRPC_GO_LOG_VERBOSITY_LEVEL": "99",
+                "GRPC_GO_LOG_SEVERITY_LEVEL": "info"
             },
             "program": "${workspaceFolder}/main.go"
         }
     ],
-    "inputs": [
-        {
-            "id": "GRPC_GO_LOG_SEVERITY_LEVEL",
-            "type": "promptString",
-            "default": "info"
-        }
-    ]
+    "inputs": []
 }
