@@ -129,10 +129,6 @@ local-start-k3d: build setup-album-properties
 local-start-grpc: build setup-album-properties
 	$(album_setup) OTEL_LOCATION=localhost:4327 ./album-store
 
-.PHONY: local-start-http
-local-start-http: build setup-album-properties
-	$(album_setup) OTEL_LOCATION=localhost:4328 ./album-store
-
 .PHONY: docker-stop
 docker-stop:
 	docker stop album-store;
