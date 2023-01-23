@@ -1,5 +1,7 @@
 .PHONY: build
 build:
+	go mod tidy;
+	go get;
 	go clean;
 	go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o album-store
 
