@@ -57,9 +57,10 @@ Terminal window 3:
 
 ## 4. view spans in Jaeger
 
-These will have 2 spans.
+Each Span will also have 2 sub spans.
 
-* 1 for Proxy-Service
-* 1 for Album-Store
+* The original call to Proxy-Service.
+    * 1 call http to Album-Store.
+    * 1 call to Album-Store.
 
 [Jaeger proxy-service spans](http://localhost:16696/search?service=proxy-service)

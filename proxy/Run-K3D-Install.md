@@ -26,8 +26,8 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 ## 2. Build the applications in Docker and push Docker image to the  K3D Internal Registry
 
 ```bash
-  make docker-build-proxy && make docker-tag-k3d-registry;
-  make docker-build-album && make docker-tag-k3d-registry-album;
+  make docker-tag-k3d-registry-proxy;
+  make docker-tag-k3d-registry-album;
 ```
 
 ## 3. Start All Observability & Log Viewing Services
@@ -43,7 +43,8 @@ This will deploy 3 replicas of album-store into the cluster.
 You will see different instance names in the Jaeger Process for the 3 pods.
 
 ```bash
-  make k3d-album-deploy-deployment && make k3d-proxy-deploy-deployment;
+  make k3d-album-deploy-deployment;
+  make k3d-proxy-deploy-deployment;
 ```
 
 **Note: the application will hang after printing its version number if  OpenTelemetry collector is not running**
@@ -52,20 +53,9 @@ You will see different instance names in the Jaeger Process for the 3 pods.
 
 [Debugging commands for cluster](../docs/K3D-Debugging.md)
 
-## 5. View the events in the different Services in K3D
+## 5. Run Some Tests
 
-These will have 2 spans.
-
-* 1 for Proxy-Service
-* 1 for Album-Store
-
-[View Jaeger](http://jaeger.local:8070/search?limit=20&service=proxy-service)
-
-[View Kubernetes environment](http://k-dashboard:8070/)
-
-## 6. Run Some Tests
-
-### 6.1 Command line
+### 5.1 Command line
 
 ```bash
 curl --insecure --location 'http://proxy-service.local:8070/albums/'; 
@@ -75,7 +65,7 @@ curl --insecure --location 'http://proxy-service.local:8070/albums/';
 make k3d-test;
 ```
 
-### 6.2 Postman
+### 5.2 Postman
 
 [Postman files](../test/.)
 
@@ -83,9 +73,21 @@ make k3d-test;
 1. Set Environment to `proxy-service.local`
 1. Open a test in the `Album-Store` collection and run it.
 
-### 6.3 Browser
+### 5.3 Browser
 
 [view proxy-service albums](http://album-service:8070/albums)
+
+## 6. View the events in the different Services in K3D
+
+Each Span will also have 2 sub spans. 
+
+* The original call to Proxy-Service.
+  * 1 call http to Album-Store.
+  * 1 call to Album-Store.
+
+[View Jaeger](http://jaeger.local:8070/search?limit=20&service=proxy-service)
+
+[View Kubernetes environment](http://k-dashboard:8070/)
 
 ## 7. Stop the Services  
 
