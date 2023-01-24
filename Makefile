@@ -121,7 +121,7 @@ docker-k3d-start: docker-build-album setup-album-docker-properties
 
 .PHONY: docker-local-start
 docker-local-start: docker-build-album setup-album-docker-properties
-	docker run -d -p 9080:9080  $(album_setup) -e OTEL_LOCATION=localhost:4327 --name album-store album-store:0.1
+	docker run -d -p 9080:9080 $(album_setup) -e OTEL_LOCATION=localhost:4327 --name album-store-local album-store:0.1
 
 .PHONY: local-start-k3d
 local-start-k3d: build setup-album-properties
@@ -131,13 +131,13 @@ local-start-k3d: build setup-album-properties
 local-start-grpc: build setup-album-properties
 	$(album_setup) OTEL_LOCATION=localhost:4327 ./album-store
 
-.PHONY: docker-stop
-docker-stop:
-	docker stop album-store;
+.PHONY: docker-local-stop
+docker-local-stop:
+	docker stop album-store-local;
 
 .PHONY: docker-compose-full-start
 docker-compose-full-start: docker-build-album
-	docker-compose -f ./install/docker-compose.yaml -d up --remove-orphans;
+	docker-compose -f ./install/docker-compose.yaml up -d --remove-orphans;
 
 .PHONY: docker-compose-full-stop
 docker-compose-full-stop:

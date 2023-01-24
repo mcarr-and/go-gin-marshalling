@@ -3,7 +3,7 @@ version: "3.9"
 services:
   jaeger-all-in-one:
     image: jaegertracing/all-in-one:latest
-    container_name: jaeger-gin-opentelemetry
+    container_name: jaeger-album-limited
     restart: always
     ports:
       - "16696:16686"
@@ -15,7 +15,7 @@ services:
       - default
   otel-collector:
     image: otel/opentelemetry-collector:latest
-    container_name: otel-gin-opentelemetry
+    container_name: otel-album-limited
     restart: always
     command:
       [
@@ -36,7 +36,7 @@ services:
     networks:
       - default
   prometheus:
-    container_name: prometheus-gin-opentelemetry
+    container_name: prometheus-album-limited
     image: prom/prometheus:latest
     restart: always
     volumes:
@@ -48,7 +48,7 @@ services:
 #    logging: *logging
   grafana:
     image: grafana/grafana:9.1.0
-    container_name: grafana-gin-opentelemetry
+    container_name: grafana-album-limited
     volumes:
       - ./values/docker-compose/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./values/docker-compose/grafana/provisioning/:/etc/grafana/provisioning/
