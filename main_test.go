@@ -109,7 +109,7 @@ func Test_getAlbumById(t *testing.T) {
 	assert.Equal(t, listAlbums()[1].Title, album.Title)
 }
 
-func Test_getAlbumById_BadId(t *testing.T) {
+func Test_getAlbumById_InvalidID_Character(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
 	var serverError models.ServerError

@@ -184,16 +184,16 @@ func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error,
 
 func processValidationBindingError(c *gin.Context, err error, span trace.Span, requestBodyJSON string) bool {
 	var newAlbum models.Album
-	var ve validator.ValidationErrors
-	if errors.As(err, &ve) {
-		bindingErrorMessages := make([]models.BindingErrorMsg, len(ve))
-		for i, fe := range ve {
-			field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fe.Field())
+	var validationErrors validator.ValidationErrors
+	if errors.As(err, &validationErrors) {
+		bindingErrorMessages := make([]models.BindingErrorMsg, len(validationErrors))
+		for index, fieldError := range validationErrors {
+			field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fieldError.Field())
 			fieldJSONName, okay := field.Tag.Lookup("json")
 			if !okay {
-				log.Fatal(fmt.Sprintf("No json type on Struct model.Album %s Expecting : `json:\"title\" ...`", fe.Field()))
+				log.Fatal(fmt.Sprintf("No json type on Struct model.Album %s Expecting : `json:\"title\" ...`", fieldError.Field()))
 			}
-			bindingErrorMessages[i] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fe)}
+			bindingErrorMessages[index] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fieldError)}
 		}
 		bindingErrorMessage, _ := json.Marshal(bindingErrorMessages)
 		span.SetStatus(codes.Error, "Album JSON field validation failed")
