@@ -178,7 +178,7 @@ func Test_getAlbums_Albumstore_returns_bad_request(t *testing.T) {
 	responseBody := `[{"artist":"Black Sabbath","id":10,"price":66.6,"title":"The Ozzman Cometh"}]`
 	body := io.NopCloser(bytes.NewReader([]byte(responseBody)))
 
-	//inject a success message from the server and return a json blob that represents an album
+	//inject a bad request response code and message from the server
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
 		return &http.Response{
 			StatusCode: http.StatusBadRequest,
