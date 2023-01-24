@@ -94,7 +94,7 @@ func postAlbum(c *gin.Context) {
 		return
 	}
 	// proxy call to album-Store
-	resp, err := Post(c.Request.Context(), albumStoreURL+"/albums/", "application/json", strings.NewReader(fmt.Sprintf("%v", requestBodyString)))
+	resp, err := Post(c.Request.Context(), albumStoreURL+"/albums", "application/json", strings.NewReader(fmt.Sprintf("%v", requestBodyString)))
 	if handleRequestHasError(c, err, "postAlbum", span) {
 		return
 	}
