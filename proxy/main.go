@@ -133,8 +133,8 @@ func processResponseBody(c *gin.Context, span trace.Span, body io.ReadCloser) (i
 		errorMessage := fmt.Sprintf("error album-store closing response %v", err)
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
-		span.SetAttributes(attribute.Key("http.response.code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
+		span.SetAttributes(attribute.Key("http.response.code").Int(http.StatusInternalServerError))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": errorMessage})
 		return jsonBody, true
 	}
 	span.SetAttributes(attribute.Key("proxy-service.response.body").String(jsonBodyString))
