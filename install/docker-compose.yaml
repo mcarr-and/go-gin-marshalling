@@ -75,7 +75,7 @@ services:
     environment:
       - OTEL_LOCATION=otel-collector:4317
       - NAMESPACE=default
-      - INSTANCE_NAME=album-store-1
+      - INSTANCE_NAME=proxy-service-1
       - GRPC_GO_LOG_SEVERITY_LEVEL=99
       - GRPC_GO_LOG_VERBOSITY_LEVEL=info
       - ALBUM_STORE_URL=http://album-store:9080
