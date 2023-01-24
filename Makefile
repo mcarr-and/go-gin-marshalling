@@ -136,7 +136,7 @@ docker-local-stop:
 	docker stop album-store-local;
 
 .PHONY: docker-compose-full-start
-docker-compose-full-start: docker-build-album
+docker-compose-full-start: docker-build-album docker-build-proxy
 	docker-compose -f ./install/docker-compose.yaml up -d --remove-orphans;
 
 .PHONY: docker-compose-full-stop
