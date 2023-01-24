@@ -166,7 +166,7 @@ func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, response s
 	span.AddEvent(errorMessage)
 	span.SetAttributes(attribute.Key(spanAttributeType).String(response))
 	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(errorCode))
-	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
+	c.AbortWithStatusJSON(errorCode, gin.H{"message": errorMessage})
 	return true
 }
 
@@ -176,7 +176,7 @@ func handleRequestHasError(c *gin.Context, err error, methodName string, span tr
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusInternalServerError))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": errorMessage})
 		return true
 	}
 	return false

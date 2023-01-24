@@ -116,7 +116,7 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
 
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+	assert.Equal(t, http.StatusInternalServerError, testRecorder.Code)
 
 	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
@@ -154,7 +154,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
 
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+	assert.Equal(t, http.StatusInternalServerError, testRecorder.Code)
 
 	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
@@ -227,7 +227,7 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
 
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+	assert.Equal(t, http.StatusInternalServerError, testRecorder.Code)
 
 	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
@@ -297,7 +297,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
 
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+	assert.Equal(t, http.StatusInternalServerError, testRecorder.Code)
 
 	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
@@ -449,7 +449,7 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
 
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+	assert.Equal(t, http.StatusInternalServerError, testRecorder.Code)
 
 	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
@@ -492,7 +492,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
 
-	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+	assert.Equal(t, http.StatusInternalServerError, testRecorder.Code)
 
 	finishedSpans := spanRecorder.Ended()
 	assert.Len(t, finishedSpans, 1)
