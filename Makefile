@@ -79,31 +79,31 @@ docker-tag-k3d-registry-proxy: docker-build-proxy
 
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment: docker-tag-k3d-registry-album
-	kubectl apply -f album-store-k3d-deployment.yaml
+	kubectl apply -f ./install/album-store-k3d-deployment.yaml
 
 .PHONY: k3d-album-undeploy-deployment
 k3d-album-undeploy-deployment:
-	kubectl delete -f album-store-k3d-deployment.yaml
+	kubectl delete -f ./install/album-store-k3d-deployment.yaml
 
 .PHONY: k3d-album-deploy-pod
 k3d-album-deploy-pod: docker-tag-k3d-registry-album
-	kubectl apply -f album-store-k3d-pod.yaml
+	kubectl apply -f ./install/album-store-k3d-pod.yaml
 
 .PHONY: k3d-album-undeploy-pod
 k3d-album-undeploy-pod:
-	kubectl delete -f album-store-k3d-pod.yaml
+	kubectl delete -f ./install/album-store-k3d-pod.yaml
 
 .PHONY: k3d-proxy-deploy-deployment
 k3d-proxy-deploy-deployment: docker-tag-k3d-registry-proxy
-	kubectl apply -f proxy/proxy-service-k3d-deployment.yaml
+	kubectl apply -f ./install/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-undeploy-deployment
 k3d-proxy-undeploy-deployment:
-	kubectl delete -f proxy/proxy-service-k3d-deployment.yaml
+	kubectl delete -f ./install/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-deploy-pod
 k3d-proxy-deploy-pod: docker-tag-k3d-registry-proxy
-	kubectl apply -f proxy/proxy-service-k3d-pod.yaml
+	kubectl apply -f ./install/proxy-service-k3d-pod.yaml
 
 .PHONY: k3d-proxy-undeploy-pod
 k3d-proxy-undeploy-pod:
@@ -137,23 +137,23 @@ docker-stop:
 
 .PHONY: docker-compose-full-start
 docker-compose-full-start: docker-build-album
-	docker-compose up -d --remove-orphans;
+	docker-compose -f ./install/docker-compose.yaml -d up --remove-orphans;
 
 .PHONY: docker-compose-full-stop
 docker-compose-full-stop:
-	docker-compose down;
+	docker-compose -f ./install/docker-compose.yaml down;
 
 .PHONY: docker-compose-limited-start
 docker-compose-limited-start:
-	docker-compose -f docker-compose-limited.yaml up -d --remove-orphans;
+	docker-compose -f ./install/docker-compose-limited.yaml up -d --remove-orphans;
 
 .PHONY: docker-compose-limited-stop
 docker-compose-limited-stop:
-	docker-compose -f docker-compose-limited.yaml down;
+	docker-compose -f ./install/docker-compose-limited.yaml down;
 
 .PHONY: k3d-cluster-create
 k3d-cluster-create:
-	k3d cluster create k3s-default --config k3d-config.yaml
+	k3d cluster create k3s-default --config ./instal/k3d-config.yaml
 	kubectl create namespace album-store
 	kubectl create namespace proxy-service
 

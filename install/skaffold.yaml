@@ -1,20 +1,38 @@
-apiVersion: skaffold/v2beta22
-kind: Config
-metadata:
-  name: ingress-nginx
-profiles:
-  - name: k3d
-    activation:
-      - kubeContext: k3d-k3s-default
-    deploy:
-      helm:
-        releases:
-          - name: ingress-nginx
-            remoteChart: ingress-nginx
-            repo: https://kubernetes.github.io/ingress-nginx
-            namespace: kube-system
-            createNamespace: true
-            valuesFiles: ["./values/local/nginx-ingress.values.yaml"]
+ apiVersion: skaffold/v2beta22
+ kind: Config
+ metadata:
+   name: ingress-nginx
+ profiles:
+   - name: k3d
+     activation:
+       - kubeContext: k3d-k3s-default
+     deploy:
+       helm:
+         releases:
+           - name: ingress-nginx
+             remoteChart: ingress-nginx
+             repo: https://kubernetes.github.io/ingress-nginx
+             namespace: kube-system
+             createNamespace: true
+             valuesFiles: ["./values/local/nginx-ingress.values.yaml"]
+ ---
+ apiVersion: skaffold/v2beta22
+ kind: Config
+ metadata:
+   name: prometheus
+ profiles:
+   - name: k3d
+     activation:
+       - kubeContext: k3d-k3s-default
+     deploy:
+       helm:
+         releases:
+           - name: prometheus
+             remoteChart: prometheus
+             repo: https://prometheus-community.github.io/helm-charts
+             namespace: monitoring
+             createNamespace: true
+             valuesFiles: ["./values/local/prometheus.values.yaml"]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
@@ -33,24 +51,6 @@ profiles:
             namespace: monitoring
             createNamespace: true
             valuesFiles: ["./values/local/grafana.values.yaml"]
----
-apiVersion: skaffold/v2beta22
-kind: Config
-metadata:
-  name: prometheus
-profiles:
-  - name: k3d
-    activation:
-      - kubeContext: k3d-k3s-default
-    deploy:
-      helm:
-        releases:
-          - name: prometheus
-            remoteChart: prometheus
-            repo: https://prometheus-community.github.io/helm-charts
-            namespace: monitoring
-            createNamespace: true
-            valuesFiles: ["./values/local/prometheus.values.yaml"]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
@@ -124,21 +124,3 @@ profiles:
             namespace: observability
             createNamespace: true
             valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
-#---
-#apiVersion: skaffold/v2beta22
-#kind: Config
-#metadata:
-#  name: album-store
-#profiles:
-#  - name: album-store
-#    activation:
-#      - kubeContext: k3d-k3s-default
-#    deploy:
-#      helm:
-#        releases:
-#          - name: album-store
-#            createNamespace: true
-#            namespace: opentelemetry
-#            remoteChart: album-store
-#            repo: https://raw.githubusercontent.com/mcarr-and/go-gin-otelcollector/master/helm/charts
-#            valuesFiles: ["./helm/album-store/values.yaml"]

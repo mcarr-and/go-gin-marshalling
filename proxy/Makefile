@@ -69,19 +69,19 @@ docker-tag-k3d-registry-album:
 
 .PHONY: k3d-proxy-deploy-deployment
 k3d-proxy-deploy-deployment:
-	kubectl apply -f proxy-service-k3d-deployment.yaml
+	kubectl apply -f ../install/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-undeploy-deployment
 k3d-proxy-undeploy-deployment:
-	kubectl delete -f proxy-service-k3d-deployment.yaml
+	kubectl delete -f ../install/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-deploy-pod
 k3d-proxy-deploy-pod:
-	kubectl apply -f proxy-service-k3d-pod.yaml
+	kubectl apply -f ../install/proxy-service-k3d-pod.yaml
 
 .PHONY: k3d-proxy-undeploy-pod
 k3d-proxy-undeploy-pod:
-	kubectl delete -f proxy-service-k3d-pod.yaml
+	kubectl delete -f ../install/proxy-service-k3d-pod.yaml
 
 setup-proxy-properties:
 	$(eval proxy_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=proxy-service-1)
@@ -108,10 +108,6 @@ local-start-proxy-grpc: build setup-proxy-properties
 .PHONY: local-start-album-grpc
 local-start-album-grpc: build setup-proxy-properties
 	cd ../ && $(proxy_setup) OTEL_LOCATION=localhost:4327 ./album-store && cd proxy
-
-.PHONY: local-start-proxy-http
-local-start-proxy-http: build setup-proxy-properties
-	$(proxy_setup) OTEL_LOCATION=localhost:4328 ALBUM_STORE_URL=localhost:9080 ./proxy-service
 
 .PHONY: docker-stop
 docker-stop:

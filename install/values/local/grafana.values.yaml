@@ -117,18 +117,17 @@ createConfigmap: true
 
 # Extra configmaps to mount in grafana pods
 # Values are templated.
-extraConfigmapMounts: []
+extraConfigmapMounts:
+  []
   # - name: certs-configmap
   #   mountPath: /etc/grafana/ssl/
-  #   subPath: certificates.crt # (optional)
-  #   configMap: certs-configmap
+#   subPath: certificates.crt # (optional)
+#   configMap: certs-configmap
 #   readOnly: true
 
-
 extraEmptyDirMounts: []
-  # - name: provisioning-notifiers
+# - name: provisioning-notifiers
 #   mountPath: /etc/grafana/provisioning/notifiers
-
 
 # Apply extra labels to common labels.
 extraLabels: {}
@@ -195,16 +194,17 @@ serviceMonitor:
   scrapeTimeout: 30s
   relabelings: []
 
-extraExposePorts: []
+extraExposePorts:
+  []
   # - name: keycloak
-  #   port: 8080
-  #   targetPort: 8080
+#   port: 8080
+#   targetPort: 8080
 #   type: ClusterIP
 
 # overrides pod.spec.hostAliases in the grafana deployment's pods
 hostAliases: []
-  # - ip: "1.2.3.4"
-  #   hostnames:
+# - ip: "1.2.3.4"
+#   hostnames:
 #     - "my.host.com"
 
 ingress:
@@ -240,7 +240,6 @@ ingress:
   #       name: ssl-redirect
   #       port:
   #         name: use-annotation
-
 
   tls: []
   #  - secretName: chart-example-tls
@@ -366,7 +365,6 @@ initChownData:
     runAsNonRoot: false
     runAsUser: 0
 
-
 # Administrator credentials when not using an existing secret (see below)
 adminUser: admin
 # adminPassword: strongpassword
@@ -417,10 +415,11 @@ env: {}
 ##     - name: <key>
 ##       valueFrom:
 ##         <value rendered as YAML>
-envValueFrom: {}
+envValueFrom:
+  {}
   #  ENV_NAME:
-  #    configMapKeyRef:
-  #      name: configmap-name
+#    configMapKeyRef:
+#      name: configmap-name
 #      key: value_key
 
 ## The name of a secret in the same kubernetes namespace which contain values to be added to the environment
@@ -452,7 +451,8 @@ enableServiceLinks: true
 
 ## Additional grafana server secret mounts
 # Defines additional mounts with secrets. Secrets must be manually created in the namespace.
-extraSecretMounts: []
+extraSecretMounts:
+  []
   # - name: secret-files
   #   mountPath: /etc/secrets
   #   secretName: grafana-secret-files
@@ -479,13 +479,14 @@ extraSecretMounts: []
   #    driver: secrets-store.csi.k8s.io
   #    readOnly: true
   #    volumeAttributes:
-  #      secretProviderClass: "akv-grafana-spc"
-  #    nodePublishSecretRef:                       # Only required when using service principal mode
+#      secretProviderClass: "akv-grafana-spc"
+#    nodePublishSecretRef:                       # Only required when using service principal mode
 #       name: grafana-akv-creds                  # Only required when using service principal mode
 
 ## Additional grafana server volume mounts
 # Defines additional volume mounts.
-extraVolumeMounts: []
+extraVolumeMounts:
+  []
   # - name: extra-volume-0
   #   mountPath: /mnt/volume0
   #   readOnly: true
@@ -498,20 +499,20 @@ extraVolumeMounts: []
   #   csi: true
   #   data:
   #     driver: secrets-store.csi.k8s.io
-  #     readOnly: true
-  #     volumeAttributes:
+#     readOnly: true
+#     volumeAttributes:
 #       secretProviderClass: "grafana-env-spc"
 
 ## Container Lifecycle Hooks. Execute a specific bash command or make an HTTP request
 lifecycleHooks: {}
-  # postStart:
-  #   exec:
+# postStart:
+#   exec:
 #     command: []
 
 ## Pass the plugins you want installed as a list.
 ##
 plugins: []
-  # - digrich-bubblechart-panel
+# - digrich-bubblechart-panel
 # - grafana-clock-panel
 
 ## Configure grafana datasources
@@ -538,7 +539,8 @@ datasources:
 ## Configure grafana alerting (can be templated)
 ## ref: http://docs.grafana.org/administration/provisioning/#alerting
 ##
-alerting: {}
+alerting:
+  {}
   # rules.yaml:
   #   apiVersion: 1
   #   groups:
@@ -596,8 +598,8 @@ alerting: {}
   #             severity: critical
   #             class: ping failure
   #             component: Grafana
-  #             group: app-stack
-  #             summary: |
+#             group: app-stack
+#             summary: |
 #               {{ `{{ include "default.message" . }}` }}
 
 ## Configure notifiers
@@ -643,28 +645,35 @@ dashboardProviders: {}
 ## dashboards per provider, use provider name as key.
 ##
 dashboards: {}
-  # default:
-  #   some-dashboard:
-  #     json: |
-  #       $RAW_JSON
-  #   custom-dashboard:
-  #     file: dashboards/custom-dashboard.json
-  #   prometheus-stats:
-  #     gnetId: 2
-  #     revision: 2
-  #     datasource: Prometheus
-  #   local-dashboard:
-  #     url: https://example.com/repository/test.json
-  #     token: ''
-  #   local-dashboard-base64:
-  #     url: https://example.com/repository/test-b64.json
-  #     token: ''
-  #     b64content: true
-  #   local-dashboard-gitlab:
-  #     url: https://example.com/repository/test-gitlab.json
-  #     gitlabToken: ''
-  #   local-dashboard-bitbucket:
-  #     url: https://example.com/repository/test-bitbucket.json
+#  default:
+#    jaeger-all-in-one:
+#      json: |
+#        ${indent(8, file("${path.module}/grafana/jager-all-in-one_rev1.json"))}
+#    prometheus-metrics:
+#      json: |
+#        ${indent(8, file("${path.module}/local/values/grafana/prometheus-2.0.json"))}
+#   default:
+#     some-dashboard:
+#       json: |
+#  #       $RAW_JSON
+#     custom-dashboard:
+#       file: grafana/grafana.json
+#   prometheus-stats:
+#     gnetId: 2
+#     revision: 2
+#     datasource: Prometheus
+#   local-dashboard:
+#     url: https://example.com/repository/test.json
+#     token: ''
+#   local-dashboard-base64:
+#     url: https://example.com/repository/test-b64.json
+#     token: ''
+#     b64content: true
+#   local-dashboard-gitlab:
+#     url: https://example.com/repository/test-gitlab.json
+#     gitlabToken: ''
+#   local-dashboard-bitbucket:
+#     url: https://example.com/repository/test-bitbucket.json
 #     bearerToken: ''
 
 ## Reference to external ConfigMap per provider. Use provider name as key and ConfigMap name as value.
@@ -675,7 +684,8 @@ dashboards: {}
 ##   example-dashboard.json: |
 ##     RAW_JSON
 ##
-dashboardsConfigMaps: {}
+dashboardsConfigMaps:
+  jaeger: "jaeger-dashboard-configmap"
 #  default: ""
 
 ## Grafana's primary configuration
@@ -696,8 +706,8 @@ grafana.ini:
     url: https://grafana.net
   server:
     domain: "{{ if (and .Values.ingress.enabled .Values.ingress.hosts) }}{{ .Values.ingress.hosts | first }}{{ else }}''{{ end }}"
-      ## grafana Authentication can be enabled with the following values on grafana.ini
-      # server:
+    ## grafana Authentication can be enabled with the following values on grafana.ini
+    # server:
     # The full public facing url you use in browser, used for redirects and emails
   #    root_url:
   # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
@@ -863,7 +873,7 @@ sidecar:
       # orgid as configured in grafana
       orgid: 1
       # folder in which the dashboards should be imported in grafana
-      folder: ''
+      folder: ""
       # type of the provider
       type: file
       # disableDelete to activate a import-only behaviour
@@ -1040,18 +1050,18 @@ imageRenderer:
   # image-renderer deployment container securityContext
   containerSecurityContext:
     capabilities:
-      drop: ['ALL']
+      drop: ["ALL"]
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
   # image-renderer deployment Host Aliases
   hostAliases: []
   # image-renderer deployment priority class
-  priorityClassName: ''
+  priorityClassName: ""
   service:
     # Enable the image-renderer service
     enabled: true
     # image-renderer service port name
-    portName: 'http'
+    portName: "http"
     # image-renderer service port used by both service and deployment
     port: 8081
     targetPort: 8081
@@ -1153,11 +1163,12 @@ networkPolicy:
     enabled: false
     ##
     ## @param networkPolicy.egress.ports Add individual ports to be allowed by the egress
-    ports: []
+    ports:
+      []
       ## Add ports to the egress by specifying - port: <port number>
       ## E.X.
-      ## ports:
-      ## - port: 80
+    ## ports:
+    ## - port: 80
     ## - port: 443
   ##
   ##
@@ -1170,14 +1181,15 @@ networkPolicy:
 enableKubeBackwardCompatibility: false
 useStatefulSet: false
 # Create a dynamic manifests via values:
-extraObjects: []
+extraObjects:
+  []
   # - apiVersion: "kubernetes-client.io/v1"
   #   kind: ExternalSecret
   #   metadata:
   #     name: grafana-secrets
   #   spec:
   #     backendType: gcpSecretsManager
-  #     data:
-  #       - key: grafana-admin-password
+#     data:
+#       - key: grafana-admin-password
 #         name: adminPassword
 
