@@ -63,7 +63,6 @@ func getAlbums(c *gin.Context) {
 	if handleResponseCodeHasError(c, resp.StatusCode, "getAlbums", span) {
 		return
 	}
-	span.SetAttributes(attribute.Key("proxy-service.response").Int(http.StatusOK))
 	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
 	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
@@ -93,7 +92,6 @@ func getAlbumByID(c *gin.Context) {
 	if handleResponseCodeHasError(c, resp.StatusCode, "getAlbumById", span) {
 		return
 	}
-	span.SetAttributes(attribute.Key("proxy-service.response").Int(http.StatusOK))
 	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusOK))
 	span.SetStatus(codes.Ok, "")
 	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
@@ -120,7 +118,6 @@ func postAlbum(c *gin.Context) {
 	if handleResponseCodeHasError(c, resp.StatusCode, "postAlbum", span) {
 		return
 	}
-	span.SetAttributes(attribute.Key("proxy-service.response").Int(http.StatusCreated))
 	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusCreated))
 	span.SetStatus(codes.Ok, "")
 	c.JSON(http.StatusCreated, albumStoreResponseBodyJson)
@@ -128,7 +125,7 @@ func postAlbum(c *gin.Context) {
 
 func setResponseCodeIfPresent(resp *http.Response, span trace.Span) {
 	if resp != nil {
-		span.SetAttributes(attribute.Key("album-service.response.code").Int(resp.StatusCode))
+		span.SetAttributes(attribute.Key("album-store.response.code").Int(resp.StatusCode))
 	}
 }
 
