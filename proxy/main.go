@@ -52,6 +52,7 @@ func getAlbums(c *gin.Context) {
 	defer span.End()
 	// proxy call to album-Store
 	resp, err := Get(c.Request.Context(), albumStoreURL+"/albums")
+	setResponseCodeIfPresent(resp, span)
 	if handleResponseHasError(c, err, "getAlbums", span) {
 		return
 	}
@@ -81,6 +82,7 @@ func getAlbumByID(c *gin.Context) {
 	}
 	// proxy call to album-Store
 	resp, err := Get(c.Request.Context(), fmt.Sprintf("%v/albums/%v", albumStoreURL, albumID))
+	setResponseCodeIfPresent(resp, span)
 	if handleResponseHasError(c, err, "getAlbumById", span) {
 		return
 	}
@@ -107,6 +109,7 @@ func postAlbum(c *gin.Context) {
 	}
 	// proxy call to album-Store
 	resp, err := Post(c.Request.Context(), albumStoreURL+"/albums", "application/json", strings.NewReader(fmt.Sprintf("%v", requestBodyString)))
+	setResponseCodeIfPresent(resp, span)
 	if handleResponseHasError(c, err, "postAlbum", span) {
 		return
 	}
@@ -117,10 +120,16 @@ func postAlbum(c *gin.Context) {
 	if handleResponseCodeHasError(c, resp.StatusCode, "postAlbum", span) {
 		return
 	}
-	span.SetAttributes(attribute.Key("proxy-service.response").Int(http.StatusOK))
-	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusOK))
+	span.SetAttributes(attribute.Key("proxy-service.response").Int(http.StatusCreated))
+	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusCreated))
 	span.SetStatus(codes.Ok, "")
-	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
+	c.JSON(http.StatusCreated, albumStoreResponseBodyJson)
+}
+
+func setResponseCodeIfPresent(resp *http.Response, span trace.Span) {
+	if resp != nil {
+		span.SetAttributes(attribute.Key("album-service.response.code").Int(resp.StatusCode))
+	}
 }
 
 func status(c *gin.Context) {
@@ -200,6 +209,7 @@ func handleResponseHasError(c *gin.Context, err error, methodName string, span t
 		errorMessage := fmt.Sprintf("error contacting album-store %s %v", methodName, err)
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
+		span.SetAttributes(attribute.Key("proxy-service.response.body").String(fmt.Sprintf(`{"message":"%v"}`, errorMessage)))
 		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusInternalServerError))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": errorMessage})
 		return true
@@ -225,6 +235,7 @@ func buildErrorInvalidRequestParameters(c *gin.Context, err error, id string, sp
 		span.SetStatus(codes.Error, errorMessage)
 		span.AddEvent(errorMessage)
 		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusBadRequest))
+		span.SetAttributes(attribute.Key("proxy-service.response.body").String(fmt.Sprintf(`{"message":"%v"}`, errorMessage)))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
 		return true
 	}
