@@ -117,7 +117,7 @@ func Test_getAlbumById_InvalidID_Character(t *testing.T) {
 	req := newTestHttpRequest(http.MethodGet, "/albums/X", nil)
 	router.ServeHTTP(testRecorder, req)
 	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
-		assert.Fail(t, "json unmarshal fail", "Should be Album ", testRecorder.Body.String())
+		assert.Fail(t, "json unmarshal fail", "Should be ServerError ", testRecorder.Body.String())
 	}
 
 	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)

@@ -70,6 +70,8 @@ Go does JSON marshalling and binding in Gin: https://blog.logrocket.com/gin-bind
 
 Go Gin testing: https://semaphoreci.com/community/tutorials/test-driven-development-of-go-web-applications-with-gin
 
+Otel gin testing https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/github.com/gin-gonic/gin/otelgin/test/gintrace_test.go
+
 Test benchmarking: https://blog.logrocket.com/benchmarking-golang-improve-function-performance/
 
 Gin Examples: https://gin-gonic.com/docs/examples/
