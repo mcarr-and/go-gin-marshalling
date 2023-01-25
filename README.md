@@ -24,8 +24,7 @@ Proxy-Service uses the `otelhttp.client` to make requests which produces nested 
 Run the following and you can see how the services work and produce nested OpenTelemetry spans.
 
 ```bash 
-  make docker-compose-full-start;
-  make local-proxy-test;
+  make && make local-proxy-test;
 ```
 
 http://localhost:16696/ <- Jaeger to see spans. 
