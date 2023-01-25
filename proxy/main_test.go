@@ -186,7 +186,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
 
-func Test_getAlbums_Failure_Bad_Request(t *testing.T) {
+func Test_getAllAlbums_Failure_Bad_Request(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 	DefaultClient = &MockClient{}
 
