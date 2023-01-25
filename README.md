@@ -3,11 +3,35 @@ Use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework) &
 
 The project is a backend service that represents a music store with an in-memory database.
 
-## OpenTelemetry collector 
+### OpenTelemetry Collector 
 
-Send data to the following services:
+Sends data to the following services:
 * Jaeger
 * Prometheus
+
+## Proxy-Service
+
+Standalone server that proxies calls to the `album-store`
+
+Used for showing nested spans in open-telemetry.
+
+Proxy-Service uses the `otelhttp.client` to make requests which produces nested spans
+
+[proxy-service](proxy/.)
+
+
+## TL;NR
+Run the following and you can see how the services work and produce nested OpenTelemetry spans.
+
+```bash 
+  make docker-compose-full-start;
+  make local-proxy-test;
+```
+
+http://localhost:16696/ <- Jaeger to see spans. 
+
+Pick the `proxy-service` from the `service` dropdown to see nested spans. 
+
 
 ## Running Project
 
@@ -31,15 +55,6 @@ Run the project with a local Kubernetes cluster with K3D.
 
 [Local Kubernetes with Microk8s instructions](docs/Microk8s-Install.md)
 
-## Proxy-Service
-
-Standalone server that proxies calls to the album-store.
-
-Used for showing nested spans in open-telemetry.
-
-Proxy-Service uses the `otelhttp.client` to make requests and it will create 3 spans.  
-
-[proxy-service](proxy/.)
 
 ## TODO 
 * Grafana dashboards to display the GO services, Jaeger, nginx-ingress
