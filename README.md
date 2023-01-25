@@ -104,3 +104,5 @@ Go & Docker example https://github.com/open-telemetry/opentelemetry-go-contrib/b
 Go & Contract testing for swagger https://github.com/getkin/kin-openapi
 
 Go & HTTP2 + too large frame issue https://kennethjenkins.net/posts/go-nginx-grpc/
+
+Full OpenTelemetry Demo in multiple languages https://github.com/open-telemetry/opentelemetry-demo
