@@ -1,3 +1,7 @@
+.PHONY: docker-compose-full-start
+docker-compose-full-start: docker-build-album docker-build-proxy
+	docker-compose -f ./install/docker-compose.yaml up -d --remove-orphans;
+
 .PHONY: build
 build:
 	go mod tidy;
@@ -142,10 +146,6 @@ local-start-grpc: build setup-album-properties
 .PHONY: docker-local-stop
 docker-local-stop:
 	docker stop album-store-local;
-
-.PHONY: docker-compose-full-start
-docker-compose-full-start: docker-build-album docker-build-proxy
-	docker-compose -f ./install/docker-compose.yaml up -d --remove-orphans;
 
 .PHONY: docker-compose-full-stop
 docker-compose-full-stop:
