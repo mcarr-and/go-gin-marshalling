@@ -20,7 +20,7 @@ Proxy-Service uses the `otelhttp.client` to make requests which produces nested 
 [proxy-service](proxy/.)
 
 
-## TL;NR
+## TL;DR
 Run the following and you can see how the services work and produce nested OpenTelemetry spans.
 
 ```bash 
