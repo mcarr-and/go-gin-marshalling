@@ -19,17 +19,20 @@ test-benchmark:
 
 .PHONY: skaffold-dev-k3d
 skaffold-dev-k3d:
-	skaffold dev -p k3d
+	skaffold dev -f install/skaffold.yaml -p k3d
 
 .PHONY: skaffold-dev-microk8s
 skaffold-dev-microk8s:
-	skaffold dev -p microk8s
+	skaffold dev -f install/skaffold.yaml -p microk8s
 
 set-local-test:
 	$(eval url_value := http://localhost:9080)
 
-set-k3d-test:
+set-k3d-album-test:
 	$(eval url_value := http://album-store.local:8070)
+
+set-k3d-proxy-test:
+	$(eval url_value := http://proxy-service.local:8070)
 
 set-local-proxy-test:
 	$(eval url_value := http://localhost:9070)
@@ -41,8 +44,12 @@ local-test: set-local-test run-tests
 .PHONY: local-proxy-test
 local-proxy-test: set-local-proxy-test run-tests
 
-.PHONY: k3d-test
-k3d-test: set-k3d-test run-tests
+.PHONY: k3d-proxy-test
+k3d-proxy-test: set-k3d-proxy-test run-tests
+
+.PHONY: k3d-album-test
+k3d-album-test: set-k3d-album-test run-tests
+	curl --location --request GET '$(url_value)/v3/api-docs';
 
 run-tests:
 	curl --location --request GET '$(url_value)/albums/1' --header 'Accept: application/json';

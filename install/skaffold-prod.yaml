@@ -14,7 +14,7 @@ profiles:
             repo: https://kubernetes.github.io/ingress-nginx
             namespace: kube-system
             createNamespace: true
-            valuesFiles: ["./values/local/nginx-ingress.values.yaml"]
+            valuesFiles: [ "./install/values/local/nginx-ingress.values.yaml" ]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
@@ -32,7 +32,7 @@ profiles:
             repo: https://prometheus-community.github.io/helm-charts
             namespace: monitoring
             createNamespace: true
-            valuesFiles: ["./values/local/prometheus.values.yaml"]
+            valuesFiles: [ "./install/values/local/prometheus.values.yaml" ]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
@@ -50,7 +50,7 @@ profiles:
             repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
             namespace: observability
             createNamespace: true
-            valuesFiles: ["./values/local/jaeger-all-in-one.values.yaml"]
+            valuesFiles: [ "./install/values/local/jaeger-all-in-one.values.yaml" ]
             wait: true # needed when otel-collector sends data to jaeger but not currently.
 ---
 apiVersion: skaffold/v2beta22
@@ -69,7 +69,7 @@ profiles:
             repo: https://open-telemetry.github.io/opentelemetry-helm-charts
             namespace: observability
             createNamespace: true
-            valuesFiles: ["./values/local/opentelemetry-collector.values.yaml"]
+            valuesFiles: [ "./install/values/local/opentelemetry-collector.values.yaml" ]
 ---
 apiVersion: skaffold/v2beta29
 kind: Config
@@ -87,4 +87,4 @@ profiles:
             repo: https://kubernetes.github.io/dashboard/
             namespace: kubernetes-dashboard
             createNamespace: true
-            valuesFiles: ["./values/local/dashboard.values.yaml"]
+            valuesFiles: [ "./install/values/local/dashboard.values.yaml" ]
