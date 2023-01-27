@@ -527,6 +527,12 @@ datasources:
         url: http://prometheus-server.monitoring.svc.cluster.local:80
         access: proxy
         isDefault: true
+      - name: Jaeger
+        type: jaeger
+        url: http://jaeger-all-in-one.observability.svc.cluster.local:16686
+        access: proxy
+        isDefault: false
+
 #    - name: CloudWatch
 #      type: cloudwatch
 #      access: proxy
