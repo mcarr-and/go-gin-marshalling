@@ -213,11 +213,7 @@ func getErrorMsg(fe validator.FieldError) string {
 		return "required field"
 	case "min":
 		return "below minimum value"
-	case "gte":
-		return "below minimum value"
 	case "max":
-		return "above maximum value"
-	case "lte":
 		return "above maximum value"
 	default:
 		return fmt.Sprintf("Unknown Error %s", fe.Tag())

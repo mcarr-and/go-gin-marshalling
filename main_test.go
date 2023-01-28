@@ -281,7 +281,7 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 
 	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
-	assert.Equal(t, `{"id": -1, "title": "a", "artist": "z", "price": -0.1}`, attributeMap["album-store.request.body"].Emit())
+	assert.Equal(t, album, attributeMap["album-store.request.body"].Emit())
 	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
 	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
 
@@ -294,6 +294,48 @@ func Test_postAlbum_BadRequest_BadJSON_MinValues(t *testing.T) {
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[2].Message)
 	assert.Equal(t, "price", serverError.BindingErrors[3].Field)
 	assert.Equal(t, "below minimum value", serverError.BindingErrors[3].Message)
+
+	assert.Equal(t, len(listAlbums()), 3)
+}
+
+func Test_postAlbum_BadRequest_BadJSON_MaxValues(t *testing.T) {
+	resetAlbums()
+	testRecorder, spanRecorder, router := setupTestRouter()
+
+	album := `{"id": 50000000, "title": "aa", "artist": "zz", "price": 20000.00}`
+	bindingErrorMessage := `[{"field":"id","message":"above maximum value"},{"field":"price","message":"above maximum value"}]`
+	var serverError models.ServerError
+
+	req := newTestHttpRequest(http.MethodPost, "/albums", strings.NewReader(album))
+	router.ServeHTTP(testRecorder, req)
+	if err := json.Unmarshal(testRecorder.Body.Bytes(), &serverError); err != nil {
+		var ve validator.ValidationErrors
+		errors.As(err, &ve)
+		assert.Fail(t, "json unmarshalling fail", "should be ServerError ", ve.Error(), testRecorder.Body.String())
+	}
+
+	assert.Equal(t, http.StatusBadRequest, testRecorder.Code)
+
+	finishedSpans := spanRecorder.Ended()
+	assert.Len(t, finishedSpans, 1)
+
+	assert.Equal(t, codes.Error, finishedSpans[0].Status().Code)
+	assert.Equal(t, "Album JSON field validation failed", finishedSpans[0].Status().Description)
+
+	assert.Equal(t, 1, len(finishedSpans[0].Events()))
+	assert.Equal(t, bindingErrorMessage, finishedSpans[0].Events()[0].Name)
+
+	attributeMap := makeKeyMap(finishedSpans[0].Attributes())
+	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
+	assert.Equal(t, album, attributeMap["album-store.request.body"].Emit())
+	assert.Equal(t, fmt.Sprintf("{\"errors\":%v}", bindingErrorMessage), attributeMap["album-store.response.body"].Emit())
+	assert.Equal(t, "/albums", attributeMap["http.target"].Emit())
+
+	assert.Equal(t, 2, len(serverError.BindingErrors))
+	assert.Equal(t, "id", serverError.BindingErrors[0].Field)
+	assert.Equal(t, "above maximum value", serverError.BindingErrors[0].Message)
+	assert.Equal(t, "price", serverError.BindingErrors[1].Field)
+	assert.Equal(t, "above maximum value", serverError.BindingErrors[1].Message)
 
 	assert.Equal(t, len(listAlbums()), 3)
 }
