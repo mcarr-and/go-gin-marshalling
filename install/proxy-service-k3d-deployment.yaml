@@ -1,37 +1,37 @@
 apiVersion: v1
 kind: List
 items:
-- apiVersion: v1
-  kind: Service
-  metadata:
-    namespace: "proxy-service"
-    name: "proxy-service"
-    annotations:
-      prometheus.io/probe: "true"
-      prometheus.io/probe-path: /status
-      prometheus.io/scrape: "true"
-      prometheus.io/path: "/metrics"
-      prometheus.io/port: "9070"
-    labels:
-      app.kubernetes.io/instance: "proxy-service"
-      app.kubernetes.io/name: "proxy-service"
-      app.kubernetes.io/version: "0.1"
-  spec:
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-      - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-      - protocol: TCP
-        name: http
-        port: 9070
-        targetPort: 9070
-    selector:
-      app.kubernetes.io/instance: "proxy-service"
-      app.kubernetes.io/name: "proxy-service"
-      app.kubernetes.io/version: "0.1"
-    sessionAffinity: None
-    type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      namespace: "proxy-service"
+      name: "proxy-service"
+      annotations:
+        prometheus.io/probe: "true"
+        prometheus.io/probe-path: /status
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9070"
+      labels:
+        app.kubernetes.io/instance: "proxy-service"
+        app.kubernetes.io/name: "proxy-service"
+        app.kubernetes.io/version: "0.1"
+    spec:
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+        - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+        - protocol: TCP
+          name: http
+          port: 9070
+          targetPort: 9070
+      selector:
+        app.kubernetes.io/instance: "proxy-service"
+        app.kubernetes.io/name: "proxy-service"
+        app.kubernetes.io/version: "0.1"
+      sessionAffinity: None
+      type: ClusterIP
 ---
 apiVersion: v1
 kind: List
