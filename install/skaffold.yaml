@@ -119,7 +119,7 @@ profiles:
       helm:
         releases:
           - name: album-store
-            chartPath: ./helm/album-store
+            chartPath: ./install/helm/album-store
             namespace: album-store
             createNamespace: true
             valuesFiles: ["./install/values/local/album-store.values.yaml"]
@@ -136,7 +136,7 @@ profiles:
       helm:
         releases:
           - name: proxy-service
-            chartPath: ./helm/proxy-service
+            chartPath: ./install/helm/proxy-service
             namespace: proxy-service
             createNamespace: true
             valuesFiles: ["./install/values/local/proxy-service.values.yaml"]
