@@ -1,0 +1,13 @@
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: prometheus
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      kubectl:
+        manifests:
+          - install/album-store-k3d-deployment.yaml
+          - install/proxy-service-k3d-deployment.yaml
