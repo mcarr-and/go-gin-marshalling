@@ -110,17 +110,33 @@ profiles:
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
-  name: opentelemetry-collector-microk8s
+  name: album-store
 profiles:
-  - name: microk8s
+  - name: k3d
     activation:
-      - kubeContext: microk8s
+      - kubeContext: k3d-k3s-default
     deploy:
       helm:
         releases:
-          - name: opentelemetry-collector
-            remoteChart: opentelemetry-collector
-            repo: https://open-telemetry.github.io/opentelemetry-helm-charts
-            namespace: observability
+          - name: album-store
+            chartPath: ./helm/album-store
+            namespace: album-store
             createNamespace: true
-            valuesFiles: ["./install/values/local/opentelemetry-collector.values.yaml"]
+            valuesFiles: ["./install/values/local/album-store.values.yaml"]
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: proxy-service
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: album-store
+            chartPath: ./helm/proxy-service
+            namespace: proxy-service
+            createNamespace: true
+            valuesFiles: ["./install/values/local/proxy-service.values.yaml"]
