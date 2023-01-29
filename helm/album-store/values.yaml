@@ -8,7 +8,7 @@ image:
   repository: registry.local:54094/album-store
   pullPolicy: Always #IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1"
+  tag: "0.1.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -42,19 +42,20 @@ service:
   type: ClusterIP
   port: 9080
   annotations:
+    prometheus.io/path: "/metrics"
+    prometheus.io/port: "9080"
     prometheus.io/probe: "true"
     prometheus.io/probe-path: /status
     prometheus.io/scrape: "true"
-    prometheus.io/path: "/metrics"
-    prometheus.io/port: "9080"
 
-env:
-  - name: OTEL_LOCATION
-    value: "opentelemetry-collector.observability.svc.cluster.local:4317"
-  - name: GRPC_GO_LOG_VERBOSITY_LEVEL
-    value: "99"
-  - name: GRPC_GO_LOG_SEVERITY_LEVEL
-    value: "info"
+deployment:
+  env:
+    - name: OTEL_LOCATION
+      value: "opentelemetry-collector.observability.svc.cluster.local:4317"
+    - name: GRPC_GO_LOG_VERBOSITY_LEVEL
+      value: "99"
+    - name: GRPC_GO_LOG_SEVERITY_LEVEL
+      value: "info"
 
 ingress:
   enabled: true
