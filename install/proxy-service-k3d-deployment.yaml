@@ -49,7 +49,6 @@ items:
       replicas: 3
       selector:
         matchLabels:
-          app.kubernetes.io/component: "proxy-service"
           app.kubernetes.io/instance: "proxy-service"
           app.kubernetes.io/name: "proxy-service"
           app.kubernetes.io/version: "0.1.0"
@@ -61,7 +60,6 @@ items:
       template:
         metadata:
           labels:
-            app.kubernetes.io/component: "proxy-service"
             app.kubernetes.io/instance: "proxy-service"
             app.kubernetes.io/name: "proxy-service"
             app.kubernetes.io/version: "0.1.0"
