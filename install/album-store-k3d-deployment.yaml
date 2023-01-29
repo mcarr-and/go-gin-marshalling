@@ -15,7 +15,7 @@ items:
       labels:
         app.kubernetes.io/instance: "album-store"
         app.kubernetes.io/name: "album-store"
-        app.kubernetes.io/version: "0.1"
+        app.kubernetes.io/version: "0.1.0"
     spec:
       internalTrafficPolicy: Cluster
       ipFamilies:
@@ -29,7 +29,7 @@ items:
       selector:
         app.kubernetes.io/instance: "album-store"
         app.kubernetes.io/name: "album-store"
-        app.kubernetes.io/version: "0.1"
+        app.kubernetes.io/version: "0.1.0"
       sessionAffinity: None
       type: ClusterIP
 ---
@@ -42,7 +42,7 @@ items:
       labels:
         app.kubernetes.io/name: "album-store"
         app.kubernetes.io/instance: "album-store"
-        app.kubernetes.io/version: "0.1"
+        app.kubernetes.io/version: "0.1.0"
       name: "album-store"
       namespace: "album-store"
     spec:
@@ -52,7 +52,7 @@ items:
           app.kubernetes.io/component: "album-store"
           app.kubernetes.io/instance: "album-store"
           app.kubernetes.io/name: "album-store"
-          app.kubernetes.io/version: "0.1"
+          app.kubernetes.io/version: "0.1.0"
       strategy:
         rollingUpdate:
           maxSurge: 0
@@ -64,7 +64,7 @@ items:
             app.kubernetes.io/component: "album-store"
             app.kubernetes.io/instance: "album-store"
             app.kubernetes.io/name: "album-store"
-            app.kubernetes.io/version: "0.1"
+            app.kubernetes.io/version: "0.1.0"
         spec:
           containers:
             - name: "album-store"
@@ -120,7 +120,7 @@ items:
       labels:
         app.kubernetes.io/instance: "album-store"
         app.kubernetes.io/name: "album-store"
-        app.kubernetes.io/version: "0.1"
+        app.kubernetes.io/version: "0.1.0"
       name: "album-store"
       namespace: "album-store"
     spec:
