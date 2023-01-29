@@ -37,6 +37,21 @@ profiles:
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
+  name: grafana-dashboards
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      kubectl:
+        manifests:
+          - install/jaeger-dashboard-configmap.yaml
+          - install/golang-dashboard-configmap.yaml
+          - install/prometheus-dashboard-configmap.yaml
+---
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
   name: grafana
 profiles:
   - name: k3d

@@ -631,19 +631,34 @@ notifiers: {}
 ##
 ## `path` must be /var/lib/grafana/dashboards/<provider_name>
 ##
-dashboardProviders: {}
-#  dashboardproviders.yaml:
-#    apiVersion: 1
-#    providers:
-#    - name: 'default'
-#      orgId: 1
-#      folder: ''
-#      type: file
-#      disableDeletion: false
-#      editable: true
-#      options:
-#        path: /var/lib/grafana/dashboards/default
-
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: "jaeger"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/jaeger
+      - name: "golang"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/golang
+      - name: "prometheus"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/prometheus
 ## Configure grafana dashboard to import
 ## NOTE: To use dashboards you must also enable/configure dashboardProviders
 ## ref: https://grafana.com/dashboards
@@ -692,6 +707,8 @@ dashboards: {}
 ##
 dashboardsConfigMaps:
   jaeger: "jaeger-dashboard-configmap"
+  golang: "golang-dashboard-configmap"
+  prometheus: "prometheus-dashboard-configmap"
 #  default: ""
 
 ## Grafana's primary configuration
@@ -1166,11 +1183,12 @@ networkPolicy:
   egress:
     ## @param networkPolicy.egress.enabled When enabled, an egress network policy will be
     ## created allowing grafana to connect to external data sources from kubernetes cluster.
-    enabled: false
+    enabled: tue
     ##
     ## @param networkPolicy.egress.ports Add individual ports to be allowed by the egress
     ports:
-      []
+      - port: 80
+      - port: 443
       ## Add ports to the egress by specifying - port: <port number>
       ## E.X.
     ## ports:

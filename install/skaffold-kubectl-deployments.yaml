@@ -1,7 +1,7 @@
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
-  name: prometheus
+  name: kubectl-deployments
 profiles:
   - name: k3d
     activation:
