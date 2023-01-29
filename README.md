@@ -71,7 +71,6 @@ Run the project with a local Kubernetes cluster with K3D.
 * Fuzz testing 
 * Helm chart add Database configuration
 * Terraform project into EKS or GKE
-* Get working helm chart for album-store - github raw url not working for chart, not in skaffold.
 * Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D) GO issue http2 frame too large.
 
 ## Bibliography of sites used for creating this project:
