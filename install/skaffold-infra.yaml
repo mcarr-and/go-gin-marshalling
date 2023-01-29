@@ -1,38 +1,38 @@
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
-   name: ingress-nginx
+  name: ingress-nginx
 profiles:
-   - name: k3d
-     activation:
-       - kubeContext: k3d-k3s-default
-     deploy:
-       helm:
-         releases:
-           - name: ingress-nginx
-             remoteChart: ingress-nginx
-             repo: https://kubernetes.github.io/ingress-nginx
-             namespace: kube-system
-             createNamespace: true
-             valuesFiles: ["./install/values/local/nginx-ingress.values.yaml"]
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: ingress-nginx
+            remoteChart: ingress-nginx
+            repo: https://kubernetes.github.io/ingress-nginx
+            namespace: kube-system
+            createNamespace: true
+            valuesFiles: ["./install/values/local/nginx-ingress.values.yaml"]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
-   name: prometheus
+  name: prometheus
 profiles:
-   - name: k3d
-     activation:
-       - kubeContext: k3d-k3s-default
-     deploy:
-       helm:
-         releases:
-           - name: prometheus
-             remoteChart: prometheus
-             repo: https://prometheus-community.github.io/helm-charts
-             namespace: monitoring
-             createNamespace: true
-             valuesFiles: ["./install/values/local/prometheus.values.yaml"]
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: prometheus
+            remoteChart: prometheus
+            repo: https://prometheus-community.github.io/helm-charts
+            namespace: monitoring
+            createNamespace: true
+            valuesFiles: ["./install/values/local/prometheus.values.yaml"]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
@@ -65,10 +65,11 @@ profiles:
         releases:
           - name: jaeger-all-in-one
             remoteChart: jaeger-all-in-one
-            repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
+            repo: https://mcarr-and.github.io/jaeger-all-in-one/helm/charts
             namespace: observability
             createNamespace: true
-            valuesFiles: ["./install/values/local/jaeger-all-in-one.values.yaml"]
+            valuesFiles:
+              ["./install/values/local/jaeger-all-in-one.values.yaml"]
             wait: true # needed when otel-collector sends data to jaeger but not currently.
 ---
 apiVersion: skaffold/v2beta22
@@ -87,7 +88,8 @@ profiles:
             repo: https://open-telemetry.github.io/opentelemetry-helm-charts
             namespace: observability
             createNamespace: true
-            valuesFiles: ["./install/values/local/opentelemetry-collector.values.yaml"]
+            valuesFiles:
+              ["./install/values/local/opentelemetry-collector.values.yaml"]
 ---
 apiVersion: skaffold/v2beta29
 kind: Config

@@ -65,7 +65,7 @@ profiles:
         releases:
           - name: jaeger-all-in-one
             remoteChart: jaeger-all-in-one
-            repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
+            repo: https://mcarr-and.github.io/jaeger-all-in-one/helm/charts
             namespace: observability
             createNamespace: true
             valuesFiles: ["./install/values/local/jaeger-all-in-one.values.yaml"]
