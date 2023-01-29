@@ -113,8 +113,8 @@ items:
     kind: Ingress
     metadata:
       annotations:
-        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
         nginx.ingress.kubernetes.io/backend-protocol: HTTP
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
         nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
         app.kubernetes.io/name: "album-store"
       labels:
