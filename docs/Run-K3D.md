@@ -27,7 +27,7 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
   make docker-tag-k3d-registry-album && make docker-tag-k3d-registry-proxy;
 ```
 
-## 3. Start Services and Observability tooling and Monitoring.
+## 3. Install to cluster: Applications, Observability tooling, Monitoring tooling. 
  
 ```bash
   make skaffold-dev-k3d;
@@ -76,7 +76,7 @@ make k3d-test;
 
 [Prometheus](http://prometheus.local:8070/)
 
-## 6. Uninstall Applications, Observability, Monitoring from cluster  
+## 6. Uninstall from cluster: Applications, Observability tooling, Monitoring tooling.  
 
 Ctr + C on the terminal window where you started `make skaffold-dev`
 
