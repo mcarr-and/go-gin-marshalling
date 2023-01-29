@@ -127,6 +127,10 @@ skaffold-dev-k3d:
 k3d-cluster-create:
 	cd .. && $(MAKE) k3d-cluster-create && cd proxy
 
+.PHONY: k3d-cluster-delete
+k3d-cluster-create:
+	cd .. && $(MAKE) k3d-cluster-delete && cd proxy
+
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment:
 	cd .. && $(MAKE) k3d-album-deploy-deployment && cd proxy

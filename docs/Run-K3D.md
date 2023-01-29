@@ -9,7 +9,7 @@
 
 local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
-```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local album-store.local```
+```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local album-store.local proxy-serivce.local```
 
 ### 0.1 K3D Registry info
 
@@ -18,59 +18,47 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 ## 1. Create K3d Kubernetes Cluster with Internal Registry
 
 ```bash
-make k3d-cluster-create
+  make k3d-cluster-create;
 ```
 
 ## 2. Build the application in Docker and push Docker image to the  K3D Internal Registry
 
 ```bash
-make docker-build-album;
-make docker-tag-k3d-registry;
+  make docker-tag-k3d-registry-album && make docker-tag-k3d-registry-proxy;
 ```
 
-## 3. Start All Observability & Log Viewing Services
+## 3. Start Services and Observability tooling and Monitoring.
  
 ```bash
-make skaffold-dev-k3d;
+  make skaffold-dev-k3d;
 ```
 
-## 4. Deploy Album-Store to the K3D Kubernetes Cluster
+**Note:**
 
-This will deploy 3 replicas of album-store into the cluster. 
+The album-store will not start after printing its version number if OpenTelemetry-collector cannot be reached.
 
-You will see different instance names in the Jaeger Process for the 3 pods.
+This will mean the liveness probe will fail and the album-store will eventually be in a CrashLoopBackoff state when you get pods.
 
-```bash
-make k3d-album-deploy-deployment;
-```
 
-**Note: the application will hang after printing its version number if  OpenTelemetry collector is not running**
-
-### 4.1 Debugging Advice  
+### 3.1 Debugging Advice  
 
 [Debugging commands for cluster](K3D-Debugging.md)
 
-## 5. View the events in the different Services in K3D
+## 4. Run Some Tests
 
-[View Jaeger](http://jaeger.local:8070/search?limit=20&service=album-store)
-
-[View Kubernetes environment](http://k-dashboard:8070/)
-
-## 6. Run Some Tests
-
-### 6.1 curl
+### 4.1 curl
 
 ```bash
 curl --insecure --location 'http://album-store.local:8070/albums/'; 
 ```
 
-### 6.3 Run Test Suite
+### 4.3 Run Test Suite
 
 ```bash
 make k3d-test;
 ```
 
-### 6.2 Postman
+### 4.2 Postman
 
 [Postman files](../test/.)
 
@@ -78,19 +66,23 @@ make k3d-test;
 1. Set Environment to `album-store.local`
 1. Open a test in the `Album-Store` collection and run it.
 
-## 7. Stop album-store server & Services  
+## 5. View the events in the different Services in K3D
+
+[View Jaeger to see spans](http://jaeger.local:8070/search?limit=20&service=album-store)
+
+[View Kubernetes environment](http://k-dashboard.local:8070/)
+
+[Grafana](http://grafana.local:8070/)
+
+[Prometheus](http://prometheus.local:8070/)
+
+## 6. Uninstall Applications, Observability, Monitoring from cluster  
 
 Ctr + C on the terminal window where you started `make skaffold-dev`
 
-## 8. Delete Album-Store
+## 7. Delete Cluster
 
 ```bash
-make k3d-album-undeploy-deployment;
-```
-
-## 9. Delete Cluster
-
-```bash
-make k3d-cluster-delete
+  make k3d-cluster-delete;
 ```
 

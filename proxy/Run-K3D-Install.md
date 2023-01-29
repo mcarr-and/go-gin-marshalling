@@ -26,8 +26,7 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 ## 2. Build the applications in Docker and push Docker image to the  K3D Internal Registry
 
 ```bash
-  make docker-tag-k3d-registry-proxy;
-  make docker-tag-k3d-registry-album;
+  make docker-tag-k3d-registry-proxy && make docker-tag-k3d-registry-album;
 ```
 
 ## 3. Start All Observability & Log Viewing Services
@@ -36,36 +35,31 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
   make skaffold-dev-k3d;
 ```
 
-## 4. Deploy Album-Store to the K3D Kubernetes Cluster
+**Note:** 
 
-This will deploy 3 replicas of album-store into the cluster.
+The proxy-service will not start after printing its version number if OpenTelemetry-collector cannot be reached.
 
-You will see different instance names in the Jaeger Process for the 3 pods.
+This will mean the liveness probe will fail and the proxy-service will eventually be in a CrashLoopBackoff state when you get pods.
 
-```bash
-  make k3d-album-deploy-deployment;
-  make k3d-proxy-deploy-deployment;
-```
 
-**Note: the application will hang after printing its version number if  OpenTelemetry collector is not running**
 
-### 4.1 Debugging Advice  
+### 3.1 Debugging Advice  
 
 [Debugging commands for cluster](../docs/K3D-Debugging.md)
 
-## 5. Run Some Tests
+## 4. Run Some Tests
 
-### 5.1 Command line
+### 4.1 Command line
 
 ```bash
-curl --insecure --location 'http://proxy-service.local:8070/albums/'; 
+  curl --insecure --location 'http://proxy-service.local:8070/albums/'; 
 ```
 
 ```bash
-make k3d-test;
+  make k3d-test;
 ```
 
-### 5.2 Postman
+### 4.2 Postman
 
 [Postman files](../test/.)
 
@@ -73,11 +67,11 @@ make k3d-test;
 1. Set Environment to `proxy-service.local`
 1. Open a test in the `Album-Store` collection and run it.
 
-### 5.3 Browser
+### 4.3 Browser
 
-[view proxy-service albums](http://album-service:8070/albums)
+[view proxy-service albums](http://proxy-service.local:8070/albums)
 
-## 6. View the events in the different Services in K3D
+## 5. View the events in the different Services in K3D
 
 Each Span will also have 2 sub spans. 
 
@@ -85,22 +79,20 @@ Each Span will also have 2 sub spans.
   * 1 call http to Album-Store.
   * 1 call to Album-Store.
 
-[View Jaeger](http://jaeger.local:8070/search?limit=20&service=proxy-service)
+[View Jaeger to see spans](http://jaeger.local:8070/search?limit=20&service=proxy-service)
 
-[View Kubernetes environment](http://k-dashboard:8070/)
+[View Kubernetes environment](http://k-dashboard.local:8070/)
 
-## 7. Stop the Services  
+[Grafana](http://grafana.local:8070/)
+
+[Prometheus](http://prometheus.local:8070/)
+
+## 6. Uninstall Applications, Observability, Monitoring from cluster  
 
 Ctr + C on the terminal window where you started `make skaffold-dev`
 
-## 8. Delete Proxy-Service from Kubernetes
+## 7. Delete cluster
 
 ```bash
-  make k3d-proxy-undeploy-deployment;
-```
-
-## 9. Delete Album-Store from Kubernetes
-
-```bash
-  make k3d-album-undeploy-deployment;
+  make k3d-cluster-delete;
 ```
