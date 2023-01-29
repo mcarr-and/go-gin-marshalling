@@ -133,6 +133,7 @@ func status(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/status")
 	span.SetStatus(codes.Ok, "")
+	defer span.End()
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
@@ -140,6 +141,7 @@ func metrics(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/metrics")
 	span.SetStatus(codes.Ok, "")
+	defer span.End()
 	promhttp.Handler().ServeHTTP(c.Writer, c.Request)
 }
 
