@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   labels:
     grafana_dashboard: "1"
-  name: jaeger-dashboard-configmap
+  name: dashboard-configmap-jaeger
   namespace: monitoring
 data:
   jaeger-all-in-one-dashboard.json: |-

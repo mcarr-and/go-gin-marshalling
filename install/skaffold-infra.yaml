@@ -45,9 +45,9 @@ profiles:
     deploy:
       kubectl:
         manifests:
-          - install/jaeger-dashboard-configmap.yaml
-          - install/golang-dashboard-configmap.yaml
-          - install/prometheus-dashboard-configmap.yaml
+          - install/dashboard-configmap-jaeger.yaml
+          - install/dashboard-configmap-golang.yaml
+          - install/dashboard-configmap-prometheus.yaml
 ---
 apiVersion: skaffold/v2beta22
 kind: Config

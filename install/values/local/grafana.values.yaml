@@ -706,9 +706,9 @@ dashboards: {}
 ##     RAW_JSON
 ##
 dashboardsConfigMaps:
-  jaeger: "jaeger-dashboard-configmap"
-  golang: "golang-dashboard-configmap"
-  prometheus: "prometheus-dashboard-configmap"
+  jaeger: "dashboard-configmap-jaeger"
+  golang: "dashboard-configmap-golang"
+  prometheus: "dashboard-configmap-prometheus"
 #  default: ""
 
 ## Grafana's primary configuration

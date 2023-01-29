@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   labels:
     grafana_dashboard: "3"
-  name: prometheus-dashboard-configmap
+  name: dashboard-configmap-prometheus
   namespace: monitoring
 data:
   prometheus-2.0-dashboard.json: |-

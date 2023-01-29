@@ -102,3 +102,5 @@ Go & Contract testing for swagger https://github.com/getkin/kin-openapi
 Go & HTTP2 + too large frame issue https://kennethjenkins.net/posts/go-nginx-grpc/
 
 Full OpenTelemetry Demo in multiple languages https://github.com/open-telemetry/opentelemetry-demo
+
+Grafana import dashboards via configmaps https://blog.cloudcover.ch/posts/grafana-helm-dashboard-import/

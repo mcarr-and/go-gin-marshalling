@@ -45,9 +45,9 @@ profiles:
     deploy:
       kubectl:
         manifests:
-          - install/jaeger-dashboard-configmap.yaml
-          - install/golang-dashboard-configmap.yaml
-          - install/prometheus-dashboard-configmap.yaml
+          - install/dashboard-configmap-jaeger.yaml
+          - install/dashboard-configmap-golang.yaml
+          - install/dashboard-configmap-prometheus.yaml
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
@@ -70,88 +70,90 @@ profiles:
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
- name: jaeger
+  name: jaeger
 profiles:
- - name: k3d
-   activation:
-     - kubeContext: k3d-k3s-default
-   deploy:
-     helm:
-       releases:
-         - name: jaeger-all-in-one
-           remoteChart: jaeger-all-in-one
-           repo: https://mcarr-and.github.io/jaeger-all-in-one/helm/charts
-           namespace: observability
-           createNamespace: true
-           valuesFiles: ["./install/values/local/jaeger-all-in-one.values.yaml"]
-           wait: true # needed when otel-collector sends data to jaeger but not currently.
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: jaeger-all-in-one
+            remoteChart: jaeger-all-in-one
+            repo: https://mcarr-and.github.io/jaeger-all-in-one/helm/charts
+            namespace: observability
+            createNamespace: true
+            valuesFiles:
+              ["./install/values/local/jaeger-all-in-one.values.yaml"]
+            wait: true # needed when otel-collector sends data to jaeger but not currently.
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
- name: opentelemetry-collector-k3d
+  name: opentelemetry-collector-k3d
 profiles:
- - name: k3d
-   activation:
-     - kubeContext: k3d-k3s-default
-   deploy:
-     helm:
-       releases:
-         - name: opentelemetry-collector
-           remoteChart: opentelemetry-collector
-           repo: https://open-telemetry.github.io/opentelemetry-helm-charts
-           namespace: observability
-           createNamespace: true
-           valuesFiles: ["./install/values/local/opentelemetry-collector.values.yaml"]
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: opentelemetry-collector
+            remoteChart: opentelemetry-collector
+            repo: https://open-telemetry.github.io/opentelemetry-helm-charts
+            namespace: observability
+            createNamespace: true
+            valuesFiles:
+              ["./install/values/local/opentelemetry-collector.values.yaml"]
 ---
 apiVersion: skaffold/v2beta29
 kind: Config
 metadata:
- name: dashboard
+  name: dashboard
 profiles:
- - name: k3d
-   activation:
-     - kubeContext: k3d-k3s-default
-   deploy:
-     helm:
-       releases:
-         - name: kubernetes-dashboard
-           remoteChart: kubernetes-dashboard
-           repo: https://kubernetes.github.io/dashboard/
-           namespace: kubernetes-dashboard
-           createNamespace: true
-           valuesFiles: ["./install/values/local/dashboard.values.yaml"]
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: kubernetes-dashboard
+            remoteChart: kubernetes-dashboard
+            repo: https://kubernetes.github.io/dashboard/
+            namespace: kubernetes-dashboard
+            createNamespace: true
+            valuesFiles: ["./install/values/local/dashboard.values.yaml"]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
- name: album-store
+  name: album-store
 profiles:
- - name: k3d
-   activation:
-     - kubeContext: k3d-k3s-default
-   deploy:
-     helm:
-       releases:
-         - name: album-store
-           chartPath: ./install/helm/album-store
-           namespace: album-store
-           createNamespace: true
-           valuesFiles: ["./install/values/local/album-store.values.yaml"]
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: album-store
+            chartPath: ./install/helm/album-store
+            namespace: album-store
+            createNamespace: true
+            valuesFiles: ["./install/values/local/album-store.values.yaml"]
 ---
 apiVersion: skaffold/v2beta22
 kind: Config
 metadata:
- name: proxy-service
+  name: proxy-service
 profiles:
- - name: k3d
-   activation:
-     - kubeContext: k3d-k3s-default
-   deploy:
-     helm:
-       releases:
-         - name: proxy-service
-           chartPath: ./install/helm/proxy-service
-           namespace: proxy-service
-           createNamespace: true
-           valuesFiles: ["./install/values/local/proxy-service.values.yaml"]
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: proxy-service
+            chartPath: ./install/helm/proxy-service
+            namespace: proxy-service
+            createNamespace: true
+            valuesFiles: ["./install/values/local/proxy-service.values.yaml"]

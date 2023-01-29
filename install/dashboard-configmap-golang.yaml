@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   labels:
     grafana_dashboard: "2"
-  name: golang-dashboard-configmap
+  name: dashboard-configmap-golang
   namespace: monitoring
 data:
   golang-metrics.json: |-
