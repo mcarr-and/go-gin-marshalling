@@ -58,7 +58,6 @@ Run the project with a local Kubernetes cluster with K3D.
 ## TODO 
 * Grafana dashboards to display the GO services, Jaeger, nginx-ingress
 * Write Logs in JSON format
-* add all request and response headers and request parameters to the otel attributes.
 * Adding CI server integration
 * Add open-telemetry to the ingress-nginx so spans are created from the entry point to the cluster.
 * Contract tests compare swagger output to actual output
@@ -71,8 +70,7 @@ Run the project with a local Kubernetes cluster with K3D.
 * Database migration tooling via scripts 
 * Fuzz testing 
 * Helm chart add Database configuration
-* Terraform project into EKS
-* Run album store inside cluster via helm chart
+* Terraform project into EKS or GKE
 * Get working helm chart for album-store - github raw url not working for chart, not in skaffold.
 * Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D) GO issue http2 frame too large.
 
