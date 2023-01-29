@@ -135,7 +135,7 @@ profiles:
     deploy:
       helm:
         releases:
-          - name: album-store
+          - name: proxy-service
             chartPath: ./helm/proxy-service
             namespace: proxy-service
             createNamespace: true
