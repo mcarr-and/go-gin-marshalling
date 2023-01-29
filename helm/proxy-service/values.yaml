@@ -40,7 +40,7 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 9080
+  port: 9070
   annotations:
     prometheus.io/path: "/metrics"
     prometheus.io/port: "9070"
