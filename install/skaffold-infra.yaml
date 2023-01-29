@@ -106,21 +106,3 @@ profiles:
             namespace: kubernetes-dashboard
             createNamespace: true
             valuesFiles: ["./install/values/local/dashboard.values.yaml"]
----
-apiVersion: skaffold/v2beta22
-kind: Config
-metadata:
-  name: opentelemetry-collector-microk8s
-profiles:
-  - name: microk8s
-    activation:
-      - kubeContext: microk8s
-    deploy:
-      helm:
-        releases:
-          - name: opentelemetry-collector
-            remoteChart: opentelemetry-collector
-            repo: https://open-telemetry.github.io/opentelemetry-helm-charts
-            namespace: observability
-            createNamespace: true
-            valuesFiles: ["./install/values/local/opentelemetry-collector.values.yaml"]
