@@ -25,7 +25,7 @@ git push
 
 ## Use Helm Repo
 ```bash
-helm repo add album-store 'https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts'
+helm repo add go-gin-opentelemetry 'https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts'
 helm repo update
 helm repo list
 ```
