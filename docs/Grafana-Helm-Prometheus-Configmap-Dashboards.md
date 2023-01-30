@@ -121,11 +121,21 @@ data:
 
 You cannot just download dashboards from https://grafana.com/grafana/dashboards/ and add them fully to your configmap.
 
-You have to make some modififications.
+You have to make some modifications.
 
-## Paste the contents 
+## Import & Export Route for Datasource Changes
 
-Add your dashboard json to your `configmap` on the line after the `|-` indented in `4 spaces`.
+You could skip all the step by first import the grafana dashboard into Grafana, select your datasource when you import it.
+
+Then export the dashboard. 
+
+On Export **DO NOT** `Export for sharing externally` as doing this you will have to do all the `datasource` changes that are described below.
+
+You will still have to paste the JSON to the `configmap`
+
+## Grafana Dashboard Modifications Route
+
+Cut and paste your dashboard json to your `configmap` on the line after the `|-` indented in `4 spaces`.
 
 ```yaml
 ...
@@ -137,7 +147,7 @@ data:
 
 ## Remove the inputs 
 
-Remove all the blocks below. 
+Remove all the json blocks below. 
 
 ```json
   "__inputs": [],
@@ -148,10 +158,9 @@ Remove all the blocks below.
 
 The inputs you cannot use as grafana cannot use a Input dropdown by itself to select a datasource.
 
-We will force the datasouce as described below.
+We will force the `datasource` as described below.
 
 The first json block I have in my dashboards are `"annotations": {`
-
 
 ## Force dashboard datasource to be Grafana
 
@@ -227,7 +236,7 @@ The datasource is now:
 },
 ```
 
-## Why the replace works
+## Why the replacement works
 
 Down the bottom of the dashboard contents in the `templating` section you have where we set the `uid` to be used for Prometheus in this dashboard as a single value.
 
