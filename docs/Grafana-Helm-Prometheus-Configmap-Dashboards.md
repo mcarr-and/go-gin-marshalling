@@ -157,7 +157,7 @@ The first json block I have in my dashboards are `"annotations": {`
 
 Replace the dropdown value for datasource
 
-`"datasource": "-- Grafana --",` we are going to removed
+`"datasource": "-- Grafana --",` we are going to be removed.
 
 ### Original annotations datasource: 
 
@@ -179,7 +179,16 @@ Replace the dropdown value for datasource
 
 ### Changed annotations datasource:
 
-`"datasource": { "type": "datasource", "uid": "grafana" },` is now set.
+The datasource is now: 
+
+```json
+"datasource": { 
+    "type": "datasource", 
+    "uid": "grafana" 
+},
+```
+
+#### Example annotations datasource block:
 
 ```json
 "annotations": {
@@ -271,13 +280,18 @@ Down the bottom of the dashboard contents in the `templating` section you have w
 
 ## DS_PROMETHEUS change explained 
 
-When 
+When:
 
 `"datasource": "${DS_PROMETHEUS}",` 
 
-is replaced with the 
+is replaced with:
 
-`"datasource": {"type": "prometheus", "uid": "PBFA97CFB590B2093" },` 
+```json 
+"datasource": {
+    "type": "prometheus", 
+"uid": "PBFA97CFB590B2093" 
+},
+``` 
 
 it forces the dashboard to use Prometheus for its datasource.
 

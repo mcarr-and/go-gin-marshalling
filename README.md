@@ -105,4 +105,4 @@ Full OpenTelemetry Demo in multiple languages https://github.com/open-telemetry/
 
 Grafana import dashboards via configmaps https://blog.cloudcover.ch/posts/grafana-helm-dashboard-import/
 
-[Grafana dashboards imported from configmaps](./docs/Grafana-Prometheus-Configmap-Dashboards.md)
+[Grafana dashboards imported from configmaps](./docs/Grafana-Helm-Prometheus-Configmap-Dashboards.md)
