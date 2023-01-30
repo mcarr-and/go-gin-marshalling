@@ -1,9 +1,36 @@
 Starting point
 https://blog.cloudcover.ch/posts/grafana-helm-dashboard-import/
 
+## Grafana Helm Chart Changes 
+
+In your Grafana Helm chart you add the following 2 blocks that are commented out.
+
+**Import your `configmap` before you provision your `grafana`**
+
+### dashboardProviders
+
+In your Helm chart there will be a commented out section 
 
 
-In your Grafana Helm chart you add the following 2 blocks that are commented out
+### Original dashboardProviders: Helm Value
+
+```yaml
+dashboardProviders: {}
+#  dashboardproviders.yaml:
+#    apiVersion: 1
+#    providers:
+#    - name: 'default'
+#      orgId: 1
+#      folder: ''
+#      type: file
+#      disableDeletion: false
+#      editable: true
+#      options:
+#        path: /var/lib/grafana/dashboards/default
+
+```
+
+#### Changed dashboardProviders:
 
 ```yaml
 dashboardProviders:
@@ -20,19 +47,45 @@ dashboardProviders:
           path: /var/lib/grafana/dashboards/jaeger
 ```
 
-AND something like the following under `dashboardsConfigMaps` 
+#### What this is doing
 
+Uncommenting the `dashboardproviders.yaml:` and adding a `name` to the `providers` list will give you a dashboards.
 
+If you want to add a second dashboard just add it under `providers`
+
+```yaml
+    ...
+    - name: "golang"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/golang
+```
+
+### dashboardsConfigMaps:
+
+#### Original dashboardsConfigMaps:
+
+```yaml
+dashboardsConfigMaps: {}
+#  default: ""
+```
+
+#### Changed dashboardsConfigMaps:
 
 ```yaml
 dashboardsConfigMaps:
   jaeger: "dashboard-configmap-jaeger"
 ```
 
+#### What this is doing 
 
 The left hand side of the `:` maps to the name you used in the `providers` block above. E.G.: `jaeger`
 
-The right hand side of the `:` maps to the dashboard you want to import from your configmap. E.G.: `dashboard-configmap-jaeger`
+The right hand side of the `:` maps to the name of your `configmap` dashboard you want to import from your configmap. E.G.: `dashboard-configmap-jaeger`
 
 
 ## ConfigMap 
