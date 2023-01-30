@@ -1,13 +1,18 @@
-Starting point
-https://blog.cloudcover.ch/posts/grafana-helm-dashboard-import/
+# Helm Grafana Dashboards setup
 
-## Grafana Helm Chart Changes 
-
-In your Grafana Helm chart you add the following 2 blocks that are commented out.
+## Important note
 
 **Import your `configmap` before you provision your `grafana`**
 
-### dashboardProviders
+## Starting point
+
+https://blog.cloudcover.ch/posts/grafana-helm-dashboard-import/
+
+# Grafana Helm Chart Value Changes 
+
+In your Grafana Helm chart you add the following 2 blocks that are commented out.
+
+## dashboardProviders:
 
 In your Helm chart there will be a commented out section 
 
@@ -27,10 +32,9 @@ dashboardProviders: {}
 #      editable: true
 #      options:
 #        path: /var/lib/grafana/dashboards/default
-
 ```
 
-#### Changed dashboardProviders:
+### Changed dashboardProviders:
 
 ```yaml
 dashboardProviders:
@@ -47,9 +51,9 @@ dashboardProviders:
           path: /var/lib/grafana/dashboards/jaeger
 ```
 
-#### What this is doing
+### What this is doing
 
-Uncommenting the `dashboardproviders.yaml:` and adding a `name` to the `providers` list will give you a dashboards.
+Uncommenting the `dashboardproviders.yaml:` and adding a `name` to the `providers` list will allow you to import dashboards.
 
 If you want to add a second dashboard just add it under `providers`
 
@@ -65,30 +69,29 @@ If you want to add a second dashboard just add it under `providers`
           path: /var/lib/grafana/dashboards/golang
 ```
 
-### dashboardsConfigMaps:
+## dashboardsConfigMaps:
 
-#### Original dashboardsConfigMaps:
+### Original dashboardsConfigMaps:
 
 ```yaml
 dashboardsConfigMaps: {}
 #  default: ""
 ```
 
-#### Changed dashboardsConfigMaps:
+### Changed dashboardsConfigMaps:
 
 ```yaml
 dashboardsConfigMaps:
   jaeger: "dashboard-configmap-jaeger"
 ```
 
-#### What this is doing 
+### What this is doing 
 
 The left hand side of the `:` maps to the name you used in the `providers` block above. E.G.: `jaeger`
 
 The right hand side of the `:` maps to the name of your `configmap` dashboard you want to import from your configmap. E.G.: `dashboard-configmap-jaeger`
 
-
-## ConfigMap 
+# ConfigMap Creation 
 
 Example of a `dashboard-configmap-jaeger`
 
@@ -111,10 +114,10 @@ data:
               "type": "datasource",
               "uid": "grafana"
             },
-            ....
+            ...
 ```
 
-### Note on Dashboards from Grafana or any Plugin you use 
+### Note on Dashboards from Grafana or any plugin you use 
 
 You cannot just download dashboards from https://grafana.com/grafana/dashboards/ and add them fully to your configmap.
 
@@ -122,17 +125,15 @@ You have to make some modififications.
 
 ## Paste the contents 
 
-Add your dashboard json on the line after the `|-` indented in `4 spaces`.
+Add your dashboard json to your `configmap` on the line after the `|-` indented in `4 spaces`.
 
 ```yaml
 ...
-
 data:
   jaeger-all-in-one-dashboard.json: |-
     {
       "annotations": {
 ```
-
 
 ## Remove the inputs 
 
@@ -142,22 +143,24 @@ Remove all the blocks below.
   "__inputs": [],
   "__elements": {},
   "__requires": []
+  ...
 ```
 
-The inputs you cannot use as you want to force the datasource as grafana cannot use a Input dropdown by itself.
+The inputs you cannot use as grafana cannot use a Input dropdown by itself to select a datasource.
 
 We will force the datasouce as described below.
 
 The first json block I have in my dashboards are `"annotations": {`
 
 
-## Force datasource to be Grafana
+## Force dashboard datasource to be Grafana
 
-### Replace the dropdown value 
+Replace the dropdown value for datasource
 
-`"datasource": "-- Grafana --",` we are going to remove 
+`"datasource": "-- Grafana --",` we are going to removed
 
-#### Original value 
+### Original annotations datasource: 
+
 ```json
 "annotations": {
     "list": [
@@ -174,7 +177,7 @@ The first json block I have in my dashboards are `"annotations": {`
 },
 ```
 
-#### Changed datasource
+### Changed annotations datasource:
 
 `"datasource": { "type": "datasource", "uid": "grafana" },` is now set.
 
@@ -215,11 +218,11 @@ The first json block I have in my dashboards are `"annotations": {`
 },
 ```
 
-### Why the replace works
+## Why the replace works
 
 Down the bottom of the dashboard contents in the `templating` section you have where we set the `uid` to be used for Prometheus in this dashboard as a single value.
 
-#### Original templating
+### Original templating:
 ```json
 "templating": {
     "list": [
@@ -239,7 +242,7 @@ Down the bottom of the dashboard contents in the `templating` section you have w
   },
 ```
 
-#### Forced templating
+### Changed templating:
 ```json
 "templating": {
     "list": [
@@ -264,6 +267,9 @@ Down the bottom of the dashboard contents in the `templating` section you have w
     ]
   },
 ```
+
+
+## DS_PROMETHEUS change explained 
 
 When 
 
@@ -273,7 +279,7 @@ is replaced with the
 
 `"datasource": {"type": "prometheus", "uid": "PBFA97CFB590B2093" },` 
 
-it forces this dashboard to use Prometheus for its datasource.
+it forces the dashboard to use Prometheus for its datasource.
 
 My prometheus had my datasource as `PBFA97CFB590B2093` so I have kept that value. 
 
