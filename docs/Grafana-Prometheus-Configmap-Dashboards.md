@@ -85,8 +85,6 @@ data:
 
 Remove all the blocks below. 
 
-
-
 ```json
   "__inputs": [],
   "__elements": {},
@@ -96,6 +94,8 @@ Remove all the blocks below.
 The inputs you cannot use as you want to force the datasource as grafana cannot use a Input dropdown by itself.
 
 We will force the datasouce as described below.
+
+The first json block I have in my dashboards are `"annotations": {`
 
 
 ## Force datasource to be Grafana
@@ -174,7 +174,7 @@ Down the bottom of the dashboard contents in the `templating` section you have w
         "allValue": null,
         "current": {},
         "datasource": "${DS_PROMETHEUS}",
-        .....
+        ...
       },
       {
         "allValue": null,
@@ -197,7 +197,7 @@ Down the bottom of the dashboard contents in the `templating` section you have w
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        .....
+        ...
       },
       {
         "allValue": null,
