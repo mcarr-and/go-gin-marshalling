@@ -21,10 +21,6 @@ test-benchmark:
 skaffold-dev-k3d:
 	skaffold dev -f install/skaffold.yaml -p k3d
 
-.PHONY: skaffold-dev-microk8s
-skaffold-dev-microk8s:
-	skaffold dev -f install/skaffold.yaml -p microk8s
-
 set-local-test:
 	$(eval url_value := http://localhost:9080)
 

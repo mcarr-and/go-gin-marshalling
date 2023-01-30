@@ -659,6 +659,30 @@ dashboardProviders:
         editable: true
         options:
           path: /var/lib/grafana/dashboards/prometheus
+      - name: "nginx"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/nginx
+
+## Reference to external ConfigMap per provider. Use provider name as key and ConfigMap name as value.
+## A provider dashboards must be defined either by external ConfigMaps or in values.yaml, not in both.
+## ConfigMap data example:
+##
+## data:
+##   example-dashboard.json: |
+##     RAW_JSON
+##
+dashboardsConfigMaps:
+  jaeger: "dashboard-configmap-jaeger"
+  golang: "dashboard-configmap-golang"
+  prometheus: "dashboard-configmap-prometheus"
+  nginx: "dashboard-configmap-nginx-ingress"
+
+
 ## Configure grafana dashboard to import
 ## NOTE: To use dashboards you must also enable/configure dashboardProviders
 ## ref: https://grafana.com/dashboards
@@ -690,20 +714,6 @@ dashboards:
   #   local-dashboard-bitbucket:
   #     url: https://example.com/repository/test-bitbucket.json
   #     bearerToken: ''
-
-## Reference to external ConfigMap per provider. Use provider name as key and ConfigMap name as value.
-## A provider dashboards must be defined either by external ConfigMaps or in values.yaml, not in both.
-## ConfigMap data example:
-##
-## data:
-##   example-dashboard.json: |
-##     RAW_JSON
-##
-dashboardsConfigMaps:
-  jaeger: "dashboard-configmap-jaeger"
-  golang: "dashboard-configmap-golang"
-  prometheus: "dashboard-configmap-prometheus"
-#  default: ""
 
 ## Grafana's primary configuration
 ## NOTE: values in map will be converted to ini format
