@@ -32,7 +32,7 @@ dashboardsConfigMaps:
 
 The left hand side of the `:` maps to the name you used in the `providers` block above. E.G.: `jaeger`
 
-The right hand side maps to the dashboard you want to import from your configmap. E.G.: `dashboard-configmap-jaeger`
+The right hand side of the `:` maps to the dashboard you want to import from your configmap. E.G.: `dashboard-configmap-jaeger`
 
 
 ## ConfigMap 
@@ -61,15 +61,31 @@ data:
             ....
 ```
 
+### Note on Dashboards from Grafana or any Plugin you use 
 
 You cannot just download dashboards from https://grafana.com/grafana/dashboards/ and add them fully to your configmap.
 
-You have to 
+You have to make some modififications.
+
+## Paste the contents 
+
+Add your dashboard json on the line after the `|-` indented in `4 spaces`.
+
+```yaml
+...
+
+data:
+  jaeger-all-in-one-dashboard.json: |-
+    {
+      "annotations": {
+```
 
 
 ## Remove the inputs 
 
-Remove all the blocks below as you will force the file to use a datasource not pick one from a dropdown.
+Remove all the blocks below. 
+
+
 
 ```json
   "__inputs": [],
@@ -77,10 +93,18 @@ Remove all the blocks below as you will force the file to use a datasource not p
   "__requires": []
 ```
 
+The inputs you cannot use as you want to force the datasource as grafana cannot use a Input dropdown by itself.
+
+We will force the datasouce as described below.
+
+
 ## Force datasource to be Grafana
 
 ### Replace the dropdown value 
 
+`"datasource": "-- Grafana --",` we are going to remove 
+
+#### Original value 
 ```json
 "annotations": {
     "list": [
@@ -97,7 +121,9 @@ Remove all the blocks below as you will force the file to use a datasource not p
 },
 ```
 
-### Change to force the datasource to grafana
+#### Changed datasource
+
+`"datasource": { "type": "datasource", "uid": "grafana" },` is now set.
 
 ```json
 "annotations": {
@@ -128,7 +154,7 @@ Remove all the blocks below as you will force the file to use a datasource not p
 },
 ```
 
-### Replace with 
+### Replace with fixed datasource
 ```json
 "datasource": {
   "type": "prometheus",
@@ -138,7 +164,7 @@ Remove all the blocks below as you will force the file to use a datasource not p
 
 ### Why the replace works
 
-Down the bottom of the file in the `templating` section you have where we set the UID to be used for Prometheus in this dashboard.
+Down the bottom of the dashboard contents in the `templating` section you have where we set the `uid` to be used for Prometheus in this dashboard as a single value.
 
 #### Original templating
 ```json
@@ -196,4 +222,6 @@ is replaced with the
 
 it forces this dashboard to use Prometheus for its datasource.
 
-My prometheus had my datasource as `PBFA97CFB590B2093` so I have kept that value. You can use any value as long as it is consistent across the dashboard.
+My prometheus had my datasource as `PBFA97CFB590B2093` so I have kept that value. 
+
+You can use any value as long as it is consistent across the dashboard.
