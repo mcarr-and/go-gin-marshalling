@@ -1177,12 +1177,10 @@ networkPolicy:
   egress:
     ## @param networkPolicy.egress.enabled When enabled, an egress network policy will be
     ## created allowing grafana to connect to external data sources from kubernetes cluster.
-    enabled: tue
+    enabled: false
     ##
     ## @param networkPolicy.egress.ports Add individual ports to be allowed by the egress
-    ports:
-      - port: 80
-      - port: 443
+    ports: []
       ## Add ports to the egress by specifying - port: <port number>
       ## E.X.
     ## ports:
