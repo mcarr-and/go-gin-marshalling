@@ -298,3 +298,15 @@ it forces the dashboard to use Prometheus for its datasource.
 My prometheus had my datasource as `PBFA97CFB590B2093` so I have kept that value. 
 
 You can use any value as long as it is consistent across the dashboard.
+
+## Common problems.
+
+* I have removed the `__input` fixed the datasource for `grafana` and `prometheus` in the dashboard JSON.
+* I have created the configmap and deployed it before the `grafana`
+* I have wired in `dashboardproviders.yaml`  
+* the name on the left hand side of `dashboardsConfigMaps` matches `dashboardproviders.yaml` name
+
+### Things to try
+Reformat your configmap json and add it back in with the right indentation. 
+
+Change the `grafana_dashboard: "1"` to `grafana_dashboard: "2"` if you have 2 dashboards and you only see one at a time. 
