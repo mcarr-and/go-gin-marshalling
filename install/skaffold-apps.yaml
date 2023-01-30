@@ -1,5 +1,5 @@
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: album-store
@@ -16,7 +16,7 @@ profiles:
             createNamespace: true
             valuesFiles: ["./install/values/local/album-store.values.yaml"]
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: proxy-service

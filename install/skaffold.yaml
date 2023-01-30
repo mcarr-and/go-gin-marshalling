@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: ingress-nginx
@@ -16,7 +16,7 @@ profiles:
             createNamespace: true
             valuesFiles: ["./install/values/local/nginx-ingress.values.yaml"]
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: prometheus
@@ -50,7 +50,7 @@ profiles:
           - install/dashboard-configmap-prometheus.yaml
           - install/dashboard-configmap-nginx-ingress.yaml
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: grafana
@@ -68,7 +68,7 @@ profiles:
             createNamespace: true
             valuesFiles: ["./install/values/local/grafana.values.yaml"]
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: jaeger
@@ -88,7 +88,7 @@ profiles:
               ["./install/values/local/jaeger-all-in-one.values.yaml"]
             wait: true # needed when otel-collector sends data to jaeger but not currently.
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: opentelemetry-collector-k3d
@@ -107,7 +107,7 @@ profiles:
             valuesFiles:
               ["./install/values/local/opentelemetry-collector.values.yaml"]
 ---
-apiVersion: skaffold/v2beta29
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: dashboard
@@ -125,7 +125,7 @@ profiles:
             createNamespace: true
             valuesFiles: ["./install/values/local/dashboard.values.yaml"]
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: album-store
@@ -142,7 +142,7 @@ profiles:
             createNamespace: true
             valuesFiles: ["./install/values/local/album-store.values.yaml"]
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: proxy-service
