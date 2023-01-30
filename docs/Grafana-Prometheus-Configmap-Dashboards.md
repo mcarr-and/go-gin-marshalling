@@ -20,7 +20,7 @@ dashboardProviders:
           path: /var/lib/grafana/dashboards/jaeger
 ```
 
-AND something like the folloiwng under `dashboardsConfigMaps` 
+AND something like the following under `dashboardsConfigMaps` 
 
 
 
