@@ -80,7 +80,7 @@ profiles:
         releases:
           - name: jaeger-all-in-one
             remoteChart: jaeger-all-in-one
-            repo: https://mcarr-and.github.io/jaeger-all-in-one/helm/charts
+            repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
             namespace: observability
             createNamespace: true
             valuesFiles:
