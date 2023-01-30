@@ -58,7 +58,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": "grafana",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -99,10 +99,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "editable": true,
       "error": false,
       "fill": 0,
@@ -193,10 +190,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "editable": true,
       "error": false,
       "fill": 0,
@@ -286,10 +280,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "description": "",
       "fill": 0,
       "gridPos": {
@@ -392,10 +383,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(245, 54, 54, 0.9)"
       ],
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -474,10 +462,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "fill": 0,
       "gridPos": {
         "h": 5,
@@ -578,10 +563,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "editable": true,
       "error": false,
       "fill": 0,
@@ -669,10 +651,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "decimals": null,
       "description": "",
       "fill": 0,
@@ -762,10 +741,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "fill": 1,
       "gridPos": {
         "h": 5,
@@ -865,10 +841,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "decimals": null,
       "description": "",
       "fill": 0,
@@ -988,10 +961,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "fill": 1,
       "gridPos": {
         "h": 5,
@@ -1087,10 +1057,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "fill": 0,
       "gridPos": {
         "h": 5,
@@ -1177,10 +1144,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "decimals": null,
       "editable": true,
       "error": false,
@@ -1273,10 +1237,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+      "datasource": "prometheus",
       "fill": 1,
       "gridPos": {
         "h": 7,

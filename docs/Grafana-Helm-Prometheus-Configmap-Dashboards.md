@@ -190,12 +190,7 @@ Replace the dropdown value for datasource
 
 The datasource is now: 
 
-```json
-"datasource": { 
-    "type": "datasource", 
-    "uid": "grafana" 
-},
-```
+`"datasource": "grafana",`
 
 #### Example annotations datasource block:
 
@@ -204,10 +199,7 @@ The datasource is now:
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
-        },
+        "datasource": "grafana",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -229,12 +221,7 @@ The datasource is now:
 ```
 
 ### Replace with fixed datasource
-```json
-"datasource": {
-  "type": "prometheus",
-  "uid": "prometheus"
-},
-```
+`"datasource": "prometheus",`
 
 ## Why the replacement works
 
@@ -267,19 +254,13 @@ Down the bottom of the dashboard contents in the `templating` section you have w
       {
         "allValue": null,
         "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+        "datasource": "prometheus",
         ...
       },
       {
         "allValue": null,
         "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "prometheus"
-        },
+        "datasource": "prometheus",
         ...
       }
     ]
@@ -295,23 +276,18 @@ When:
 
 is replaced with:
 
-```json 
-"datasource": {
-  "type": "prometheus", 
-  "uid": "prometheus" 
-},
-``` 
+`"datasource": "prometheus",` 
 
 it forces the dashboard to use Prometheus for its datasource.
 
-In my Grafana Helm values file my prometheus datasource has `uid: "prometheus"` so I have kept that value.
+In my `grafana` Helm values file my `prometheus` datasource has `name: prometheus` so I have kept that value.
 
 ```yaml
 datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
-      - name: Prometheus
+      - name: prometheus
         uid: "prometheus"
         type: prometheus
         url: http://prometheus-server.monitoring.svc.cluster.local:80

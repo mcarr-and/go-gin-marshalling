@@ -48,7 +48,7 @@ profiles:
           - install/dashboard-configmap-jaeger.yaml
           - install/dashboard-configmap-golang.yaml
           - install/dashboard-configmap-prometheus.yaml
-          - install/dashboard-configmap-nginx-ingress.yaml
+          - install/dashboard-configmap-otel-collector.yaml
 ---
 apiVersion: skaffold/v4beta2
 kind: Config

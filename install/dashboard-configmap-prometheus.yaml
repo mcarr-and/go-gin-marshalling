@@ -12,10 +12,7 @@ data:
         "list": [
           {
             "builtIn": 1,
-            "datasource": {
-              "type": "datasource",
-              "uid": "grafana"
-            },
+            "datasource": "grafana",
             "enable": true,
             "hide": true,
             "iconColor": "rgba(0, 211, 255, 1)",
@@ -169,10 +166,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "sum(irate(prometheus_tsdb_head_samples_appended_total{job=\"prometheus\"}[5m]))",
               "format": "time_series",
               "hide": false,
@@ -269,10 +263,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "topk(5, max(scrape_duration_seconds) by (job))",
               "format": "time_series",
               "interval": "",
@@ -370,10 +361,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "sum(process_resident_memory_bytes{job=\"prometheus\"})",
               "format": "time_series",
               "hide": false,
@@ -384,10 +372,7 @@ data:
               "step": 20
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "process_virtual_memory_bytes{job=\"prometheus\"}",
               "format": "time_series",
               "hide": false,
@@ -468,10 +453,7 @@ data:
           "pluginVersion": "9.3.6",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "prometheus_tsdb_wal_corruptions_total{job=\"prometheus\"}",
               "format": "time_series",
               "intervalFactor": 2,
@@ -565,10 +547,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "sum(prometheus_tsdb_head_active_appenders{job=\"prometheus\"})",
               "format": "time_series",
               "interval": "",
@@ -579,10 +558,7 @@ data:
               "step": 20
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "sum(process_open_fds{job=\"prometheus\"})",
               "format": "time_series",
               "interval": "",
@@ -708,10 +684,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "prometheus_tsdb_blocks_loaded{job=\"prometheus\"}",
               "format": "time_series",
               "intervalFactor": 2,
@@ -806,10 +779,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "prometheus_tsdb_head_chunks{job=\"prometheus\"}",
               "format": "time_series",
               "interval": "",
@@ -918,10 +888,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "prometheus_tsdb_head_gc_duration_seconds{job=\"prometheus\",quantile=\"0.99\"}",
               "format": "time_series",
               "intervalFactor": 2,
@@ -930,10 +897,7 @@ data:
               "step": 20
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "irate(prometheus_tsdb_head_gc_duration_seconds_count{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
@@ -1042,10 +1006,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "histogram_quantile(0.99, sum(rate(prometheus_tsdb_compaction_duration_bucket{job=\"prometheus\"}[5m])) by (le))",
               "format": "time_series",
               "hide": false,
@@ -1056,10 +1017,7 @@ data:
               "step": 20
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "irate(prometheus_tsdb_compactions_total{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
@@ -1068,10 +1026,7 @@ data:
               "step": 20
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "irate(prometheus_tsdb_compactions_failed_total{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
@@ -1080,10 +1035,7 @@ data:
               "step": 20
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "irate(prometheus_tsdb_compactions_triggered_total{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
@@ -1177,10 +1129,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "rate(prometheus_tsdb_reloads_total{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
@@ -1189,10 +1138,7 @@ data:
               "step": 20
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "rate(prometheus_tsdb_reloads_failures_total{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "hide": false,
@@ -1287,10 +1233,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "prometheus_engine_query_duration_seconds{job=\"prometheus\", quantile=\"0.99\"}",
               "format": "time_series",
               "intervalFactor": 2,
@@ -1384,10 +1327,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "max(prometheus_rule_group_duration_seconds{job=\"prometheus\"}) by (quantile)",
               "format": "time_series",
               "interval": "",
@@ -1482,10 +1422,7 @@ data:
           "pluginVersion": "8.1.0-pre",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "rate(prometheus_rule_group_iterations_missed_total{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
@@ -1494,10 +1431,7 @@ data:
               "step": 10
             },
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
+              "datasource" : "prometheus",
               "expr": "rate(prometheus_rule_group_iterations_total{job=\"prometheus\"}[5m])",
               "format": "time_series",
               "intervalFactor": 2,
