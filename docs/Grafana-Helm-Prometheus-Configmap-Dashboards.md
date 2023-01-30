@@ -304,7 +304,9 @@ is replaced with:
 
 it forces the dashboard to use Prometheus for its datasource.
 
-My prometheus had my datasource as `PBFA97CFB590B2093` so I have kept that value. 
+My prometheus had my datasource as `PBFA97CFB590B2093` so I have kept that value.
+
+You may have to reference your own `datasource` if your Prometheus has a different `uid`.  
 
 You can use any value as long as it is consistent across the dashboard.
 
