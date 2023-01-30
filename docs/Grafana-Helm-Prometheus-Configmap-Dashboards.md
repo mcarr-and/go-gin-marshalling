@@ -232,7 +232,7 @@ The datasource is now:
 ```json
 "datasource": {
   "type": "prometheus",
-  "uid": "PBFA97CFB590B2093"
+  "uid": "prometheus"
 },
 ```
 
@@ -269,7 +269,7 @@ Down the bottom of the dashboard contents in the `templating` section you have w
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "prometheus"
         },
         ...
       },
@@ -278,7 +278,7 @@ Down the bottom of the dashboard contents in the `templating` section you have w
         "current": {},
         "datasource": {
           "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "uid": "prometheus"
         },
         ...
       }
@@ -297,14 +297,27 @@ is replaced with:
 
 ```json 
 "datasource": {
-    "type": "prometheus", 
-"uid": "PBFA97CFB590B2093" 
+  "type": "prometheus", 
+  "uid": "prometheus" 
 },
 ``` 
 
 it forces the dashboard to use Prometheus for its datasource.
 
-My prometheus had my datasource as `PBFA97CFB590B2093` so I have kept that value.
+In my Grafana Helm values file my prometheus datasource has `uid: "prometheus"` so I have kept that value.
+
+```yaml
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        uid: "prometheus"
+        type: prometheus
+        url: http://prometheus-server.monitoring.svc.cluster.local:80
+        access: proxy
+        isDefault: true
+```
 
 You may have to reference your own `datasource` if your Prometheus has a different `uid`.
 

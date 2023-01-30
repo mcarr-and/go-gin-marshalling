@@ -43,7 +43,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "gridPos": {
             "h": 1,
@@ -57,7 +57,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "refId": "A"
             }
@@ -72,7 +72,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -120,7 +120,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_spans_received_total[1m]))",
               "format": "time_series",
@@ -168,7 +168,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -216,7 +216,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_in_queue_latency_sum / jaeger_in_queue_latency_count",
               "format": "time_series",
@@ -264,7 +264,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -312,7 +312,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_batch_size",
               "format": "time_series",
@@ -359,7 +359,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -407,7 +407,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_queue_length",
               "format": "time_series",
@@ -455,7 +455,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -503,7 +503,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "rate(jaeger_spans_dropped_total[5m])",
               "format": "time_series",
@@ -550,7 +550,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -598,7 +598,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_save_latency_sum / jaeger_save_latency_count",
               "format": "time_series",
@@ -645,7 +645,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "description": "Trace接收总数",
           "fieldConfig": {
@@ -692,7 +692,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_traces_received_total{svc=\"$svc\"}",
               "interval": "",
@@ -737,7 +737,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "description": "保存Save总数",
           "fieldConfig": {
@@ -784,7 +784,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_traces_saved_by_svc_total{svc=\"$svc\"}",
               "interval": "",
@@ -829,7 +829,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "description": "接收Span总数",
           "fieldConfig": {
@@ -876,7 +876,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_spans_received_total{svc=\"$svc\"}",
               "interval": "",
@@ -921,7 +921,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "description": "保存Span总数",
           "fieldConfig": {
@@ -968,7 +968,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "jaeger_spans_saved_by_svc_total{svc=\"$svc\"}",
               "interval": "",
@@ -1010,7 +1010,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "gridPos": {
             "h": 1,
@@ -1024,7 +1024,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "refId": "A"
             }
@@ -1039,7 +1039,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1087,7 +1087,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_thrift_udp_server_packets_processed_total[5m])) by (protocol)",
               "format": "time_series",
@@ -1134,7 +1134,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1182,7 +1182,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "avg(jaeger_thrift_udp_server_packet_size) by (protocol)",
               "format": "time_series",
@@ -1229,7 +1229,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1277,7 +1277,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "avg(jaeger_thrift_udp_server_queue_size) by (protocol)",
               "format": "time_series",
@@ -1324,7 +1324,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1372,7 +1372,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_thrift_udp_server_read_errors_total[5m])) by (protocol)",
               "format": "time_series",
@@ -1419,7 +1419,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1467,7 +1467,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_thrift_udp_server_packets_dropped_total[5m])) by (protocol)",
               "format": "time_series",
@@ -1514,7 +1514,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1562,7 +1562,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_thrift_udp_t_processor_handler_errors_total[5m])) by (protocol)",
               "format": "time_series",
@@ -1609,7 +1609,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1657,7 +1657,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_agent_reporter_batches_submitted_total[5m])) by (format)",
               "format": "time_series",
@@ -1704,7 +1704,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1752,7 +1752,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_agent_reporter_spans_submitted_total[5m])) by (format)",
               "format": "time_series",
@@ -1797,7 +1797,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1845,7 +1845,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "avg(jaeger_agent_reporter_batch_size) by (format)",
               "format": "time_series",
@@ -1890,7 +1890,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1938,7 +1938,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_http_server_requests_total[5m])) by (type)",
               "format": "time_series",
@@ -1985,7 +1985,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2033,7 +2033,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_agent_reporter_batches_failures_total[5m])) by (format)",
               "format": "time_series",
@@ -2078,7 +2078,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2126,7 +2126,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_agent_reporter_spans_failures_total[5m])) by (format)",
               "format": "time_series",
@@ -2171,7 +2171,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2218,7 +2218,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_http_server_errors_total[5m])) by (source, status)",
               "format": "time_series",
@@ -2265,7 +2265,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2312,7 +2312,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(jaeger_agent_collector_proxy_total) by (endpoint,protocol,result)",
               "format": "time_series",
@@ -2354,7 +2354,7 @@ data:
           "collapsed": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "gridPos": {
             "h": 1,
@@ -2368,7 +2368,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "refId": "A"
             }
@@ -2383,7 +2383,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2431,7 +2431,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "(jaeger_rpc_request_latency_sum / jaeger_rpc_request_latency_count)*1000",
               "format": "time_series",
@@ -2477,7 +2477,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2524,7 +2524,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total[5m]))*60",
               "format": "time_series",
@@ -2536,7 +2536,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{status_code=~\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2547,7 +2547,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{status_code!=\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2593,7 +2593,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2640,7 +2640,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/traces\"}[5m]))*60",
               "format": "time_series",
@@ -2651,7 +2651,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/traces\",status_code=~\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2662,7 +2662,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/traces\",status_code!=\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2708,7 +2708,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2755,7 +2755,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/traces/-traceID-\"}[5m]))*60",
               "format": "time_series",
@@ -2767,7 +2767,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/traces/-traceID-\",status_code=~\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2778,7 +2778,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/traces/-traceID-\",status_code!=\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2824,7 +2824,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2871,7 +2871,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/services/-service-/operations\"}[5m]))*60",
               "format": "time_series",
@@ -2882,7 +2882,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/services/-service-/operations\",status_code=~\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2893,7 +2893,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/services/-service-/operations\",status_code!=\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -2939,7 +2939,7 @@ data:
           "dashes": false,
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2986,7 +2986,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/services\"}[5m]))*60",
               "format": "time_series",
@@ -2997,7 +2997,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/services\",status_code=~\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -3008,7 +3008,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "expr": "sum(rate(jaeger_rpc_http_requests_total{endpoint=~\"/api/services\",status_code!=\"2xx\"}[5m]))*60",
               "format": "time_series",
@@ -3065,7 +3065,7 @@ data:
             },
             "datasource": {
               "type": "prometheus",
-              "uid": "PBFA97CFB590B2093"
+              "uid": "prometheus"
             },
             "definition": "label_values(svc)",
             "hide": 0,
