@@ -225,51 +225,6 @@ The datasource is now:
 
 ## Why the replacement works
 
-Down the bottom of the dashboard contents in the `templating` section you have where we set the `uid` to be used for Prometheus in this dashboard as a single value.
-
-### Original templating:
-```json
-"templating": {
-    "list": [
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "${DS_PROMETHEUS}",
-        ...
-      },
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "${DS_PROMETHEUS}",
-        ...
-      }
-    ]
-  },
-```
-
-### Changed templating:
-```json
-"templating": {
-    "list": [
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "prometheus",
-        ...
-      },
-      {
-        "allValue": null,
-        "current": {},
-        "datasource": "prometheus",
-        ...
-      }
-    ]
-  },
-```
-
-
-## DS_PROMETHEUS change explained 
-
 When:
 
 `"datasource": "${DS_PROMETHEUS}",` 
@@ -278,10 +233,12 @@ is replaced with:
 
 `"datasource": "prometheus",` 
 
-it forces the dashboard to use Prometheus for its datasource.
+it forces the dashboard to use prometheus for its datasource.
 
-In my `grafana` Helm values file my `prometheus` datasource has `name: prometheus` so I have kept that value.
+In my `grafana` Helm values file my `datasources` for `prometheus` has `name: prometheus` so that is why the mapping works.
 
+
+E.G.: my Grafana Helm Value block for dataources 
 ```yaml
 datasources:
   datasources.yaml:
@@ -295,21 +252,24 @@ datasources:
         isDefault: true
 ```
 
-You may have to reference your own `datasource` if your Prometheus has a different `uid`.
+Use the name of your prometheus `datasource` if your Prometheus is using a different `name`.
 
 ## Common problems.
 
 ### Dashboard not showing up 
-* 
-* I have removed the `__input` fixed the datasource for `grafana` and `prometheus` in the dashboard JSON.
+
+* I have removed the `__input` fixed the datasource for `grafana` at the annotations and `prometheus` in the rest of the dashboard JSON.
+
 * I have created the configmap and deployed it before the `grafana`
+
 * I have wired in `dashboardproviders.yaml`  
-* the name on the left hand side of `dashboardsConfigMaps` matches `dashboardproviders.yaml` name
+
+* the name on the left hand side of `dashboardsConfigMaps` matches `dashboardproviders.yaml` `name`
 
 AND - the dashboard does not show up in Prometheus.
 
 #### Things to try
 
-Reformat your configmap json and paste the contents back into the `configmap` with the correct 4 space indentation. 
+* Reformat your configmap json and paste the contents back into the `configmap` with the correct 4 space indentation. 
 
-Change the `grafana_dashboard: "1"` to `grafana_dashboard: "2"` if you have 2 dashboards with the same ID if you only see one or the other. 
+* Change the `grafana_dashboard: "1"` to `grafana_dashboard: "2"` if you have 2 dashboards with the same ID if you only see one or the other. 
