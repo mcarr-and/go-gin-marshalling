@@ -4,6 +4,6 @@ datasources:
   - name: jaeger
     uid: "jaeger"
     type: jaeger
-    url: http://jaeger-all-in-one:16696/
+    url: http://jaeger:16686/
     editable: true
     isDefault: false

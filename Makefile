@@ -1,6 +1,6 @@
 .PHONY: docker-compose-full-start
 docker-compose-full-start: docker-build-album docker-build-proxy
-	docker-compose -f ./install/docker-compose.yaml up -d --remove-orphans;
+	docker-compose -f ./install/docker/docker-compose.yaml up -d --remove-orphans;
 
 .PHONY: build
 build:
@@ -152,15 +152,15 @@ docker-local-stop:
 
 .PHONY: docker-compose-full-stop
 docker-compose-full-stop:
-	docker-compose -f ./install/docker-compose.yaml down;
+	docker-compose -f ./install/docker/docker-compose.yaml down;
 
 .PHONY: docker-compose-limited-start
 docker-compose-limited-start:
-	docker-compose -f ./install/docker-compose-limited.yaml up -d --remove-orphans;
+	docker-compose -f ./install/docker/docker-compose-limited.yaml up -d --remove-orphans;
 
 .PHONY: docker-compose-limited-stop
 docker-compose-limited-stop:
-	docker-compose -f ./install/docker-compose-limited.yaml down;
+	docker-compose -f ./install/docker/docker-compose-limited.yaml down;
 
 .PHONY: k3d-cluster-create
 k3d-cluster-create:
