@@ -63,7 +63,7 @@ configMap:
 config:
   exporters:
     logging: { }
-    otlp:
+    jaeger:
       endpoint: jaeger-all-in-one.observability.svc.cluster.local:14250
       tls:
         insecure: true
@@ -140,7 +140,6 @@ config:
       traces:
         exporters:
           - logging
-          - otlp
           - jaeger
         processors:
           - memory_limiter
