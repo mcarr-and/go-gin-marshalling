@@ -10,15 +10,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"io"
 	"log"
 	"net/http"
@@ -314,8 +312,7 @@ func initOtelProvider(serviceName string, version string, gitHash string) (func(
 		return nil, fmt.Errorf("failed to create resource: %w", err)
 	}
 
-	//setup for Protobuff - model.proto works with sending this to port 14250 in Jaeger
-	otelTraceExporter, err := setupOtelProtoBuffGrpcTrace(ctx, &otelLocation)
+	otelTraceExporter, err := setupOtelHttpTrace(ctx, &otelLocation)
 	if err != nil {
 		return nil, err
 	}
@@ -337,18 +334,20 @@ func setupOtelTraceProvider(traceExporter *otlptrace.Exporter, otelResource *res
 	return tracerProvider
 }
 
-func setupOtelProtoBuffGrpcTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
-	// insecure transport here. DO NOT USE IN PROD
-	conn, err := grpc.DialContext(ctx, *otelLocation,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
+func setupOtelHttpTrace(ctx context.Context, otelLocation *string) (*otlptrace.Exporter, error) {
+	// insecure transport here DO NOT USE IN PROD
+	client := otlptracehttp.NewClient(
+		otlptracehttp.WithInsecure(),
+		otlptracehttp.WithEndpoint(*otelLocation),
+		otlptracehttp.WithCompression(otlptracehttp.GzipCompression),
 	)
+	err := client.Start(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create gRPC connection to opentelemetry-collector: %w", err)
+		return nil, fmt.Errorf("failed to start http client: %w", err)
 	}
-	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
+	traceExporter, err := otlptrace.New(ctx, client)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create opentelemetry trace exporter: %w", err)
+		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
 	return traceExporter, nil
 }

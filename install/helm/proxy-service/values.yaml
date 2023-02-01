@@ -51,11 +51,7 @@ service:
 deployment:
   env:
     - name: OTEL_LOCATION
-      value: "opentelemetry-collector.observability.svc.cluster.local:4317"
-    - name: GRPC_GO_LOG_VERBOSITY_LEVEL
-      value: "99"
-    - name: GRPC_GO_LOG_SEVERITY_LEVEL
-      value: "info"
+      value: "opentelemetry-collector.observability.svc.cluster.local:4318"
     - name: ALBUM_STORE_URL
       value: "http://album-store.album-store.svc.cluster.local:9080"
 ingress:

@@ -88,7 +88,7 @@ services:
     image: album-store:latest
     restart: always
     environment:
-      - OTEL_LOCATION=otel-collector:4317
+      - OTEL_LOCATION=otel-collector:4318
       - NAMESPACE=default
       - INSTANCE_NAME=album-store-1
       - GRPC_GO_LOG_SEVERITY_LEVEL=99
@@ -105,7 +105,7 @@ services:
     image: proxy-service:latest
     restart: always
     environment:
-      - OTEL_LOCATION=otel-collector:4317
+      - OTEL_LOCATION=otel-collector:4318
       - NAMESPACE=default
       - INSTANCE_NAME=proxy-service-1
       - GRPC_GO_LOG_SEVERITY_LEVEL=99
