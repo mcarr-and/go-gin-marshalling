@@ -6,6 +6,11 @@ x-default-logging:
     max-size: "5m"
     max-file: "2"
 
+networks:
+  default:
+    name: default-limited
+    driver: bridge
+
 services:
 
   # Jager Tracing
