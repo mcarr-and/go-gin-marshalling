@@ -238,7 +238,8 @@ it forces the dashboard to use prometheus for its datasource.
 In my `grafana` Helm values file my `datasources` for `prometheus` has `name: prometheus` so that is why the mapping works.
 
 
-E.G.: my Grafana Helm Value block for dataources 
+E.G.: my Grafana Helm Value block for `dataources:`
+
 ```yaml
 datasources:
   datasources.yaml:
