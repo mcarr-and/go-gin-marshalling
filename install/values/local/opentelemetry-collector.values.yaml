@@ -63,18 +63,25 @@ configMap:
 config:
   exporters:
     logging: { }
-    jaeger:
+    otlp:
       endpoint: jaeger-all-in-one.observability.svc.cluster.local:14250
       tls:
         insecure: true
+    prometheus:
+      endpoint: "0.0.0.0:9464"
+
   extensions:
     # The health_check extension is mandatory for this chart.
     # Without the health_check extension the collector will fail the readiness and liveliness probes.
     # The health_check extension can be modified, but should never be removed.
     health_check: {}
     memory_ballast: { }
+
   processors:
     batch: { }
+    spanmetrics:
+      metrics_exporter: prometheus
+
     # If set to null, will be overridden with values based on k8s resource limits
     memory_limiter: null
   receivers:
@@ -92,6 +99,10 @@ config:
           endpoint: 0.0.0.0:4317
         http:
           endpoint: 0.0.0.0:4318
+          cors:
+            allowed_origins:
+              - "http://*"
+              - "https://*"
     prometheus:
       config:
         scrape_configs:
@@ -119,6 +130,7 @@ config:
       metrics:
         exporters:
           - logging
+          - prometheus
         processors:
           - memory_limiter
           - batch
@@ -128,10 +140,12 @@ config:
       traces:
         exporters:
           - logging
+          - otlp
           - jaeger
         processors:
           - memory_limiter
           - batch
+          - spanmetrics
         receivers:
           - otlp
           - jaeger
@@ -309,7 +323,7 @@ service:
   # loadBalancerIP: 1.2.3.4
   annotations:
     prometheus.io/scrape: "true"
-    prometheus.io/port: "8888"
+    prometheus.io/port: "9464"
 
 ingress:
   ingressClassName: nginx # required to get nginx-ingress to open up an ingress to the service
