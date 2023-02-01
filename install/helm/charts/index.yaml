@@ -3,7 +3,17 @@ entries:
   album-store:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-02-01T20:43:13.316356Z"
+    created: "2023-02-01T21:25:41.530043Z"
+    description: A Helm chart for Kubernetes
+    digest: 562e27784a71ce888c3def8f98b7723cb67ba7a5204dc3d690fe3a4ad8c304e1
+    name: album-store
+    type: application
+    urls:
+    - album-store-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2023-02-01T21:25:41.52693Z"
     description: A Helm chart for Kubernetes
     digest: b65858f31838a62f8ae954f74b8ce9f5a227dd7ffe9405eaecc8299fed547610
     name: album-store
@@ -13,8 +23,18 @@ entries:
     version: 0.1.0
   proxy-service:
   - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2023-02-01T21:25:41.534893Z"
+    description: A Helm chart for Kubernetes
+    digest: 753148557025b6205c4ad593874aa9aeae139bdddb055d4ee7743836770d8e06
+    name: proxy-service
+    type: application
+    urls:
+    - proxy-service-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-02-01T20:43:13.318045Z"
+    created: "2023-02-01T21:25:41.53271Z"
     description: A Helm chart for Kubernetes
     digest: 241607bc8be5c00154611b933198611e4ff29e7f8d0cc0ddeaff2aaaf9a7be16
     name: proxy-service
@@ -22,4 +42,4 @@ entries:
     urls:
     - proxy-service-0.1.0.tgz
     version: 0.1.0
-generated: "2023-02-01T20:43:13.314133Z"
+generated: "2023-02-01T21:25:41.523073Z"

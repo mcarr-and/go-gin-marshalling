@@ -316,14 +316,17 @@ ingress:
   enabled: true
   annotations:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "660"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "660"
   hosts:
     - host: otel-collector.local
       paths:
         - path: /
           pathType: ImplementationSpecific
-          port: 4317
+          port: 4318
   tls: [ ]
 
   # Additional ingresses - only created if ingress.enabled is true
