@@ -318,6 +318,7 @@ ingress:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
+    # Below is need if you want to expose the http service outside the cluster for local testing. Can be removed if not needed
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "660"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "660"
