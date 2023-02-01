@@ -70,7 +70,7 @@ services:
   # Grafana Monitoring Dashboards
   grafana:
     container_name: grafana
-    image: grafana/grafana:9.1.0
+    image: grafana/grafana:latest
     volumes:
       - ./config/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./config/grafana/provisioning/:/etc/grafana/provisioning/
