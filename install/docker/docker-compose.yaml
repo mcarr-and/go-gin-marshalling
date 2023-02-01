@@ -11,6 +11,7 @@ networks:
     driver: bridge
 
 services:
+
   # Jager Tracing
   jaeger:
     container_name: jaeger
@@ -18,7 +19,6 @@ services:
     restart: always
     ports:
       - "16696:16686"
-      - "16686" # Prometheus Internal endpoint
       - "14268" # jaeger.thrift
       - "14250" # model.proto
       - "4317" # otel grpc
@@ -26,40 +26,51 @@ services:
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     logging: *logging
+
   # Open Telemetry Collector
   otel-collector:
     container_name: otel-collector
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.61.0 # :latest
     restart: always
     command:
       [ "--config=/etc/otel-collector-config.yaml",
-        "--config=/etc/otelcol-config-extras.yml"
+        "--config=/etc/otel-collector-config-extras.yaml"
       ]
     volumes:
       - ./config/otelcollector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-      - ./config/otelcollector/otel-collector-config-extras.yaml:/etc/otelcol-config-extras.yml
+      - ./config/otelcollector/otel-collector-config-extras.yaml:/etc/otel-collector-config-extras.yaml
     ports:
       - "1888" # pprof extension
-      - "8888" # Prometheus metrics exposed by the collector
+      - "8888" # Prometheus metrics endpoint
       - "8889" # Prometheus exporter metrics
       - "9464" # Prometheus exporter
       - "13133" # health_check extension
       - "4327:4317" # OTLP gRPC receiver
-      - "4318" # OTLP http receiver
+      - "4328:4318" # OTLP http receiver
       - "55679" # zpages extension
     depends_on:
       - jaeger
     logging: *logging
+
   # Prometheus Monitoring
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:latest
+    image: prom/prometheus:latest # quay.io/prometheus/prometheus:v2.34.0
     restart: always
+    command:
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --storage.tsdb.retention.time=1h
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
     volumes:
-      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yaml
     ports:
       - "9090:9090"
     logging: *logging
+
   # Grafana Monitoring Dashboards
   grafana:
     container_name: grafana
@@ -70,6 +81,7 @@ services:
     ports:
       - "3000:3000"
     logging: *logging
+
   # Album-Store Go Application
   album-store:
     container_name: album-store
@@ -86,6 +98,7 @@ services:
     depends_on:
       - otel-collector
     logging: *logging
+
   # Proxy-Service Go Application
   proxy-service:
     container_name: proxy-service

@@ -9,18 +9,18 @@ receivers:
             - "https://*"
 
 exporters:
-  prometheus:
-    endpoint: "otel-collector:9464"
-  logging:
-  jaeger:
-    endpoint: jaeger:14250
-#  otlp:
-#    endpoint: "jaeger:4317"
+  otlp:
+    endpoint: "jaeger:4317"
     tls:
       insecure: true
+  logging:
+  prometheus:
+    endpoint: "otel-collector:9464"
 
 processors:
   batch:
+  spanmetrics:
+    metrics_exporter: prometheus
 
 extensions:
   health_check:
@@ -34,9 +34,9 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [logging, jaeger]
+      processors: [spanmetrics, batch]
+      exporters: [logging, otlp]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, prometheus]
+      exporters: [prometheus, logging]

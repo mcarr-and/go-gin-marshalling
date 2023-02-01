@@ -7,14 +7,14 @@ x-default-logging:
     max-file: "2"
 
 services:
-  # Jaeger Tracing
+
+  # Jager Tracing
   jaeger:
-    image: jaegertracing/all-in-one:latest
     container_name: jaeger
+    image: jaegertracing/all-in-one:latest
     restart: always
     ports:
       - "16696:16686"
-      - "16686" # internal prometheus port
       - "14268" # jaeger.thrift
       - "14250" # model.proto
       - "4317" # otel grpc
@@ -22,45 +22,55 @@ services:
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     logging: *logging
-  # Open Telemetry Collector 
+
+  # Open Telemetry Collector
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
+    image: otel/opentelemetry-collector-contrib:latest
     restart: always
     command:
       [ "--config=/etc/otel-collector-config.yaml",
-        "--config=/etc/otelcol-config-extras.yml"
+        "--config=/etc/otel-collector-config-extras.yaml"
       ]
     volumes:
-      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-      - ./config/otelcollector/otel-collector-config-extras.yaml:/etc/otelcol-config-extras.yml
+      - ./config/otelcollector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+      - ./config/otelcollector/otel-collector-config-extras.yaml:/etc/otel-collector-config-extras.yaml
     ports:
       - "1888" # pprof extension
-      - "8888" # Prometheus metrics exposed by the collector
+      - "8888" # Prometheus metrics endpoint
       - "8889" # Prometheus exporter metrics
       - "9464" # Prometheus exporter
       - "13133" # health_check extension
       - "4327:4317" # OTLP gRPC receiver
-      - "4317" # internal OTLP gRPC receiver
-      - "4318" # OTLP http receiver
-      - "55679:55679" # zpages extension
+      - "4328:4318" # OTLP http receiver
+      - "55679" # zpages extension
     depends_on:
       - jaeger
     logging: *logging
-  # Prometheus Metrics Collection
+
+  # Prometheus Monitoring
   prometheus:
     container_name: prometheus
     image: prom/prometheus:latest
     restart: always
+    command:
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --storage.tsdb.retention.time=1h
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
     volumes:
-      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yaml
     ports:
       - "9090:9090"
     logging: *logging
-  # Grafana Metrics Dashboard
+
+  # Grafana Monitoring Dashboards
   grafana:
-    image: grafana/grafana:9.1.0
     container_name: grafana
+    image: grafana/grafana:9.1.0
     volumes:
       - ./config/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./config/grafana/provisioning/:/etc/grafana/provisioning/
