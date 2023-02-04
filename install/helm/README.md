@@ -17,11 +17,12 @@ Check out this example:
 ```bash
 cd helm
 #This will create tgz file with chart in charts directory
-helm package album-store -d charts 
-helm package proxy-service -d charts
-helm repo index ./charts #This will create index.yaml file which references album-store.yaml
-git add *
-git commit -m "album-store helm"
+helm package album-store -d charts; 
+helm package proxy-service -d charts;
+#This will create index.yaml file which references album-store.yaml and proxy-service.yaml
+helm repo index ./charts; 
+git add *;
+git commit -m "helm chart updates"
 git push
 ```
 
