@@ -1,0 +1,55 @@
+{{- if .Values.dashboards.prometheus -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-prometheus
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  prometheus.json: |-
+{{ .Files.Get "dashboards/prometheus.json" | indent 4 }}
+---
+{{- end }}
+
+{{- if .Values.dashboards.golang -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-golang
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  golang.json: |-
+{{ .Files.Get "dashboards/golang.json" | indent 4 }}
+---
+{{- end }}
+
+{{- if .Values.dashboards.jaegerAllInOne -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-jaeger-all-in-one
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  jaeger-all-in-one.json: |-
+{{ .Files.Get "dashboards/jaeger-all-in-one.json" | indent 4 }}
+---
+{{- end }}
+
+{{- if .Values.dashboards.otelCollector -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-otel-collector
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  otel-collector.json: |-
+{{ .Files.Get "dashboards/otel-collector.json" | indent 4 }}
+---
+{{- end }}

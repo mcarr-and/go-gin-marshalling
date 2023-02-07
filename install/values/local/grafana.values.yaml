@@ -679,11 +679,10 @@ dashboardProviders:
 ##     RAW_JSON
 ##
 dashboardsConfigMaps:
-  jaeger: "dashboard-configmap-jaeger"
-  golang: "dashboard-configmap-golang"
-  prometheus: "dashboard-configmap-prometheus"
-  otel-collector : "dashboard-configmap-otel-collector"
-
+  jaeger: "charts-grafana-dashboards-jaeger-all-in-one"
+  golang: "charts-grafana-dashboards-golang"
+  prometheus: "charts-grafana-dashboards-prometheus"
+  otel-collector: "charts-grafana-dashboards-otel-collector"
 
 ## Configure grafana dashboard to import
 ## NOTE: To use dashboards you must also enable/configure dashboardProviders
@@ -1192,7 +1191,8 @@ networkPolicy:
     enabled: false
     ##
     ## @param networkPolicy.egress.ports Add individual ports to be allowed by the egress
-    ports: []
+    ports:
+      []
       ## Add ports to the egress by specifying - port: <port number>
       ## E.X.
     ## ports:

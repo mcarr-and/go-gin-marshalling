@@ -1,0 +1,18 @@
+# Default values for grafana-dashboards.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- String to partially override names.fullname
+nameOverride: ""
+# -- String to fully override names.fullname
+fullnameOverride: ""
+
+dashboards:
+  # -- Toggles the cert-manager dashboards
+  jaegerAllInOne: true
+  # -- Toggles the cert-manager dashboards
+  prometheus: true
+  # -- Toggles the crowdsec dashboards
+  golang: true
+  # -- Toggles the otelCollector dashboards
+  otelCollector: true

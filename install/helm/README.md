@@ -19,6 +19,7 @@ cd helm
 #This will create tgz file with chart in charts directory
 helm package album-store -d charts; 
 helm package proxy-service -d charts;
+helm package grafana-dashboards -d charts;
 #This will create index.yaml file which references album-store.yaml and proxy-service.yaml
 helm repo index ./charts; 
 git add *;

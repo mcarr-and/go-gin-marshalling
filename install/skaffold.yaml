@@ -34,7 +34,7 @@ profiles:
             createNamespace: true
             valuesFiles: ["./install/values/local/prometheus.values.yaml"]
 ---
-apiVersion: skaffold/v2beta22
+apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: grafana-dashboards
@@ -43,12 +43,17 @@ profiles:
     activation:
       - kubeContext: k3d-k3s-default
     deploy:
-      kubectl:
-        manifests:
-          - install/dashboard-configmap-jaeger.yaml
-          - install/dashboard-configmap-golang.yaml
-          - install/dashboard-configmap-prometheus.yaml
-          - install/dashboard-configmap-otel-collector.yaml
+      helm:
+        releases:
+          - name: grafana-dashboards
+            #chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
+            remoteChart: grafana-dashboards
+            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            namespace: proxy-service
+            createNamespace: true
+            valuesFiles:
+              ["./install/values/local/grafana-dashboards.values.yaml"]
+            wait: true
 ---
 apiVersion: skaffold/v4beta2
 kind: Config
@@ -137,7 +142,7 @@ profiles:
       helm:
         releases:
           - name: album-store
-#            chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
+            #            chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
             remoteChart: album-store
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: album-store
@@ -156,7 +161,7 @@ profiles:
       helm:
         releases:
           - name: proxy-service
-#            chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
+            #            chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
             remoteChart: proxy-service
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: proxy-service
