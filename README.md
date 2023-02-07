@@ -56,8 +56,11 @@ Run the project with a local Kubernetes cluster with K3D.
 
 
 ## TODO 
-* Grafana dashboards to display the GO services, Jaeger, nginx-ingress
-* Write Logs in JSON format
+* Fix horizontal pod scaling helm chart in album-store and proxy-service to use v2
+* Add documentation to use IDE with Docker-Compose?
+* Grafana dashboard to display the nginx-ingress
+* Istio for service finding and remove environmental variables.
+* Emit events when data is changed.
 * Adding CI server integration
 * Add open-telemetry to the ingress-nginx so spans are created from the entry point to the cluster.
 * Contract tests compare swagger output to actual output

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -15,7 +16,6 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -260,10 +260,13 @@ var gitHash = "No-Hash"
 var albumStoreURL = "http://localhost:9080"
 
 func main() {
-	log.Println(fmt.Sprintf("version: %v-%v", version, gitHash))
-	shutdownTraceProvider, err := initOtelProvider(serviceName, version, gitHash)
+	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	logInfo := zerolog.New(os.Stdout).With().Timestamp().Logger()
+
+	logInfo.Info().Msg(fmt.Sprintf("version: %v-%v", version, gitHash))
+	shutdownTraceProvider, err := initOtelProvider(serviceName, version, gitHash, log)
 	if err != nil {
-		log.Fatal(err)
+		log.Err(err)
 	}
 
 	albumStoreUrlEnv := os.Getenv("ALBUM_STORE_URL")
@@ -284,27 +287,27 @@ func main() {
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			log.Err(err)
 		}
 	}()
 	<-quit
 
-	log.Println("Server shutdown with 500ms timeout...")
+	logInfo.Info().Msg("Server shutdown with 500ms timeout...")
 	ctxServer, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 
-	log.Println("OpenTelemetry TraceProvider flushing & shutting down")
+	logInfo.Info().Msg("OpenTelemetry TraceProvider flushing & shutting down")
 	if err := shutdownTraceProvider(ctxServer); err != nil {
-		log.Fatal("OpenTelemetry TracerProvider shutdown failure: %w", err)
+		log.Err(err)
 	}
-	log.Println("OpenTelemetry TraceProvider exited")
+	logInfo.Info().Msg("OpenTelemetry TraceProvider exited")
 
 	if err := srv.Shutdown(ctxServer); err != nil {
-		log.Fatal("Server shutdown failure:", err)
+		log.Err(err)
 	}
 	<-ctxServer.Done()
 
-	log.Println("Server exiting")
+	logInfo.Info().Msg("Server exiting")
 }
 
 // Extracted methods from https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/instrumentation/net/http/otelhttp/client.go v0.37.0
@@ -344,14 +347,14 @@ func setupOtelResource(serviceName string, version string, gitHash string, ctx c
 }
 
 // InitOtelProvider - Initializes an OTLP exporter, and configures the corresponding trace and metric providers.
-func initOtelProvider(serviceName string, version string, gitHash string) (func(context.Context) error, error) {
+func initOtelProvider(serviceName string, version string, gitHash string, log zerolog.Logger) (func(context.Context) error, error) {
 	ctx := context.Background()
 
 	namespace := os.Getenv("NAMESPACE")
 	instanceName := os.Getenv("INSTANCE_NAME")
 	otelLocation := os.Getenv("OTEL_LOCATION")
 	if instanceName == "" || otelLocation == "" || namespace == "" {
-		log.Fatalf("Env variables not assigned NAMESPACE=%v, INSTANCE_NAME=%v, OTEL_LOCATION=%v", namespace, instanceName, otelLocation)
+		log.Fatal().Msg(fmt.Sprintf("Env variables not assigned NAMESPACE=%v, INSTANCE_NAME=%v, OTEL_LOCATION=%v", namespace, instanceName, otelLocation))
 	}
 
 	otelResource, err := setupOtelResource(serviceName, version, gitHash, ctx, &namespace, &instanceName)
