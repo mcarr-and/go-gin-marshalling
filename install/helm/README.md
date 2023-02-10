@@ -4,6 +4,7 @@
 
 * Album Store
 * Proxy Service
+* Grafana Dashboards via Configmaps. Inspred by [Glenn De Haan's Grafana Helm](https://github.com/glenndehaan/charts/tree/master/charts/grafana-dashboards)
 
 ## Basic info
 Repository with k8s Helm repo.
