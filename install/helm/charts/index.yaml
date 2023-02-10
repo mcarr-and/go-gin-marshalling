@@ -3,9 +3,9 @@ entries:
   album-store:
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-04T12:18:51.489801Z"
+    created: "2023-02-10T16:38:54.944157Z"
     description: A Helm chart for Kubernetes
-    digest: fba81079b03804fc9619d73c815fe21f922d04ee32489bd6d3570ab2d5c83dc4
+    digest: 57067c65ba78a3174dc206b4916c43c15275fa6e21f8f55741b0ac2942773d6f
     name: album-store
     type: application
     urls:
@@ -13,7 +13,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-04T12:18:51.48819Z"
+    created: "2023-02-10T16:38:54.942338Z"
     description: A Helm chart for Kubernetes
     digest: 38b7d581ac1f13771500ef56e075ea92bd2e54be6fa580d8f0c1431009d16e6c
     name: album-store
@@ -23,7 +23,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-02-04T12:18:51.486493Z"
+    created: "2023-02-10T16:38:54.939811Z"
     description: A Helm chart for Kubernetes
     digest: b65858f31838a62f8ae954f74b8ce9f5a227dd7ffe9405eaecc8299fed547610
     name: album-store
@@ -31,12 +31,47 @@ entries:
     urls:
     - album-store-0.1.0.tgz
     version: 0.1.0
+  grafana-dashboards:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2023-02-10T16:38:54.949188Z"
+    description: A Helm chart that deploys my collection of Grafana dashboards
+    digest: 31eae2fbc5d0dcabfd3161bb5962c1802cd038391f4c20548025730ebc57cc5d
+    home: https://github.com/mcarr-and/go-gin-otelcollector
+    keywords:
+    - kubernetes
+    - grafana
+    - dashboards
+    name: grafana-dashboards
+    sources:
+    - https://github.com/mcarr-and/go-gin-otelcollector
+    type: application
+    urls:
+    - grafana-dashboards-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2023-02-10T16:38:54.947217Z"
+    description: A Helm chart that deploys my collection of Grafana dashboards
+    digest: ad070f8b565ca10f8c6b30baea8fe117d7795702728e69d618ff1e93853444a9
+    home: https://github.com/mcarr-and/go-gin-otelcollector
+    keywords:
+    - kubernetes
+    - grafana
+    - dashboards
+    name: grafana-dashboards
+    sources:
+    - https://github.com/mcarr-and/go-gin-otelcollector
+    type: application
+    urls:
+    - grafana-dashboards-1.0.1.tgz
+    version: 1.0.1
   proxy-service:
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-04T12:18:51.495017Z"
+    created: "2023-02-10T16:38:54.956708Z"
     description: A Helm chart for Kubernetes
-    digest: c1e558cc5f7fd06e902032a8ab4bec78f811c43ae854fbbcd3e3ea8f9ff7850d
+    digest: e4b3c9e84e6fcc8ce1783331467bdac3139a141b6353810260e12d877111b406
     name: proxy-service
     type: application
     urls:
@@ -44,7 +79,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-04T12:18:51.493192Z"
+    created: "2023-02-10T16:38:54.955263Z"
     description: A Helm chart for Kubernetes
     digest: 753148557025b6205c4ad593874aa9aeae139bdddb055d4ee7743836770d8e06
     name: proxy-service
@@ -54,7 +89,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-02-04T12:18:51.491582Z"
+    created: "2023-02-10T16:38:54.951669Z"
     description: A Helm chart for Kubernetes
     digest: 241607bc8be5c00154611b933198611e4ff29e7f8d0cc0ddeaff2aaaf9a7be16
     name: proxy-service
@@ -62,4 +97,4 @@ entries:
     urls:
     - proxy-service-0.1.0.tgz
     version: 0.1.0
-generated: "2023-02-04T12:18:51.484307Z"
+generated: "2023-02-10T16:38:54.93625Z"

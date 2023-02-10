@@ -53,3 +53,31 @@ data:
 {{ .Files.Get "dashboards/otel-collector.json" | indent 4 }}
 ---
 {{- end }}
+
+{{- if .Values.dashboards.kafka -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-kafka
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  kafka.json: |-
+{{ .Files.Get "dashboards/kafka.json" | indent 4 }}
+---
+{{- end }}
+
+{{- if .Values.dashboards.zookeeper -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-zookeeper
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  zookeeper.json: |-
+{{ .Files.Get "dashboards/zookeeper.json" | indent 4 }}
+---
+{{- end }}
