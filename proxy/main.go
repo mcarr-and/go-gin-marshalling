@@ -260,13 +260,13 @@ var gitHash = "No-Hash"
 var albumStoreURL = "http://localhost:9080"
 
 func main() {
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	proxyLog := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	logInfo := zerolog.New(os.Stdout).With().Timestamp().Logger()
 
 	logInfo.Info().Msg(fmt.Sprintf("version: %v-%v", version, gitHash))
-	shutdownTraceProvider, err := initOtelProvider(serviceName, version, gitHash, log)
+	shutdownTraceProvider, err := initOtelProvider(serviceName, version, gitHash, proxyLog)
 	if err != nil {
-		log.Err(err)
+		proxyLog.Err(err)
 	}
 
 	albumStoreUrlEnv := os.Getenv("ALBUM_STORE_URL")
@@ -287,7 +287,7 @@ func main() {
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Err(err)
+			proxyLog.Err(err)
 		}
 	}()
 	<-quit
@@ -298,12 +298,12 @@ func main() {
 
 	logInfo.Info().Msg("OpenTelemetry TraceProvider flushing & shutting down")
 	if err := shutdownTraceProvider(ctxServer); err != nil {
-		log.Err(err)
+		proxyLog.Err(err)
 	}
 	logInfo.Info().Msg("OpenTelemetry TraceProvider exited")
 
 	if err := srv.Shutdown(ctxServer); err != nil {
-		log.Err(err)
+		proxyLog.Err(err)
 	}
 	<-ctxServer.Done()
 
