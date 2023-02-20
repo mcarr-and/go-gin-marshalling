@@ -15,12 +15,10 @@
 FROM golang:1.19 as build
 ARG GIT_HASH
 WORKDIR /app/
-copy go.* ./
+COPY . .
 RUN go mod download
-COPY *.go .
-COPY models ./models
-COPY cmd ./cmd
 RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags "-X main.version=0.1 -X main.gitHash=${GIT_HASH}" -v -o album-store main.go
 FROM alpine:3.17.0
 COPY --from=build /app/album-store /app/album-store
+COPY cmd ./cmd
 CMD ["/app/album-store"]

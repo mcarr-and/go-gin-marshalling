@@ -15,9 +15,8 @@
 FROM golang:1.19 as build
 ARG GIT_HASH
 WORKDIR /app/
-copy go.* ./
+COPY . .
 RUN go mod download
-COPY *.go ./
 RUN  --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags "-X main.version=0.1 -X main.gitHash=${GIT_HASH}" -v -o proxy-service main.go
 FROM alpine:3.17.0
 COPY --from=build /app/proxy-service  /app/proxy-service

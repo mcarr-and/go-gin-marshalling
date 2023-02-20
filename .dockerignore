@@ -1,0 +1,20 @@
+# folders for system
+/.vscode
+/.kpt-pipeline
+/.history
+/.idea
+/.git
+
+# files
+.DS_Store
+coverage*
+album-store
+.gitignore
+Makefile
+.dockerignore
+
+#local folders
+docs
+install
+proxy
+test
