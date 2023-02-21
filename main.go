@@ -78,21 +78,25 @@ func getAlbumByID(c *gin.Context) {
 	findAlbum(c, albumId, span)
 }
 
-func postAlbum(c *gin.Context) {
-	span := trace.SpanFromContext(c.Request.Context())
-	span.SetName("/albums POST")
-	defer span.End()
-	//c.ShouldBindBodyWith() // the old way to get the JSON body and did get body and bind
-	requestBodyString, err := getRequestBody(c, span)
-	if err {
-		return
+func postAlbum(log zerolog.Logger) gin.HandlerFunc {
+	fn := func(context *gin.Context) {
+		span := trace.SpanFromContext(context.Request.Context())
+		span.SetName("/albums POST")
+		defer span.End()
+		//c.ShouldBindBodyWith() // the old way to get the JSON body and did get body and bind
+		requestBodyString, errBody := getRequestBody(context, span)
+		if errBody {
+			return
+		}
+		hasError, albumValue := bindJsonBody(context, span, requestBodyString, log)
+		if hasError {
+			return
+		}
+		albums = append(albums, albumValue)
+
+		buildSuccessResponse(context, span, requestBodyString, albumValue)
 	}
-	hasError, albumValue := bindJsonBody(c, span, requestBodyString)
-	if hasError {
-		return
-	}
-	albums = append(albums, albumValue)
-	buildSuccessResponse(c, span, requestBodyString, albumValue)
+	return fn
 }
 
 func status(c *gin.Context) {
@@ -163,10 +167,10 @@ func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString str
 	c.JSON(http.StatusCreated, responseAlbum)
 }
 
-func bindJsonBody(c *gin.Context, span trace.Span, requestBodyString string) (bool, models.Album) {
+func bindJsonBody(c *gin.Context, span trace.Span, requestBodyString string, log zerolog.Logger) (bool, models.Album) {
 	var album models.Album
 	if err := binding.JSON.BindBody([]byte(requestBodyString), &album); err != nil {
-		if processValidationBindingError(c, err, span, requestBodyString) {
+		if processValidationBindingError(c, err, span, requestBodyString, log) {
 			return true, album
 		}
 	}
@@ -183,7 +187,7 @@ func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error,
 	return true
 }
 
-func processValidationBindingError(c *gin.Context, err error, span trace.Span, requestBodyJSON string) bool {
+func processValidationBindingError(c *gin.Context, err error, span trace.Span, requestBodyJSON string, log zerolog.Logger) bool {
 	var newAlbum models.Album
 	var validationErrors validator.ValidationErrors
 	if errors.As(err, &validationErrors) {
@@ -192,7 +196,6 @@ func processValidationBindingError(c *gin.Context, err error, span trace.Span, r
 			field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fieldError.Field())
 			fieldJSONName, okay := field.Tag.Lookup("json")
 			if !okay {
-				log := zerolog.New(os.Stderr).With().Timestamp().Logger()
 				log.Fatal().Msg(fmt.Sprintf("No json type on Struct model.Album %s Expecting : `json:\"title\" ...`", fieldError.Field()))
 			}
 			bindingErrorMessages[index] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fieldError)}
@@ -222,13 +225,13 @@ func getErrorMsg(fe validator.FieldError) string {
 	}
 }
 
-func setupRouter() *gin.Engine {
+func setupRouter(log zerolog.Logger) *gin.Engine {
 	router := gin.Default()
 	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Gin
-	router.StaticFS("/v3/api-docs/", http.Dir("/cmd/api/swaggerui"))
+	router.StaticFS("/v3/api-docs/", http.Dir("cmd/api/swaggerui"))
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
-	router.POST("/albums", postAlbum)
+	router.POST("/albums", postAlbum(log))
 	router.GET("/status", status)
 	router.GET("/metrics", metrics)
 	return router
@@ -243,16 +246,16 @@ var version = "No-Version"
 var gitHash = "No-Hash"
 
 func main() {
-	log := zerolog.New(os.Stderr).With().Timestamp().Logger()
+	logError := zerolog.New(os.Stderr).With().Timestamp().Logger()
 	logInfo := zerolog.New(os.Stdout).With().Timestamp().Logger()
 
 	logInfo.Info().Msg(fmt.Sprintf("version: %v-%v", version, gitHash))
-	shutdownTraceProvider, err := initOtelProvider(serviceName, version, gitHash, log)
+	shutdownTraceProvider, err := initOtelProvider(serviceName, version, gitHash, logInfo)
 	if err != nil {
-		log.Fatal().Err(err)
+		logError.Fatal().Err(err)
 	}
 
-	router := setupRouter()
+	router := setupRouter(logInfo)
 	//serve requests until termination signal is sent.
 	srv := &http.Server{
 		Addr:    startAddress,
@@ -264,7 +267,7 @@ func main() {
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal().Err(err)
+			logError.Fatal().Err(err)
 		}
 	}()
 	<-quit
@@ -275,12 +278,12 @@ func main() {
 
 	logInfo.Info().Msg("OpenTelemetry TraceProvider flushing & shutting down")
 	if err := shutdownTraceProvider(ctxServer); err != nil {
-		log.Fatal().Err(err)
+		logError.Fatal().Err(err)
 	}
 	logInfo.Info().Msg("OpenTelemetry TraceProvider exited")
 
 	if err := srv.Shutdown(ctxServer); err != nil {
-		log.Fatal().Err(err)
+		logError.Fatal().Err(err)
 	}
 	<-ctxServer.Done()
 
