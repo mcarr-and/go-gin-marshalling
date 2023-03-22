@@ -2,75 +2,137 @@
 
 1. Go
 2. Docker 
-3. [Skaffold](https://skaffold.dev/)
-4. [Microk8s](https://microk8s.io/)
 
-WIP not currently running. 
+## 1. Install microk8s for OSX
 
-TODO improve ths.
+`brew install microk8s`
 
-## 0. ./kube/config with Microk8s
+## 2. Install microk8s on the machine image.
 
-### 0.1 Setup Kube Config
+### 2.1. get a shell on the microk8s image
 
-[Setup kube config](Microk8s-Kube-Config-Setup.md)
+`multipass shell microk8s-vm;` 
 
-### 0.2. Changes to Hosts file
+### 2.2 
 
-local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
+`snap info microk8s;`
 
-```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local album-store.local```
+#### 2.2.1 expected output
 
-## 2. Start All Observability & Log Viewing Services
- 
-```bash
-make skaffold-dev-microk8s;
+```
+name:      microk8s
+summary:   Kubernetes for workstations and appliances
+publisher: Canonical✓
+store-url: https://snapcraft.io/microk8s
+contact:   https://github.com/canonical/microk8s
+license:   Apache-2.0
+description: |
+  MicroK8s is a small, fast, secure, certified Kubernetes distribution that installs on just about
+  any Linux box. It provides the functionality of core Kubernetes components, in a small footprint,
+  scalable from a single node to a high-availability production multi-node cluster. Use it for
+  offline developments, prototyping, testing, CI/CD. It's also great for appliances - develop your
+  IoT apps for K8s and deploy them to MicroK8s on your boxes.
+snap-id: EaXqgt1lyCaxKaQCU349mlodBkDCXRcg
+channels:
+  1.26/stable:           v1.26.1         2023-02-07 (4595) 176MB classic  ...
+
+...
+  ```
+
+
+This means that microk8s in not installed as there are no `commands:` or `services:`
+
+### 2.3 install microk8s
+
+Substitute 1.26/stable for teh latest version of stable from the above command.
+
+`sudo snap install microk8s --classic --channel=1.26/stable;`
+
+### 2.3.1 confirm configuration
+
+`snap info microk8s;`
+
+#### 2.3.1.1 expected output 
+
+```
+name:      microk8s
+summary:   Kubernetes for workstations and appliances
+publisher: Canonical✓
+store-url: https://snapcraft.io/microk8s
+contact:   https://github.com/canonical/microk8s
+license:   Apache-2.0
+description: |
+  MicroK8s is a small, fast, secure, certified Kubernetes distribution that installs on just about
+  any Linux box. It provides the functionality of core Kubernetes components, in a small footprint,
+  scalable from a single node to a high-availability production multi-node cluster. Use it for
+  offline developments, prototyping, testing, CI/CD. It's also great for appliances - develop your
+  IoT apps for K8s and deploy them to MicroK8s on your boxes.
+commands:
+  - microk8s.add-node
+  - microk8s.addons
+  - microk8s.cilium
+  - microk8s.config
+  - microk8s.ctr
+  - microk8s.dashboard-proxy
+  - microk8s.dbctl
+  - microk8s.disable
+  - microk8s.enable
+  - microk8s.helm
+  - microk8s.helm3
+  - microk8s.images
+  - microk8s.inspect
+  - microk8s.istioctl
+  - microk8s.join
+  - microk8s.kubectl
+  - microk8s.leave
+  - microk8s.linkerd
+  - microk8s
+  - microk8s.refresh-certs
+  - microk8s.remove-node
+  - microk8s.reset
+  - microk8s.start
+  - microk8s.status
+  - microk8s.stop
+  - microk8s.version
+services:
+  microk8s.daemon-apiserver-kicker: simple, enabled, active
+  microk8s.daemon-apiserver-proxy:  simple, enabled, inactive
+  microk8s.daemon-cluster-agent:    simple, enabled, active
+  microk8s.daemon-containerd:       notify, enabled, active
+  microk8s.daemon-etcd:             simple, enabled, inactive
+  microk8s.daemon-flanneld:         simple, enabled, inactive
+  microk8s.daemon-k8s-dqlite:       simple, enabled, active
+  microk8s.daemon-kubelite:         simple, enabled, active
+snap-id:      EaXqgt1lyCaxKaQCU349mlodBkDCXRcg
+tracking:     1.26/stable
+refresh-date: today at 15:49 GMT
+channels:
+  1.26/stable:           v1.26.1         2023-02-07 (4595) 176MB classic
+
+...
 ```
 
-## 3. Start album-store Go/Gin Server with flags set
+`services` and `commands` are now available.
+
+### 2.4 make host changes.
+
+#### 2.4.1 exit out of the multipasss shell 
+
+`exit;`
+
+#### 2.4.2 add microk8s config to local expected directory
 
 ```bash
-make local-start-k3d-grpc;
+mkdir ~/.microk8s;
+microk8s config > ~/.microk8s/config;
 ```
 
-#### Note: the application will not start without the OpenTelemetry collector running
-
-## 4. Run Some Tests
-
-### 4.1 Run from command line 
+## 2.5 Confirm it is working
 
 ```bash
-make local-test;
+microk8s kubectl get pods;
 ```
 
-### 4.2 Use Postman
+### expected results
 
-[Postman files](../test/postman_collection.json)
-
-1. Import the collection and environment into your postman
-1. Set Environment to `album-store.local`
-1. Open a test in the `Album-Store` collection and run it.
-
-## 5. View the events in the different Services in K3D
-
-[View Jaeger](http://jaeger.local:8070/search?limit=20&service=album-store)
-
-[View K-Dashboard to see Kubernetes environment in a browser](http://k-dashboard:8070/)
-
-TODO Prometheus 
-
-## 6. Stop album-store server & Services  
-
-### 1. Stop Server
-
-`Ctr + C` in the terminal window where go is running. 
-
-### 2. Stop Observability and Log Viewing Services
-
-Ctr + C on the terminal window where you started `make skaffold-dev`
-
-## 7. Delete K3D Cluster
-
-```bash
-make k3d-cluster-delete
-```
+`No resources found in default namespace.`
