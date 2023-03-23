@@ -1,23 +1,64 @@
-## 0. Expected tooling to run this project in K3D
+Install Microk8s on a Mac computer.
 
-1. Go
-2. Docker 
 
-## 1. Install microk8s for OSX
+WIP - trying to install ArgoCD makes the cluster no longer work even with a 40gb disk and 4gb of ram. 
 
-`brew install microk8s`
+https://microk8s.io/docs/install-multipass
 
-## 2. Install microk8s on the machine image.
 
-### 2.1. get a shell on the microk8s image
+## 1. Install multipass for OSX
 
-`multipass shell microk8s-vm;` 
+install:
+* multipass (for use in installing the microk8s instance correctly)
 
-### 2.2 
+```bash
+brew install multipass microk8s;
+```
 
-`snap info microk8s;`
+## 2. fix the microk8s multipass image
 
-#### 2.2.1 expected output
+```bash
+microk8s stop;
+multipass stop microk8s-vm;
+multipass delete microk8s-vm;
+multipass purge;
+multipass launch --name microk8s-vm --memory 4G --disk 40G;
+```
+
+## 3. Show microk8s image
+
+```bash
+multipass list;
+```
+
+### 3.1 expected result
+
+There is not a internal IP shown so the microk8s image is not running. 
+
+```
+microk8s-vm             Running           192.168.XXX.X    Ubuntu 18.04 LTS
+```
+
+## 4. Install microk8s
+
+## 4.1 get a shell on the microk8s image
+
+From your host machine shell onto the microk8s image.
+
+```bash
+multipass shell microk8s-vm;
+
+```
+
+## 4.2 show microk8s install information.
+
+```bash
+snap info microk8s;
+```
+
+### 4.2.1 expected output
+
+There are no `commands:` or `services:` for microk8s image is not installed.
 
 ```
 name:      microk8s
@@ -39,20 +80,23 @@ channels:
 ...
   ```
 
+## 4.3 install microk8s image
 
-This means that microk8s in not installed as there are no `commands:` or `services:`
+Substitute 1.26/stable for the latest version of stable from the above command.
 
-### 2.3 install microk8s
+```bash
+sudo snap install microk8s --classic --channel=1.26/stable;
+```
 
-Substitute 1.26/stable for teh latest version of stable from the above command.
+### 4.4 confirm configuration
 
-`sudo snap install microk8s --classic --channel=1.26/stable;`
+```bash
+snap info microk8s;
+```
 
-### 2.3.1 confirm configuration
+#### 4.4.1 expected output 
 
-`snap info microk8s;`
-
-#### 2.3.1.1 expected output 
+`services` and `commands` are now available.
 
 ```
 name:      microk8s
@@ -111,28 +155,165 @@ channels:
 
 ...
 ```
-
-`services` and `commands` are now available.
-
-### 2.4 make host changes.
-
-#### 2.4.1 exit out of the multipasss shell 
-
-`exit;`
-
-#### 2.4.2 add microk8s config to local expected directory
+## 5. exit from multipass
 
 ```bash
-mkdir ~/.microk8s;
-microk8s config > ~/.microk8s/config;
+exit;
 ```
 
-## 2.5 Confirm it is working
+## 6. start microk8s 
 
 ```bash
-microk8s kubectl get pods;
+microk8s start; 
 ```
 
-### expected results
+## 7 Enable community addons for microk8s
 
-`No resources found in default namespace.`
+### 7.1 enable community 
+```bash
+microk8s enable community;
+```
+
+### 7.2 expected results
+```bash
+microk8s status;
+```
+
+### 7.2.1 expected results
+
+```
+microk8s is running
+high-availability: no
+  datastore master nodes: 127.0.0.1:19001
+  datastore standby nodes: none
+addons:
+  enabled:
+    community            # (core) The community addons repository
+    ha-cluster           # (core) Configure high availability on the current node
+    helm                 # (core) Helm - the package manager for Kubernetes
+    helm3                # (core) Helm 3 - the package manager for Kubernetes
+  disabled:
+    argocd               # (community) Argo CD is a declarative continuous deployment for Kubernetes.
+    cilium               # (community) SDN, fast with full network policy
+    dashboard-ingress    # (community) Ingress definition for Kubernetes dashboard
+    fluentd              # (community) Elasticsearch-Fluentd-Kibana logging and monitoring
+    gopaddle-lite        # (community) Cheapest, fastest and simplest way to modernize your applications
+    inaccel              # (community) Simplifying FPGA management in Kubernetes
+    istio                # (community) Core Istio service mesh services
+    jaeger               # (community) Kubernetes Jaeger operator with its simple config
+    kata                 # (community) Kata Containers is a secure runtime with lightweight VMS
+    keda                 # (community) Kubernetes-based Event Driven Autoscaling
+    knative              # (community) Knative Serverless and Event Driven Applications
+    kwasm                # (community) WebAssembly support for WasmEdge (Docker Wasm) and Spin (Azure AKS WASI)
+    linkerd              # (community) Linkerd is a service mesh for Kubernetes and other frameworks
+    multus               # (community) Multus CNI enables attaching multiple network interfaces to pods
+    nfs                  # (community) NFS Server Provisioner
+    ondat                # (community) Ondat is a software-defined, cloud native storage platform for Kubernetes.
+    openebs              # (community) OpenEBS is the open-source storage solution for Kubernetes
+    openfaas             # (community) OpenFaaS serverless framework
+    osm-edge             # (community) osm-edge is a lightweight SMI compatible service mesh for the edge-computing.
+    portainer            # (community) Portainer UI for your Kubernetes cluster
+    sosivio              # (community) Kubernetes Predictive Troubleshooting, Observability, and Resource Optimization
+    traefik              # (community) traefik Ingress controller
+    trivy                # (community) Kubernetes-native security scanner
+    cert-manager         # (core) Cloud native certificate management
+    dashboard            # (core) The Kubernetes dashboard
+    dns                  # (core) CoreDNS
+    gpu                  # (core) Automatic enablement of Nvidia CUDA
+    host-access          # (core) Allow Pods connecting to Host services smoothly
+    hostpath-storage     # (core) Storage class; allocates storage from host directory
+    ingress              # (core) Ingress controller for external access
+    kube-ovn             # (core) An advanced network fabric for Kubernetes
+    mayastor             # (core) OpenEBS MayaStor
+    metallb              # (core) Loadbalancer for your Kubernetes cluster
+    metrics-server       # (core) K8s Metrics Server for API access to service metrics
+    minio                # (core) MinIO object storage
+    observability        # (core) A lightweight observability stack for logs, traces and metrics
+    prometheus           # (core) Prometheus operator for monitoring and logging
+    rbac                 # (core) Role-Based Access Control for authorisation
+    registry             # (core) Private image registry exposed on localhost:32000
+    storage              # (core) Alias to hostpath-storage add-on, deprecated
+
+```
+
+## 8. install addons to make cluster to make it more functional
+
+
+### 8.1 install services
+
+Install services:
+* dashboard (kubernetes dashboard web based portal)
+* registry
+* observability (Prometheus)
+* istio
+* jaeger
+
+```bash
+microk8s enable dashboard registry observability istio;
+microk8s enable jaeger;
+```
+
+This will take about 15 minutes to run.
+
+
+### 10.2 show status
+
+```bash
+microk8s status;
+```
+
+### 10.2.1 expected result
+
+```
+microk8s is running
+high-availability: no
+  datastore master nodes: 127.0.0.1:19001
+  datastore standby nodes: none
+addons:
+  enabled:
+    community            # (core) The community addons repository
+    argocd               # (community) Argo CD is a declarative continuous deployment for Kubernetes.
+    dashboard            # (core) The Kubernetes dashboard
+    dns                  # (core) CoreDNS
+    ha-cluster           # (core) Configure high availability on the current node
+    helm                 # (core) Helm - the package manager for Kubernetes
+    helm3                # (core) Helm 3 - the package manager for Kubernetes
+    hostpath-storage     # (core) Storage class; allocates storage from host directory
+    istio                # (community) Core Istio service mesh services
+    jaeger               # (community) Kubernetes Jaeger operator with its simple config    
+    metrics-server       # (core) K8s Metrics Server for API access to service metrics
+    observability        # (core) A lightweight observability stack for logs, traces and metrics
+    registry             # (core) Private image registry exposed on localhost:32000
+    storage              # (core) Alias to hostpath-storage add-on, deprecated
+  disabled:
+    cilium               # (community) SDN, fast with full network policy
+    dashboard-ingress    # (community) Ingress definition for Kubernetes dashboard
+    fluentd              # (community) Elasticsearch-Fluentd-Kibana logging and monitoring
+    gopaddle-lite        # (community) Cheapest, fastest and simplest way to modernize your applications
+    inaccel              # (community) Simplifying FPGA management in Kubernetes
+    kata                 # (community) Kata Containers is a secure runtime with lightweight VMS
+    keda                 # (community) Kubernetes-based Event Driven Autoscaling
+    knative              # (community) Knative Serverless and Event Driven Applications
+    kwasm                # (community) WebAssembly support for WasmEdge (Docker Wasm) and Spin (Azure AKS WASI)
+    linkerd              # (community) Linkerd is a service mesh for Kubernetes and other frameworks
+    multus               # (community) Multus CNI enables attaching multiple network interfaces to pods
+    nfs                  # (community) NFS Server Provisioner
+    ondat                # (community) Ondat is a software-defined, cloud native storage platform for Kubernetes.
+    openebs              # (community) OpenEBS is the open-source storage solution for Kubernetes
+    openfaas             # (community) OpenFaaS serverless framework
+    osm-edge             # (community) osm-edge is a lightweight SMI compatible service mesh for the edge-computing.
+    portainer            # (community) Portainer UI for your Kubernetes cluster
+    sosivio              # (community) Kubernetes Predictive Troubleshooting, Observability, and Resource Optimization
+    traefik              # (community) traefik Ingress controller
+    trivy                # (community) Kubernetes-native security scanner
+    cert-manager         # (core) Cloud native certificate management
+    gpu                  # (core) Automatic enablement of Nvidia CUDA
+    host-access          # (core) Allow Pods connecting to Host services smoothly
+    ingress              # (core) Ingress controller for external access
+    kube-ovn             # (core) An advanced network fabric for Kubernetes
+    mayastor             # (core) OpenEBS MayaStor
+    metallb              # (core) Loadbalancer for your Kubernetes cluster
+    minio                # (core) MinIO object storage
+    prometheus           # (core) Prometheus operator for monitoring and logging
+    rbac                 # (core) Role-Based Access Control for authorisation
+```
