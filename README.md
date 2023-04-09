@@ -56,7 +56,6 @@ Run the project with a local Kubernetes cluster with K3D.
 
 
 ## TODO 
-* Fix horizontal pod scaling helm chart in album-store and proxy-service to use v2
 * Add documentation to use IDE with Docker-Compose?
 * Grafana dashboard to display the nginx-ingress
 * Istio for service finding and remove environmental variables.

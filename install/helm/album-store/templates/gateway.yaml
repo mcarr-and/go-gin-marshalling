@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ include "album-store.fullname" . }}-gateway
+  namespace: {{.Release.Namespace}}
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: {{.Values.istio.port}}
+        name: {{lower .Values.istio.protocol}}-{{.name}}
+        protocol: {{.Values.istio.protocol}}
+      hosts:
+        - "{{.Values.istio.host}}"

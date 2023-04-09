@@ -17,9 +17,26 @@ test:
 test-benchmark:
 	go test -bench=. -count 2 -run=^# -benchmem
 
+.PHONY: skaffold-helm-repos
+skaffold-helm-repos:
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts;
+	helm repo add jaegertracing       	https://jaegertracing.github.io/helm-charts;
+	helm repo add open-telemetry      	https://open-telemetry.github.io/opentelemetry-helm-charts;
+	helm repo add nginx-stable        	https://helm.nginx.com/stable;
+	helm repo add jaeger-all-in-one   	https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts;
+	helm repo add grafana             	https://grafana.github.io/helm-charts;
+	helm repo add istio               	https://istio-release.storage.googleapis.com/charts;
+	helm repo add kiali 				https://kiali.org/helm-charts
+	helm repo add argo                	https://argoproj.github.io/argo-helm;
+	helm repo update;
+
 .PHONY: skaffold-dev-k3d
 skaffold-dev-k3d:
 	skaffold dev -f install/skaffold.yaml -p k3d
+
+.PHONY: skaffold-infra-dev-k3d
+skaffold-infra-dev-k3d:
+	skaffold dev -f install/skaffold-infra.yaml -p k3d
 
 set-local-test:
 	$(eval url_value := http://localhost:9080)
@@ -72,7 +89,6 @@ eval-git-hash:
 	$(eval GIT_HASH:= $(shell git rev-parse --short HEAD))
 	echo $(GIT_HASH)
 
-
 .PHONY: docker-build-album
 docker-build-album: eval-git-hash
 	DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t album-store:0.1.1 -t album-store:latest .
@@ -86,43 +102,43 @@ docker-tag-k3d-registry-album: docker-build-album
 
 .PHONY: docker-build-proxy
 docker-build-proxy:
-	cd proxy && $(MAKE) docker-build-proxy && cd ..
+	pushd proxy && $(MAKE) docker-build-proxy && popd
 
 .PHONY: docker-tag-k3d-registry-proxy
 docker-tag-k3d-registry-proxy: docker-build-proxy
-	cd proxy && $(MAKE) docker-tag-k3d-registry-proxy && cd ..
+	pushd && $(MAKE) docker-tag-k3d-registry-proxy && popd
 
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment: docker-tag-k3d-registry-album
-	kubectl apply -f ./install/album-store-k3d-deployment.yaml
+	kubectl apply -f ./install/kubectl/album-store-k3d-deployment.yaml
 
 .PHONY: k3d-album-undeploy-deployment
 k3d-album-undeploy-deployment:
-	kubectl delete -f ./install/album-store-k3d-deployment.yaml
+	kubectl delete -f ./install/kubectl/album-store-k3d-deployment.yaml
 
 .PHONY: k3d-album-deploy-pod
 k3d-album-deploy-pod: docker-tag-k3d-registry-album
-	kubectl apply -f ./install/album-store-k3d-pod.yaml
+	kubectl apply -f ./install/kubectl/album-store-k3d-pod.yaml
 
 .PHONY: k3d-album-undeploy-pod
 k3d-album-undeploy-pod:
-	kubectl delete -f ./install/album-store-k3d-pod.yaml
+	kubectl delete -f ./install/kubectl/album-store-k3d-pod.yaml
 
 .PHONY: k3d-proxy-deploy-deployment
 k3d-proxy-deploy-deployment: docker-tag-k3d-registry-proxy
-	kubectl apply -f ./install/proxy-service-k3d-deployment.yaml
+	pushd proxy && make k3d-proxy-deploy-deployment && popd
 
 .PHONY: k3d-proxy-undeploy-deployment
 k3d-proxy-undeploy-deployment:
-	kubectl delete -f ./install/proxy-service-k3d-deployment.yaml
+	pushd proxy && make k3d-proxy-undeploy-deployment && popd
 
 .PHONY: k3d-proxy-deploy-pod
 k3d-proxy-deploy-pod: docker-tag-k3d-registry-proxy
-	kubectl apply -f ./install/proxy-service-k3d-pod.yaml
+	pushd proxy && make k3d-proxy-deploy-pod && popd
 
 .PHONY: k3d-proxy-undeploy-pod
 k3d-proxy-undeploy-pod:
-	kubectl delete -f proxy/proxy-service-k3d-pod.yaml
+	push proxy && make k3d-proxy-un	deploy-pod && popd
 
 setup-album-properties:
 	$(eval album_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)
@@ -167,6 +183,9 @@ k3d-cluster-create:
 	k3d cluster create k3s-default --config ./install/k3d-config.yaml
 	kubectl create namespace album-store
 	kubectl create namespace proxy-service
+	# add CRD for gateways
+	kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+  		{ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.6.1" | kubectl apply -f -; }
 
 .PHONY: k3d-cluster-delete
 k3d-cluster-delete:

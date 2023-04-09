@@ -63,27 +63,27 @@ docker-tag-k3d-registry-proxy: docker-build-proxy
 
 .PHONY: docker-build-album
 docker-build-album:
-	cd .. && $(MAKE) docker-build-album && cd proxy
+	pushd .. && $(MAKE) docker-build-album && popd
 
 .PHONY: docker-tag-k3d-registry-album
 docker-tag-k3d-registry-album:
-	cd .. && $(MAKE) docker-tag-k3d-registry-album && cd proxy
+	pushd .. && $(MAKE) docker-tag-k3d-registry-album && popd
 
 .PHONY: k3d-proxy-deploy-deployment
 k3d-proxy-deploy-deployment:
-	kubectl apply -f ../install/proxy-service-k3d-deployment.yaml
+	kubectl apply -f ../install/kubectl/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-undeploy-deployment
 k3d-proxy-undeploy-deployment:
-	kubectl delete -f ../install/proxy-service-k3d-deployment.yaml
+	kubectl delete -f ../install/kubectl/proxy-service-k3d-deployment.yaml
 
 .PHONY: k3d-proxy-deploy-pod
 k3d-proxy-deploy-pod:
-	kubectl apply -f ../install/proxy-service-k3d-pod.yaml
+	kubectl apply -f ../install/kubectl/proxy-service-k3d-pod.yaml
 
 .PHONY: k3d-proxy-undeploy-pod
 k3d-proxy-undeploy-pod:
-	kubectl delete -f ../install/proxy-service-k3d-pod.yaml
+	kubectl delete -f ../install/kubectl/proxy-service-k3d-pod.yaml
 
 setup-proxy-properties:
 	$(eval proxy_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=proxy-service-1)
@@ -109,7 +109,7 @@ local-start-proxy-grpc: build setup-proxy-properties
 
 .PHONY: local-start-album-grpc
 local-start-album-grpc: build setup-proxy-properties
-	cd ../ && $(proxy_setup) OTEL_LOCATION=localhost:4327 ./album-store && cd proxy
+	pushd ../ && $(proxy_setup) OTEL_LOCATION=localhost:4327 ./album-store && popd
 
 .PHONY: docker-stop
 docker-stop:
@@ -117,27 +117,27 @@ docker-stop:
 
 .PHONY: docker-compose-limited-start
 docker-compose-limited-start:
-	cd .. && $(MAKE) docker-compose-limited-start && cd proxy
+	pushd .. && $(MAKE) docker-compose-limited-start && popd
 
 .PHONY: skaffold-dev-k3d
 skaffold-dev-k3d:
-	cd .. && $(MAKE) skaffold-dev-k3d && cd proxy
+	pushd .. && $(MAKE) skaffold-dev-k3d && popd
 
 .PHONY: k3d-cluster-create
 k3d-cluster-create:
-	cd .. && $(MAKE) k3d-cluster-create && cd proxy
+	pushd .. && $(MAKE) k3d-cluster-create && popd
 
 .PHONY: k3d-cluster-delete
 k3d-cluster-create:
-	cd .. && $(MAKE) k3d-cluster-delete && cd proxy
+	pushd .. && $(MAKE) k3d-cluster-delete && popd
 
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment:
-	cd .. && $(MAKE) k3d-album-deploy-deployment && cd proxy
+	pushd .. && $(MAKE) k3d-album-deploy-deployment && popd
 
 .PHONY: k3d-album-undeploy-deployment
 k3d-album-undeploy-deployment:
-	cd .. && $(MAKE) k3d-album-undeploy-deployment && cd proxy
+	pushd .. && $(MAKE) k3d-album-undeploy-deployment && popd
 
 .PHONY: coverage
 coverage:

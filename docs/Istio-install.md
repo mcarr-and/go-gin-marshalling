@@ -15,6 +15,8 @@ Gateway + HttpRoute ?
 
 ??? When to use VirtualService vs HttpRoute for destination of gateway???
 
+VirtualService is for east west traffic.
+
 ### Notes 
 
 Must wait for the Gateway to be ready before creating the HttpRoute

@@ -9,6 +9,13 @@ WIP not currently running.
 
 TODO improve ths.
 
+
+
+`microk8s enable community;`
+
+`microk8s enable istio observability jaeger dashboard;`
+
+
 ## 0. ./kube/config with Microk8s
 
 ### 0.1 Setup Kube Config
