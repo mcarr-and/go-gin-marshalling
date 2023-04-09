@@ -53,6 +53,7 @@ deployment:
       value: "opentelemetry-collector.observability.svc.cluster.local:4318"
 
 istio:
+  enabled: true
   host: album-store.local
   gatewayPort: 80
   portNumber: 9080
