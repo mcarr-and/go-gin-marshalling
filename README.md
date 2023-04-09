@@ -57,7 +57,6 @@ Run the project with a local Kubernetes cluster with K3D.
 
 ## TODO 
 * Add documentation to use IDE with Docker-Compose?
-* Istio for service finding for Album-Store and Proxy-Service
 * Emit events when data is changed.
 * Adding CI server integration
 * Add open-telemetry to the istio-ingress so spans are created from the entry point to the cluster.
