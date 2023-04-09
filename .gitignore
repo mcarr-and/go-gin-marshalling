@@ -19,9 +19,6 @@
 
 /.kpt-pipeline
 
-# project binary
-go-gin-example
-
 #coverage informaiton
 coverage.*
 
@@ -30,5 +27,10 @@ coverage.*
 
 # vscode file
 __debug_bin
+
+# project binaries
 /album-store
 /proxy/proxy-service
+
+# skaffold single file ignore.
+install/skaffold-solo.yaml
