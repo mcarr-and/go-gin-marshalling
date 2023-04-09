@@ -1,0 +1,13 @@
+{{- range .Values.istio -}}
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{.name}}-destination-rule
+  namespace: {{.namespace}}
+spec:
+  host: {{.name}}
+  trafficPolicy:
+    tls:
+      mode: {{.tlsMode}}
+---
+{{- end -}} 

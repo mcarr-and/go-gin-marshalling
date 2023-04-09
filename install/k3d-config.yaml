@@ -6,6 +6,10 @@ ports:
   - port: 8070:80 # same as `--port '8070:80@loadbalancer'` # http default
     nodeFilters:
       - loadbalancer
+kubeAPI:
+  host: "0.0.0.0"
+  hostIP: "0.0.0.0"
+  hostPort: "6550"
 registries: # define how registries should be created or used
   create: # creates a default registry to be used with the cluster; same as `--registry-create registry.local`
     name: registry.local

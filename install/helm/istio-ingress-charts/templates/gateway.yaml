@@ -1,0 +1,18 @@
+{{- range .Values.istio -}}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{.name}}-gateway
+  namespace: {{.namespace}}
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: {{.port}}
+        name: {{lower .protocol}}-{{.name}}
+        protocol: {{.protocol}}
+      hosts:
+        - "{{.hosts}}"
+---
+{{- end -}}

@@ -1,7 +1,7 @@
 apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
-  name: ingress-nginx
+  name: istio
 profiles:
   - name: k3d
     activation:
@@ -9,12 +9,30 @@ profiles:
     deploy:
       helm:
         releases:
-          - name: ingress-nginx
-            remoteChart: ingress-nginx
-            repo: https://kubernetes.github.io/ingress-nginx
-            namespace: kube-system
+          - name: istio-base
+            remoteChart: base
+            repo: https://istio-release.storage.googleapis.com/charts
+            namespace: istio-system
             createNamespace: true
-            valuesFiles: ["./install/values/local/nginx-ingress.values.yaml"]
+            valuesFiles: ["./install/values/local/istio-base.values.yaml"]
+          - name: istiod
+            remoteChart: istiod
+            repo: https://istio-release.storage.googleapis.com/charts
+            namespace: istio-system
+            createNamespace: true
+            valuesFiles: ["./install/values/local/istio-istiod.values.yaml"]
+          - name: istio-ingressgateway
+            remoteChart: gateway
+            repo: https://istio-release.storage.googleapis.com/charts
+            namespace: istio-system
+            createNamespace: true
+            valuesFiles: ["./install/values/local/istio-gateway.values.yaml"]
+          - name: kiali
+            remoteChart: kiali-server
+            repo: https://kiali.org/helm-charts
+            namespace: istio-system
+            createNamespace: true
+            valuesFiles: ["./install/values/local/kiali-server.values.yaml"]
 ---
 apiVersion: skaffold/v4beta2
 kind: Config
@@ -46,7 +64,7 @@ profiles:
       helm:
         releases:
           - name: grafana-dashboards
-            #chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
+            # chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
             remoteChart: grafana-dashboards
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: proxy-service
@@ -129,6 +147,24 @@ profiles:
             namespace: kubernetes-dashboard
             createNamespace: true
             valuesFiles: ["./install/values/local/dashboard.values.yaml"]
+---
+apiVersion: skaffold/v4beta2
+kind: Config
+metadata:
+  name: istio-ingresses
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: istio-ingress-charts
+            chartPath: ./install/helm/istio-ingress-charts # comment out repoChart and repo to use local version
+            #  remoteChart: istio-ingress-charts
+            #  repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            namespace: default
+            valuesFiles: ["./install/values/local/istio-ingress.values.yaml"]
 ---
 apiVersion: skaffold/v4beta2
 kind: Config
