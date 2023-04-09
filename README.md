@@ -3,6 +3,9 @@ Use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework) &
 
 The project is a backend service that represents a music store with an in-memory database.
 
+WIP - adding Istio to cluster and wiring in the Album-Store and Proxy-Service. 
+
+
 ### OpenTelemetry Collector 
 
 Sends data to the following services:
@@ -27,7 +30,7 @@ Run the following, so you can see how the services work and produce nested OpenT
   make && make local-proxy-test;
 ```
 
-[Jaeger in docker-compose](http://localhost:16696/)
+[Jaeger in Docker-Compose](http://localhost:16696/)
 
 Pick the `proxy-service` from the `service` dropdown to see nested spans. 
 
