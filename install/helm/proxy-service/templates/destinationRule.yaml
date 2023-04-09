@@ -1,0 +1,10 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ include "proxy-service.fullname" . }}-destination-rule
+  namespace: {{.Release.Namespace}}
+spec:
+  host: {{ include "proxy-service.fullname" . }}
+  trafficPolicy:
+    tls:
+      mode: {{.Values.istio.tlsMode}}

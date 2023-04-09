@@ -1,9 +1,7 @@
 ## About
 Use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework) & [OpenTelemetry](https://opentelemetry.io/docs/) for Observability
 
-The project is a backend service that represents a music store with an in-memory database.
-
-WIP - adding Istio to cluster and wiring in the Album-Store and Proxy-Service. 
+The project is a backend service that represents a music store with an in-memory database. 
 
 
 ### OpenTelemetry Collector 

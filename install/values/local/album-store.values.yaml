@@ -54,29 +54,17 @@ deployment:
 
 istio:
   host: album-store.local
+  gatewayPort: 80
   portNumber: 9080
   protocol: HTTP
   tlsMode: DISABLE
 
 ingress:
   enabled: false
-  annotations:
+  annotations: {}
   # className: "nginx"
-  hosts:
-    []
-    # - host: album-store.local
-    #   paths:
-    #     - backend:
-    #         service:
-    #           name: album-store
-    #           port:
-    #             number: 9080
-    #       path: /
-    #       pathType: ImplementationSpecific
+  hosts: []
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources:
   requests:

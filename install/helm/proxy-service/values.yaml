@@ -58,6 +58,7 @@ deployment:
 
 istio:
   host: proxy-service.local
+  gatewayPort: 80
   portNumber: 9070
   protocol: HTTP
   tlsMode: DISABLE
