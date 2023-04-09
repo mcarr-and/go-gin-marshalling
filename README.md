@@ -27,10 +27,9 @@ Run the following, so you can see how the services work and produce nested OpenT
   make && make local-proxy-test;
 ```
 
-http://localhost:16696/ <- Jaeger to see spans. 
+[Jaeger in docker-compose](http://localhost:16696/)
 
 Pick the `proxy-service` from the `service` dropdown to see nested spans. 
-
 
 ## Running Project
 
@@ -57,23 +56,21 @@ Run the project with a local Kubernetes cluster with K3D.
 
 ## TODO 
 * Add documentation to use IDE with Docker-Compose?
-* Grafana dashboard to display the nginx-ingress
-* Istio for service finding and remove environmental variables.
+* Istio for service finding for Album-Store and Proxy-Service
 * Emit events when data is changed.
 * Adding CI server integration
-* Add open-telemetry to the ingress-nginx so spans are created from the entry point to the cluster.
+* Add open-telemetry to the istio-ingress so spans are created from the entry point to the cluster.
 * Contract tests compare swagger output to actual output
 * Async processing of requests 
 * Back pressure on APIs & rate limiting
 * Test data builder for creating hundreds of albums for pagination testing and load testing
 * pagination of get methods so can receive many and respond in chunks
 * Use a database as a data store
-* add open-telemetry observability to the database driver.
+  * add open-telemetry observability to the database driver.
+  * Helm chart add Database configuration
 * Database migration tooling via scripts 
 * Fuzz testing 
-* Helm chart add Database configuration
 * Terraform project into EKS or GKE
-* Run album store externally to Kubernetes with K3D cluster running OpenTelemetry(K3D) GO issue http2 frame too large.
 
 ## Bibliography of sites used for creating this project:
 
