@@ -160,8 +160,8 @@ profiles:
       helm:
         releases:
           - name: istio-ingress-charts
-            chartPath: ./install/helm/istio-ingress-charts # comment out repoChart and repo to use local version
-            #  remoteChart: istio-ingress-charts
-            #  repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            # chartPath: ./install/helm/istio-ingress-charts # comment out repoChart and repo to use local version
+            remoteChart: istio-ingress-charts
+            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: default
             valuesFiles: ["./install/values/local/istio-ingress.values.yaml"]
