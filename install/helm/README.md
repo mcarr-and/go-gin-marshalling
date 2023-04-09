@@ -5,6 +5,7 @@
 * Album Store
 * Proxy Service
 * Grafana Dashboards via Configmaps. Inspred by [Glenn De Haan's Grafana Helm](https://github.com/glenndehaan/charts/tree/master/charts/grafana-dashboards)
+* Istio Ingress charts
 
 ## Basic info
 Repository with k8s Helm repo.
@@ -16,11 +17,12 @@ Check out this example:
 ## Update Helm Repo
 
 ```bash
-cd helm
+cd install/helm
 #This will create tgz file with chart in charts directory
 helm package album-store -d charts; 
 helm package proxy-service -d charts;
 helm package grafana-dashboards -d charts;
+helm package istio-ingress-charts -d charts;
 #This will create index.yaml file which references album-store.yaml and proxy-service.yaml
 helm repo index ./charts; 
 git add *;

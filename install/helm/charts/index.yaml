@@ -3,7 +3,7 @@ entries:
   album-store:
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-10T16:38:54.944157Z"
+    created: "2023-04-09T23:02:18.332032+01:00"
     description: A Helm chart for Kubernetes
     digest: 57067c65ba78a3174dc206b4916c43c15275fa6e21f8f55741b0ac2942773d6f
     name: album-store
@@ -13,7 +13,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-10T16:38:54.942338Z"
+    created: "2023-04-09T23:02:18.331276+01:00"
     description: A Helm chart for Kubernetes
     digest: 38b7d581ac1f13771500ef56e075ea92bd2e54be6fa580d8f0c1431009d16e6c
     name: album-store
@@ -23,7 +23,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-02-10T16:38:54.939811Z"
+    created: "2023-04-09T23:02:18.330476+01:00"
     description: A Helm chart for Kubernetes
     digest: b65858f31838a62f8ae954f74b8ce9f5a227dd7ffe9405eaecc8299fed547610
     name: album-store
@@ -34,7 +34,7 @@ entries:
   grafana-dashboards:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-02-10T16:38:54.949188Z"
+    created: "2023-04-09T23:02:18.340172+01:00"
     description: A Helm chart that deploys my collection of Grafana dashboards
     digest: 31eae2fbc5d0dcabfd3161bb5962c1802cd038391f4c20548025730ebc57cc5d
     home: https://github.com/mcarr-and/go-gin-otelcollector
@@ -51,7 +51,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2023-02-10T16:38:54.947217Z"
+    created: "2023-04-09T23:02:18.333497+01:00"
     description: A Helm chart that deploys my collection of Grafana dashboards
     digest: ad070f8b565ca10f8c6b30baea8fe117d7795702728e69d618ff1e93853444a9
     home: https://github.com/mcarr-and/go-gin-otelcollector
@@ -66,10 +66,21 @@ entries:
     urls:
     - grafana-dashboards-1.0.1.tgz
     version: 1.0.1
+  istio-ingress-charts:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-04-09T23:02:18.34094+01:00"
+    description: A Helm chart for Kubernetes
+    digest: 4ed408fb32472b5771226f01340595393fbbf8aa701f10d9824579741c153147
+    name: istio-ingress-charts
+    type: application
+    urls:
+    - istio-ingress-charts-0.1.0.tgz
+    version: 0.1.0
   proxy-service:
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-10T16:38:54.956708Z"
+    created: "2023-04-09T23:02:18.343707+01:00"
     description: A Helm chart for Kubernetes
     digest: e4b3c9e84e6fcc8ce1783331467bdac3139a141b6353810260e12d877111b406
     name: proxy-service
@@ -79,7 +90,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2023-02-10T16:38:54.955263Z"
+    created: "2023-04-09T23:02:18.342518+01:00"
     description: A Helm chart for Kubernetes
     digest: 753148557025b6205c4ad593874aa9aeae139bdddb055d4ee7743836770d8e06
     name: proxy-service
@@ -89,7 +100,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2023-02-10T16:38:54.951669Z"
+    created: "2023-04-09T23:02:18.341744+01:00"
     description: A Helm chart for Kubernetes
     digest: 241607bc8be5c00154611b933198611e4ff29e7f8d0cc0ddeaff2aaaf9a7be16
     name: proxy-service
@@ -97,4 +108,4 @@ entries:
     urls:
     - proxy-service-0.1.0.tgz
     version: 0.1.0
-generated: "2023-02-10T16:38:54.93625Z"
+generated: "2023-04-09T23:02:18.327718+01:00"

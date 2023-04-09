@@ -62,26 +62,7 @@ istio:
 
 ingress:
   enabled: false
-  # annotations:
-  #   nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-  #   nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-  #   nginx.ingress.kubernetes.io/use-port-in-redirects: "true"
-  #   app.kubernetes.io/name: "album-store"
-  # className: "nginx"
-  # hosts:
-  #   - host: album-store.local
-  #     paths:
-  #       - backend:
-  #           service:
-  #             name: album-store
-  #             port:
-  #               number: 9080
-  #         path: /
-  #         pathType: ImplementationSpecific
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources:
   requests:
