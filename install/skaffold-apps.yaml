@@ -11,9 +11,10 @@ profiles:
       helm:
         releases:
           - name: album-store
-            chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
-#            remoteChart: album-store
-#            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
+            remoteChart: album-store
+            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            version: 0.1.2
             namespace: album-store
             createNamespace: true
             valuesFiles: ["./install/values/local/album-store.values.yaml"]
@@ -30,9 +31,10 @@ profiles:
       helm:
         releases:
           - name: proxy-service
-            chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
-#            remoteChart: proxy-service
-#            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            # chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
+            remoteChart: proxy-service
+            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            version: 0.1.2
             namespace: proxy-service
             createNamespace: true
             valuesFiles: ["./install/values/local/proxy-service.values.yaml"]

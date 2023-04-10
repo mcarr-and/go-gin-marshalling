@@ -17,8 +17,8 @@ rbac:
   create: true
   ## Use an existing ClusterRole/Role (depending on rbac.namespaced false/true)
   # useExistingRole: name-of-some-(cluster)role
-  pspEnabled: true
-  pspUseAppArmor: true
+  pspEnabled: false
+  pspUseAppArmor: false
   namespaced: false
   extraRoleRules: []
   # - apiGroups: []
@@ -121,13 +121,14 @@ extraConfigmapMounts:
   []
   # - name: certs-configmap
   #   mountPath: /etc/grafana/ssl/
-#   subPath: certificates.crt # (optional)
-#   configMap: certs-configmap
-#   readOnly: true
+  #   subPath: certificates.crt # (optional)
+  #   configMap: certs-configmap
+  #   readOnly: true
 
-extraEmptyDirMounts: []
-# - name: provisioning-notifiers
-#   mountPath: /etc/grafana/provisioning/notifiers
+extraEmptyDirMounts:
+  []
+  # - name: provisioning-notifiers
+  #   mountPath: /etc/grafana/provisioning/notifiers
 
 # Apply extra labels to common labels.
 extraLabels: {}
@@ -159,7 +160,7 @@ downloadDashboards:
 # podLabels: {}
 
 podPortName: grafana
-
+gossipPortName: gossip
 ## Deployment annotations
 # annotations: {}
 
@@ -171,8 +172,9 @@ service:
   enabled: true
   type: ClusterIP
   port: 80
-  targetPort: 3000
-  # targetPort: 4181 To be used with a proxy extraContainer
+  targetPort:
+    3000
+    # targetPort: 4181 To be used with a proxy extraContainer
   ## Service annotations. Can be templated.
   annotations: {}
   labels: {}
@@ -193,19 +195,21 @@ serviceMonitor:
   tlsConfig: {}
   scrapeTimeout: 30s
   relabelings: []
+  targetLabels: []
 
 extraExposePorts:
   []
   # - name: keycloak
-#   port: 8080
-#   targetPort: 8080
-#   type: ClusterIP
+  #   port: 8080
+  #   targetPort: 8080
+  #   type: ClusterIP
 
 # overrides pod.spec.hostAliases in the grafana deployment's pods
-hostAliases: []
-# - ip: "1.2.3.4"
-#   hostnames:
-#     - "my.host.com"
+hostAliases:
+  []
+  # - ip: "1.2.3.4"
+  #   hostnames:
+  #     - "my.host.com"
 
 ingress:
   enabled: true
@@ -383,6 +387,14 @@ admin:
 # - "sh"
 # - "/run.sh"
 
+## Optionally define args if command is used
+## Needed if using `hashicorp/envconsul` to manage secrets
+## By default no arguments are set
+# args:
+# - "-secret"
+# - "secret/grafana"
+# - "./grafana"
+
 ## Extra environment variables that will be pass onto deployment pods
 ##
 ## to provide grafana with access to CloudWatch on AWS EKS:
@@ -418,9 +430,9 @@ env: {}
 envValueFrom:
   {}
   #  ENV_NAME:
-#    configMapKeyRef:
-#      name: configmap-name
-#      key: value_key
+  #    configMapKeyRef:
+  #      name: configmap-name
+  #      key: value_key
 
 ## The name of a secret in the same kubernetes namespace which contain values to be added to the environment
 ## This can be useful for auth tokens, etc. Value is templated.
@@ -479,9 +491,9 @@ extraSecretMounts:
   #    driver: secrets-store.csi.k8s.io
   #    readOnly: true
   #    volumeAttributes:
-#      secretProviderClass: "akv-grafana-spc"
-#    nodePublishSecretRef:                       # Only required when using service principal mode
-#       name: grafana-akv-creds                  # Only required when using service principal mode
+  #      secretProviderClass: "akv-grafana-spc"
+  #    nodePublishSecretRef:                       # Only required when using service principal mode
+  #       name: grafana-akv-creds                  # Only required when using service principal mode
 
 ## Additional grafana server volume mounts
 # Defines additional volume mounts.
@@ -499,21 +511,26 @@ extraVolumeMounts:
   #   csi: true
   #   data:
   #     driver: secrets-store.csi.k8s.io
-#     readOnly: true
-#     volumeAttributes:
-#       secretProviderClass: "grafana-env-spc"
+  #     readOnly: true
+  #     volumeAttributes:
+  #       secretProviderClass: "grafana-env-spc"
 
 ## Container Lifecycle Hooks. Execute a specific bash command or make an HTTP request
-lifecycleHooks: {}
-# postStart:
-#   exec:
-#     command: []
+lifecycleHooks:
+  {}
+  # postStart:
+  #   exec:
+  #     command: []
 
 ## Pass the plugins you want installed as a list.
 ##
-plugins: []
-# - digrich-bubblechart-panel
-# - grafana-clock-panel
+plugins:
+  []
+  # - digrich-bubblechart-panel
+  # - grafana-clock-panel
+  ## You can also use other plugin download URL, as long as they are valid zip files,
+  ## and specify the name of the plugin after the semicolon. Like this:
+  # - https://grafana.com/api/plugins/marcusolsson-json-datasource/versions/1.3.2/download;marcusolsson-json-datasource
 
 ## Configure grafana datasources
 ## ref: http://docs.grafana.org/administration/provisioning/#datasources
@@ -539,7 +556,7 @@ datasources:
 #      type: cloudwatch
 #      access: proxy
 #      uid: cloudwatch
-#      editable: true
+#      editable: false
 #      jsonData:
 #        authType: default
 #        defaultRegion: us-east-1
@@ -606,9 +623,9 @@ alerting:
   #             severity: critical
   #             class: ping failure
   #             component: Grafana
-#             group: app-stack
-#             summary: |
-#               {{ `{{ include "default.message" . }}` }}
+  #             group: app-stack
+  #             summary: |
+  #               {{ `{{ include "default.message" . }}` }}
 
 ## Configure notifiers
 ## ref: http://docs.grafana.org/administration/provisioning/#alert-notification-channels
@@ -679,10 +696,10 @@ dashboardProviders:
 ##     RAW_JSON
 ##
 dashboardsConfigMaps:
-  jaeger: "charts-grafana-dashboards-jaeger-all-in-one"
-  golang: "charts-grafana-dashboards-golang"
-  prometheus: "charts-grafana-dashboards-prometheus"
-  otel-collector: "charts-grafana-dashboards-otel-collector"
+  jaeger: "grafana-dashboards-jaeger-all-in-one"
+  golang: "grafana-dashboards-golang"
+  prometheus: "grafana-dashboards-prometheus"
+  otel-collector: "grafana-dashboards-otel-collector"
 
 ## Configure grafana dashboard to import
 ## NOTE: To use dashboards you must also enable/configure dashboardProviders
@@ -715,6 +732,19 @@ dashboards:
   #   local-dashboard-bitbucket:
   #     url: https://example.com/repository/test-bitbucket.json
   #     bearerToken: ''
+  #   local-dashboard-azure:
+  #     url: https://example.com/repository/test-azure.json
+  #     basic: ''
+  #     acceptHeader: '*/*'
+
+## Reference to external ConfigMap per provider. Use provider name as key and ConfigMap name as value.
+## A provider dashboards must be defined either by external ConfigMaps or in values.yaml, not in both.
+## ConfigMap data example:
+##
+## data:
+##   example-dashboard.json: |
+##     RAW_JSON
+##
 
 ## Grafana's primary configuration
 ## NOTE: values in map will be converted to ini format
@@ -734,28 +764,28 @@ grafana.ini:
     url: https://grafana.net
   server:
     domain: "{{ if (and .Values.ingress.enabled .Values.ingress.hosts) }}{{ .Values.ingress.hosts | first }}{{ else }}''{{ end }}"
-    ## grafana Authentication can be enabled with the following values on grafana.ini
-    # server:
-    # The full public facing url you use in browser, used for redirects and emails
-  #    root_url:
-  # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
-  # auth.github:
-  #    enabled: false
-  #    allow_sign_up: false
-  #    scopes: user:email,read:org
-  #    auth_url: https://github.com/login/oauth/authorize
-  #    token_url: https://github.com/login/oauth/access_token
-  #    api_url: https://api.github.com/user
-  #    team_ids:
-  #    allowed_organizations:
-  #    client_id:
-  #    client_secret:
-  ## LDAP Authentication can be enabled with the following values on grafana.ini
-  ## NOTE: Grafana will fail to start if the value for ldap.toml is invalid
-  # auth.ldap:
-  #   enabled: true
-  #   allow_sign_up: true
-  #   config_file: /etc/grafana/ldap.toml
+## grafana Authentication can be enabled with the following values on grafana.ini
+# server:
+# The full public facing url you use in browser, used for redirects and emails
+#    root_url:
+# https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
+# auth.github:
+#    enabled: false
+#    allow_sign_up: false
+#    scopes: user:email,read:org
+#    auth_url: https://github.com/login/oauth/authorize
+#    token_url: https://github.com/login/oauth/access_token
+#    api_url: https://api.github.com/user
+#    team_ids:
+#    allowed_organizations:
+#    client_id:
+#    client_secret:
+## LDAP Authentication can be enabled with the following values on grafana.ini
+## NOTE: Grafana will fail to start if the value for ldap.toml is invalid
+# auth.ldap:
+#   enabled: true
+#   allow_sign_up: true
+#   config_file: /etc/grafana/ldap.toml
 
 ## Grafana's LDAP configuration
 ## Templated by the template in _helpers.tpl
@@ -795,7 +825,7 @@ smtp:
 sidecar:
   image:
     repository: quay.io/kiwigrid/k8s-sidecar
-    tag: 1.21.0
+    tag: 1.22.0
     sha: ""
   imagePullPolicy: IfNotPresent
   resources: {}
@@ -1108,6 +1138,11 @@ imageRenderer:
     tlsConfig: {}
     scrapeTimeout: 30s
     relabelings: []
+    # See: https://doc.crds.dev/github.com/prometheus-operator/kube-prometheus/monitoring.coreos.com/ServiceMonitor/v1@v0.11.0#spec-targetLabels
+    targetLabels:
+      []
+      # - targetLabel1
+      # - targetLabel2
   # If https is enabled in Grafana, this needs to be set as 'https' to correctly configure the callback used in Grafana
   grafanaProtocol: http
   # In case a sub_path is used this needs to be added to the image renderer callback
@@ -1191,10 +1226,9 @@ networkPolicy:
     enabled: false
     ##
     ## @param networkPolicy.egress.ports Add individual ports to be allowed by the egress
-    ports:
-      []
-      ## Add ports to the egress by specifying - port: <port number>
-      ## E.X.
+    ports: []
+    ## Add ports to the egress by specifying - port: <port number>
+    ## E.X.
     ## ports:
     ## - port: 80
     ## - port: 443
@@ -1217,7 +1251,6 @@ extraObjects:
   #     name: grafana-secrets
   #   spec:
   #     backendType: gcpSecretsManager
-#     data:
-#       - key: grafana-admin-password
-#         name: adminPassword
-
+  #     data:
+  #       - key: grafana-admin-password
+  #         name: adminPassword

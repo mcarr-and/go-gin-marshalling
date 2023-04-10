@@ -11,6 +11,7 @@ profiles:
         releases:
           - name: ingress-nginx
             remoteChart: ingress-nginx
+            version: 4.6.0
             repo: https://kubernetes.github.io/ingress-nginx
             namespace: kube-system
             createNamespace: true
@@ -29,6 +30,7 @@ profiles:
         releases:
           - name: prometheus
             remoteChart: prometheus
+            version: 20.2.0
             repo: https://prometheus-community.github.io/helm-charts
             namespace: monitoring
             createNamespace: true
@@ -46,10 +48,11 @@ profiles:
       helm:
         releases:
           - name: grafana-dashboards
-            #chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
+            # chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
             remoteChart: grafana-dashboards
+            version: 1.0.2
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
-            namespace: proxy-service
+            namespace: monitoring
             createNamespace: true
             valuesFiles:
               ["./install/values/local/grafana-dashboards.values.yaml"]
@@ -68,6 +71,7 @@ profiles:
         releases:
           - name: grafana
             remoteChart: grafana
+            version: 6.52.9
             repo: https://grafana.github.io/helm-charts
             namespace: monitoring
             createNamespace: true
@@ -86,6 +90,7 @@ profiles:
         releases:
           - name: jaeger-all-in-one
             remoteChart: jaeger-all-in-one
+            version: 0.1.8
             repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
             namespace: observability
             createNamespace: true
@@ -106,6 +111,7 @@ profiles:
         releases:
           - name: opentelemetry-collector
             remoteChart: opentelemetry-collector
+            version: 0.53.0
             repo: https://open-telemetry.github.io/opentelemetry-helm-charts
             namespace: observability
             createNamespace: true
@@ -125,6 +131,7 @@ profiles:
         releases:
           - name: kubernetes-dashboard
             remoteChart: kubernetes-dashboard
+            version: 6.0.6
             repo: https://kubernetes.github.io/dashboard/
             namespace: kubernetes-dashboard
             createNamespace: true
@@ -142,8 +149,9 @@ profiles:
       helm:
         releases:
           - name: album-store
-            #            chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
+            # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
             remoteChart: album-store
+            version: 0.1.2
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: album-store
             createNamespace: true
@@ -161,8 +169,9 @@ profiles:
       helm:
         releases:
           - name: proxy-service
-            #            chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
+            # chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
             remoteChart: proxy-service
+            version: 0.1.2
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: proxy-service
             createNamespace: true
