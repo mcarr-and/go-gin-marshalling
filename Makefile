@@ -91,14 +91,14 @@ eval-git-hash:
 
 .PHONY: docker-build-album
 docker-build-album: eval-git-hash
-	DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t album-store:0.1.1 -t album-store:latest .
+	DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t album-store:0.2.2 -t album-store:latest .
 
 .PHONY: docker-tag-k3d-registry-album
 docker-tag-k3d-registry-album: docker-build-album
 	docker tag album-store:latest localhost:54094/album-store:latest
-	docker tag album-store:0.1.1 localhost:54094/album-store:0.1.1
+	docker tag album-store:0.2.2 localhost:54094/album-store:0.2.2
 	docker push localhost:54094/album-store:latest
-	docker push localhost:54094/album-store:0.1.1
+	docker push localhost:54094/album-store:0.2.2
 
 .PHONY: docker-build-proxy
 docker-build-proxy:

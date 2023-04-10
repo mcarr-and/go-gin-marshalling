@@ -52,14 +52,14 @@ eval-git-hash:
 
 .PHONY: docker-build-proxy
 docker-build-proxy:eval-git-hash
-	 DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t proxy-service:0.1.1 -t proxy-service:latest  .
+	 DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t proxy-service:0.2.2 -t proxy-service:latest  .
 
 .PHONY: docker-tag-k3d-registry-proxy
 docker-tag-k3d-registry-proxy: docker-build-proxy
 	docker tag proxy-service:latest localhost:54094/proxy-service:latest
-	docker tag proxy-service:0.1.1 localhost:54094/proxy-service:0.1.1
+	docker tag proxy-service:0.2.2 localhost:54094/proxy-service:0.2.2
 	docker push localhost:54094/proxy-service:latest
-	docker push localhost:54094/proxy-service:0.1.1
+	docker push localhost:54094/proxy-service:0.2.2
 
 .PHONY: docker-build-album
 docker-build-album:
