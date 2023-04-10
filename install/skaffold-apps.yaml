@@ -1,23 +1,23 @@
---- # ---
-# apiVersion: skaffold/v4beta2
-# kind: Config
-# metadata:
-#   name: album-store
-# profiles:
-#   - name: k3d
-#     activation:
-#       - kubeContext: k3d-k3s-default
-#     deploy:
-#       helm:
-#         releases:
-#           - name: album-store
-#             version: 0.2.2
-#             # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
-#             remoteChart: album-store
-#             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
-#             namespace: album-store
-#             createNamespace: true
-#             valuesFiles: ["./install/values/local/album-store.values.yaml"]
+apiVersion: skaffold/v4beta2
+kind: Config
+metadata:
+  name: album-store
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: album-store
+            version: 0.2.2
+            # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
+            remoteChart: album-store
+            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            namespace: album-store
+            createNamespace: true
+            valuesFiles: ["./install/values/local/album-store.values.yaml"]
+---
 apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
