@@ -170,9 +170,9 @@ profiles:
       helm:
         releases:
           - name: istio-ingress-charts
+            version: 0.1.2
             # chartPath: ./install/helm/istio-ingress-charts # comment out repoChart and repo to use local version
             remoteChart: istio-ingress-charts
-            version: 0.1.1
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: default
             valuesFiles: ["./install/values/local/istio-ingress.values.yaml"]
@@ -190,9 +190,9 @@ profiles:
       helm:
         releases:
           - name: album-store
-            #            chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
-            remoteChart: album-store
+            # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
             version: 0.2.2
+            remoteChart: album-store
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: album-store
             createNamespace: true
@@ -210,9 +210,9 @@ profiles:
       helm:
         releases:
           - name: proxy-service
-            #            chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
-            remoteChart: proxy-service
+            # chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
             version: 0.2.2
+            remoteChart: proxy-service
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: proxy-service
             createNamespace: true

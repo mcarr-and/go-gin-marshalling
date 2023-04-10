@@ -9,7 +9,7 @@ spec:
     istio: ingressgateway
   servers:
     - port:
-        number: {{.port}}
+        number: {{.gatewayPort}}
         name: {{lower .protocol}}-{{.name}}
         protocol: {{.protocol}}
       hosts:

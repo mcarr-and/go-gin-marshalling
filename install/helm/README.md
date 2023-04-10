@@ -23,7 +23,6 @@ helm package album-store -d charts;
 helm package proxy-service -d charts;
 helm package grafana-dashboards -d charts;
 helm package istio-ingress-charts -d charts;
-#This will create index.yaml file which references album-store.yaml and proxy-service.yaml
 helm repo index ./charts; 
 git add *;
 git commit -m "helm chart updates"

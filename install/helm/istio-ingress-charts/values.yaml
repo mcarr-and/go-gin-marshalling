@@ -40,7 +40,7 @@ istio:
   - name: kiali
     hosts: "kiali.local"
     namespace: istio-system
-    port: 80
+    gatewayPort: 80
     protocol: HTTP
     tlsMode: DISABLE
     serviceName: kiali
@@ -48,7 +48,7 @@ istio:
   - name: kubernetes-dashboard
     namespace: kubernetes-dashboard
     hosts: "k-dashboard.local"
-    port: 80
+    gatewayPort: 80
     protocol: HTTP
     tlsMode: DISABLE
     serviceName: kubernetes-dashboard
@@ -56,7 +56,7 @@ istio:
   - name: grafana
     namespace: monitoring
     hosts: "grafana.local"
-    port: 80
+    gatewayPort: 80
     protocol: HTTP
     tlsMode: DISABLE
     serviceName: grafana
@@ -64,7 +64,7 @@ istio:
   - name: prometheus
     namespace: monitoring
     hosts: "prometheus.local"
-    port: 80
+    gatewayPort: 80
     protocol: HTTP
     tlsMode: DISABLE
     serviceName: prometheus-server
