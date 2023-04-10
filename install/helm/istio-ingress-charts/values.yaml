@@ -38,8 +38,8 @@ service:
 
 istio:
   - name: kiali
-    hosts: "kiali.local"
     namespace: istio-system
+    hosts: "kiali.local"
     gatewayPort: 80
     protocol: HTTP
     tlsMode: DISABLE
@@ -72,7 +72,7 @@ istio:
   - name: jaeger
     namespace: observability
     hosts: "jaeger.local"
-    port: 80
+    gatewayPort: 80
     protocol: HTTP
     tlsMode: DISABLE
     serviceName: jaeger-all-in-one
