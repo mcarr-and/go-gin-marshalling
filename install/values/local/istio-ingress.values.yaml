@@ -43,40 +43,40 @@ istio:
     port: 80
     protocol: HTTP
     tlsMode: DISABLE
-    httpRouteDestinationHost: kiali
-    httpRouteDesitnationPortNumber: 20001
+    serviceName: kiali
+    servicePort: 20001
   - name: kubernetes-dashboard
     namespace: kubernetes-dashboard
     hosts: "k-dashboard.local"
     port: 80
     protocol: HTTP
     tlsMode: DISABLE
-    httpRouteDestinationHost: kubernetes-dashboard
-    httpRouteDesitnationPortNumber: 9090
+    serviceName: kubernetes-dashboard
+    servicePort: 9090
   - name: grafana
     namespace: monitoring
     hosts: "grafana.local"
     port: 80
     protocol: HTTP
     tlsMode: DISABLE
-    httpRouteDestinationHost: grafana
-    httpRouteDesitnationPortNumber: 80
+    serviceName: grafana
+    servicePort: 80
   - name: prometheus
     namespace: monitoring
     hosts: "prometheus.local"
     port: 80
     protocol: HTTP
     tlsMode: DISABLE
-    httpRouteDestinationHost: prometheus-server
-    httpRouteDesitnationPortNumber: 80
+    serviceName: prometheus-server
+    servicePort: 80
   - name: jaeger
     namespace: observability
     hosts: "jaeger.local"
     port: 80
     protocol: HTTP
     tlsMode: DISABLE
-    httpRouteDestinationHost: jaeger-all-in-one
-    httpRouteDesitnationPortNumber: 16686
+    serviceName: jaeger-all-in-one
+    servicePort: 16686
 
 resources:
   {}

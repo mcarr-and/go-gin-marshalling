@@ -11,24 +11,28 @@ profiles:
         releases:
           - name: istio-base
             remoteChart: base
+            version: 1.17.2
             repo: https://istio-release.storage.googleapis.com/charts
             namespace: istio-system
             createNamespace: true
             valuesFiles: ["./install/values/local/istio-base.values.yaml"]
           - name: istiod
             remoteChart: istiod
+            version: 1.17.2
             repo: https://istio-release.storage.googleapis.com/charts
             namespace: istio-system
             createNamespace: true
             valuesFiles: ["./install/values/local/istio-istiod.values.yaml"]
           - name: istio-ingressgateway
             remoteChart: gateway
+            version: 1.17.2
             repo: https://istio-release.storage.googleapis.com/charts
             namespace: istio-system
             createNamespace: true
             valuesFiles: ["./install/values/local/istio-gateway.values.yaml"]
           - name: kiali
             remoteChart: kiali-server
+            version: 1.66.0
             repo: https://kiali.org/helm-charts
             namespace: istio-system
             createNamespace: true
@@ -47,6 +51,7 @@ profiles:
         releases:
           - name: prometheus
             remoteChart: prometheus
+            version: 20.2.0
             repo: https://prometheus-community.github.io/helm-charts
             namespace: monitoring
             createNamespace: true
@@ -66,8 +71,9 @@ profiles:
           - name: grafana-dashboards
             # chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
             remoteChart: grafana-dashboards
+            version: 1.0.2
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
-            namespace: proxy-service
+            namespace: monitoring
             createNamespace: true
             valuesFiles:
               ["./install/values/local/grafana-dashboards.values.yaml"]
@@ -86,6 +92,7 @@ profiles:
         releases:
           - name: grafana
             remoteChart: grafana
+            version: 6.52.9
             repo: https://grafana.github.io/helm-charts
             namespace: monitoring
             createNamespace: true
@@ -104,6 +111,7 @@ profiles:
         releases:
           - name: jaeger-all-in-one
             remoteChart: jaeger-all-in-one
+            version: 0.1.8
             repo: https://raw.githubusercontent.com/hansehe/jaeger-all-in-one/master/helm/charts
             namespace: observability
             createNamespace: true
@@ -124,6 +132,7 @@ profiles:
         releases:
           - name: opentelemetry-collector
             remoteChart: opentelemetry-collector
+            version: 0.53.0
             repo: https://open-telemetry.github.io/opentelemetry-helm-charts
             namespace: observability
             createNamespace: true
@@ -143,6 +152,7 @@ profiles:
         releases:
           - name: kubernetes-dashboard
             remoteChart: kubernetes-dashboard
+            version: 6.0.6
             repo: https://kubernetes.github.io/dashboard/
             namespace: kubernetes-dashboard
             createNamespace: true
@@ -162,9 +172,11 @@ profiles:
           - name: istio-ingress-charts
             # chartPath: ./install/helm/istio-ingress-charts # comment out repoChart and repo to use local version
             remoteChart: istio-ingress-charts
+            version: 0.1.1
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: default
             valuesFiles: ["./install/values/local/istio-ingress.values.yaml"]
+
 ---
 apiVersion: skaffold/v4beta2
 kind: Config
@@ -180,6 +192,7 @@ profiles:
           - name: album-store
             #            chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
             remoteChart: album-store
+            version: 0.2.2
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: album-store
             createNamespace: true
@@ -199,6 +212,7 @@ profiles:
           - name: proxy-service
             #            chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
             remoteChart: proxy-service
+            version: 0.2.2
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: proxy-service
             createNamespace: true

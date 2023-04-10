@@ -12,8 +12,8 @@ spec:
   http:
     - route:
         - destination:
-            host: {{.httpRouteDestinationHost}}
+            host: {{.serviceName}}
             port:
-              number: {{.httpRouteDesitnationPortNumber}}
+              number: {{.servicePort}}
 ---
 {{- end -}}
