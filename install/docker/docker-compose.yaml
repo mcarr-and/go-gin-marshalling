@@ -1,5 +1,6 @@
 version: "3.9"
-x-default-logging: &logging
+x-default-logging:
+  &logging
   driver: "json-file"
   options:
     max-size: "5m"
@@ -33,7 +34,8 @@ services:
     image: otel/opentelemetry-collector-contrib:latest
     restart: always
     command:
-      [ "--config=/etc/otel-collector-config.yaml",
+      [
+        "--config=/etc/otel-collector-config.yaml",
         "--config=/etc/otel-collector-config-extras.yaml"
       ]
     volumes:
@@ -91,8 +93,6 @@ services:
       - OTEL_LOCATION=otel-collector:4318
       - NAMESPACE=default
       - INSTANCE_NAME=album-store-1
-      - GRPC_GO_LOG_SEVERITY_LEVEL=99
-      - GRPC_GO_LOG_VERBOSITY_LEVEL=info
     ports:
       - "9080:9080"
     depends_on:
@@ -108,8 +108,6 @@ services:
       - OTEL_LOCATION=otel-collector:4318
       - NAMESPACE=default
       - INSTANCE_NAME=proxy-service-1
-      - GRPC_GO_LOG_SEVERITY_LEVEL=99
-      - GRPC_GO_LOG_VERBOSITY_LEVEL=info
       - ALBUM_STORE_URL=http://album-store:9080
     ports:
       - "9070:9070"

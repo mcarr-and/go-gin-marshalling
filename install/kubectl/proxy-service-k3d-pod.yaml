@@ -43,7 +43,7 @@ metadata:
 spec:
   containers:
     - name: "proxy-service"
-      image: registry.local:54094/proxy-service:0.1 # use the cluster internal name to reference registry
+      image: registry.local:54094/proxy-service:0.2.2do # use the cluster internal name to reference registry
       imagePullPolicy: Always
       env:
         - name: INSTANCE_NAME
