@@ -19,8 +19,8 @@ Cluster must have the following deployed
 
 ## Docker-Compose
 
-[Docker-Compose](Run-Docker-Compose-Limited.md)
+[Docker-Compose](../docs/Run-Docker-Compose-Install-Limited.md)
 
 # K3d Run
 
-[k3D install service ](Run-K3D-Install.md)
+[k3D install service ](../docs/K3D-run.md)

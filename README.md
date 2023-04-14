@@ -48,7 +48,7 @@ Pick the `proxy-service` from the `service` dropdown to see nested spans.
 
 Run the project with a local Kubernetes cluster with K3D. 
 
-[Local Kubernetes with K3D instructions](docs/Run-K3D.md)
+[Local Kubernetes with K3D instructions](docs/K3D-run.md)
 
 [K3D and using local registry](docs/K3D-registry.md)
 
