@@ -53,3 +53,31 @@ data:
 {{ .Files.Get "dashboards/otel-collector.json" | indent 4 }}
 ---
 {{- end }}
+
+{{- if .Values.dashboards.albumStore -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-album-store
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  album-store.json: |-
+{{ .Files.Get "dashboards/album-store.json" | indent 4 }}
+---
+{{- end }}
+
+{{- if .Values.dashboards.proxyService -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "grafana-dashboards.fullname" . }}-proxy-service
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  proxy-service.json: |-
+{{ .Files.Get "dashboards/proxy-service.json" | indent 4 }}
+---
+{{- end }}
