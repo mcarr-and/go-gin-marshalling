@@ -54,30 +54,30 @@ data:
 ---
 {{- end }}
 
-{{- if .Values.dashboards.kafka -}}
+{{- if .Values.dashboards.albumStore -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "grafana-dashboards.fullname" . }}-kafka
+  name: {{ include "grafana-dashboards.fullname" . }}-album-store
   labels:
     {{- include "grafana-dashboards.labels" . | nindent 4 }}
     grafana_dashboard: "1"
 data:
-  kafka.json: |-
-{{ .Files.Get "dashboards/kafka.json" | indent 4 }}
+  album-store.json: |-
+{{ .Files.Get "dashboards/album-store.json" | indent 4 }}
 ---
 {{- end }}
 
-{{- if .Values.dashboards.zookeeper -}}
+{{- if .Values.dashboards.proxyService -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "grafana-dashboards.fullname" . }}-zookeeper
+  name: {{ include "grafana-dashboards.fullname" . }}-proxy-service
   labels:
     {{- include "grafana-dashboards.labels" . | nindent 4 }}
     grafana_dashboard: "1"
 data:
-  zookeeper.json: |-
-{{ .Files.Get "dashboards/zookeeper.json" | indent 4 }}
+  proxy-service.json: |-
+{{ .Files.Get "dashboards/proxy-service.json" | indent 4 }}
 ---
 {{- end }}

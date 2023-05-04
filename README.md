@@ -1,7 +1,12 @@
 ## About
 Use the [Go Gin framework](https://github.com/gin-gonic/gin#gin-web-framework) & [OpenTelemetry](https://opentelemetry.io/docs/) for Observability
 
-The project is a backend service that represents a music store with an in-memory database.
+The project is a backend service that represents a music store with an in-memory database. 
+
+
+Istio ingress and networking on the [main branch](https://github.com/mcarr-and/go-gin-otelcollector/tree/main)
+
+Nginx-ingress ingress and networking is on the [nginx-ingress branch](https://github.com/mcarr-and/go-gin-otelcollector/tree/nginx-ingress)
 
 ### OpenTelemetry Collector 
 
