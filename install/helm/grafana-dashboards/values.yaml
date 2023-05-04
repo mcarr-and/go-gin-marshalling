@@ -16,7 +16,3 @@ dashboards:
   golang: true
   # -- Toggles the otelCollector dashboards
   otelCollector: true
-  # -- Toggles the kafka dashboards
-  kafka: true
-  # -- Toggles the zookeeper dashboards
-  zookeeper: true

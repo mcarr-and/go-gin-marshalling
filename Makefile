@@ -141,10 +141,10 @@ k3d-proxy-undeploy-pod:
 	push proxy && make k3d-proxy-un	deploy-pod && popd
 
 setup-album-properties:
-	$(eval album_setup := GRPC_GO_LOG_SEVERITY_LEVEL=info GRPC_GO_LOG_VERBOSITY_LEVEL=99 NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)
+	$(eval album_setup := NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)
 
 setup-album-docker-properties:
-	$(eval album_setup := -e GRPC_GO_LOG_SEVERITY_LEVEL=info -e GRPC_GO_LOG_VERBOSITY_LEVEL=99 -e NAMESPACE=no-namespace -e INSTANCE_NAME=album-store-1)
+	$(eval album_setup := -e NAMESPACE=no-namespace -e INSTANCE_NAME=album-store-1)
 
 .PHONY: docker-k3d-start
 docker-k3d-start: docker-build-album setup-album-docker-properties

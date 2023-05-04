@@ -59,7 +59,8 @@ Run the project with a local Kubernetes cluster with K3D.
 [Local Kubernetes with Microk8s instructions](docs/Microk8s-Install.md)
 
 
-## TODO 
+## TODO
+* Add istio open telemetry configuration ConfigMap & Telemetry. ? ServiceEntry & Gateway(egressgateway) - staying in cluster so not clear?  
 * Add documentation to use IDE with Docker-Compose?
 * Emit events when data is changed.
 * Adding CI server integration

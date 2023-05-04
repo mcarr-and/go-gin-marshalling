@@ -1,6 +1,6 @@
 apiVersion: v2
 name: grafana-dashboards
-description: A Helm chart that deploys my collection of Grafana dashboards
+description: Collection of grafana dashboards for go, jaeger, otel-collector, and prometheus
 home: https://github.com/mcarr-and/go-gin-otelcollector
 keywords:
   - kubernetes
@@ -22,7 +22,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.0.2
+version: 1.0.3
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to

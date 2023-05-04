@@ -1,6 +1,6 @@
 apiVersion: v2
 name: album-store
-description: Chart for Album-Store go example
+description: Chart for Album-Store go application
 
 # A chart can be either an 'application' or a 'library' chart.
 #
