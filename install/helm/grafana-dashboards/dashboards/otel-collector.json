@@ -3,26 +3,39 @@
         "list": [
             {
                 "builtIn": 1,
-                "datasource": "grafana",
+                "datasource": {
+                    "type": "datasource",
+                    "uid": "grafana"
+                },
                 "enable": true,
                 "hide": true,
                 "iconColor": "rgba(0, 211, 255, 1)",
                 "name": "Annotations & Alerts",
+                "target": {
+                    "limit": 100,
+                    "matchAny": false,
+                    "tags": [],
+                    "type": "dashboard"
+                },
                 "type": "dashboard"
             }
         ]
     },
     "description": "Provides information about the status of the OpenTelemetry Collector",
     "editable": true,
+    "fiscalYearStartMonth": 0,
     "gnetId": 12553,
     "graphTooltip": 0,
-    "id": 22,
-    "iteration": 1593502896956,
+    "id": 10,
     "links": [],
+    "liveNow": false,
     "panels": [
         {
             "collapsed": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "gridPos": {
                 "h": 1,
                 "w": 24,
@@ -31,6 +44,15 @@
             },
             "id": 23,
             "panels": [],
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "refId": "A"
+                }
+            ],
             "title": "Receivers",
             "type": "row"
         },
@@ -39,11 +61,14 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "description": "Rate of spans successfully accepted vs refused per second",
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -72,9 +97,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -84,24 +110,34 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_receiver_accepted_spans{receiver=~\"$receiver\"}[1m])) by (receiver)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_receiver_accepted_spans{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "{{receiver}} spans accepted / sec",
+                    "range": true,
                     "refId": "A"
                 },
                 {
-                    "expr": "sum(rate(otelcol_receiver_refused_spans{receiver=~\"$receiver\"}[1m])) by (receiver)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_receiver_refused_spans{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{ receiver }} spans refused /sec",
+                    "range": true,
                     "refId": "B"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Spans Accepted vs Refused /Second",
             "tooltip": {
                 "shared": true,
@@ -110,33 +146,25 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
                     "min": "0",
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -144,11 +172,14 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "description": "Rate of metrics successfully accepted vs refused per second",
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -177,9 +208,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -189,7 +221,11 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_receiver_accepted_metric_points{receiver=~\"$receiver\"}[1m])) by (receiver)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "sum(rate(otelcol_receiver_accepted_metric_points{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
@@ -197,16 +233,18 @@
                     "refId": "A"
                 },
                 {
-                    "expr": "sum(rate(otelcol_receiver_refused_metric_points{receiver=~\"$receiver\"}[1m])) by (receiver)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "sum(rate(otelcol_receiver_refused_metric_points{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{ receiver }} refused / sec",
                     "refId": "B"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Metrics Accepted vs Refused Received/Second",
             "tooltip": {
                 "shared": true,
@@ -215,38 +253,33 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
                     "min": "0",
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
             "collapsed": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "gridPos": {
                 "h": 1,
                 "w": 24,
@@ -255,6 +288,15 @@
             },
             "id": 25,
             "panels": [],
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "refId": "A"
+                }
+            ],
             "title": "Exporters",
             "type": "row"
         },
@@ -263,11 +305,14 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "description": "Rate of spans successfully exported vs Failed per second",
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -296,9 +341,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -308,7 +354,11 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_exporter_sent_spans{exporter=~\"$exporter\"}[1m])) by (exporter)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "sum(rate(otelcol_exporter_sent_spans{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
@@ -316,16 +366,18 @@
                     "refId": "A"
                 },
                 {
-                    "expr": "sum(rate(otelcol_exporter_send_failed_spans{exporter=~\"$exporter\"}[1m])) by (exporter)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "sum(rate(otelcol_exporter_send_failed_spans{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{ exporter }} failed /sec",
                     "refId": "B"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Spans Exported vs Failed / Second",
             "tooltip": {
                 "shared": true,
@@ -334,33 +386,25 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
                     "min": "0",
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -368,11 +412,14 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "description": "Rate of timeseries successfully exported per second",
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -401,9 +448,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -413,7 +461,11 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_exporter_sent_metric_points{exporter=~\"$exporter\"}[1m])) by (exporter)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "sum(rate(otelcol_exporter_sent_metric_points{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
@@ -421,16 +473,20 @@
                     "refId": "A"
                 },
                 {
-                    "expr": "sum(rate(otelcol_exporter_send_failed_metric_points{exporter=~\"$exporter\"}[1m])) by (exporter)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_exporter_send_failed_metric_points{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{ exporter }} failed / sec",
+                    "range": true,
                     "refId": "B"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Metrics Exported vs failed /Second",
             "tooltip": {
                 "shared": true,
@@ -439,59 +495,39 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
                     "min": "0",
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
-        },
-        {
-            "collapsed": false,
-            "datasource": "prometheus",
-            "gridPos": {
-                "h": 1,
-                "w": 24,
-                "x": 0,
-                "y": 20
-            },
-            "id": 21,
-            "panels": [],
-            "repeat": null,
-            "title": "Processors",
-            "type": "row"
         },
         {
             "aliasColors": {},
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -501,7 +537,7 @@
                 "h": 9,
                 "w": 8,
                 "x": 0,
-                "y": 21
+                "y": 20
             },
             "hiddenSeries": false,
             "id": 10,
@@ -519,9 +555,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -531,19 +568,23 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "max(otelcol_processor_queued_retry_queue_length)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "max(otelcol_exporter_queue_size)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "Queue Length",
+                    "range": true,
                     "refId": "A"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
-            "title": "Queued Retry Max Queue Length",
+            "title": "Queue Length",
             "tooltip": {
                 "shared": true,
                 "sort": 0,
@@ -551,33 +592,24 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -585,10 +617,13 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -598,104 +633,7 @@
                 "h": 9,
                 "w": 8,
                 "x": 8,
-                "y": 21
-            },
-            "hiddenSeries": false,
-            "id": 11,
-            "legend": {
-                "avg": false,
-                "current": false,
-                "max": false,
-                "min": false,
-                "show": true,
-                "total": false,
-                "values": false
-            },
-            "lines": true,
-            "linewidth": 1,
-            "links": [],
-            "nullPointMode": "null",
-            "options": {
-                "dataLinks": []
-            },
-            "percentage": false,
-            "pointradius": 5,
-            "points": false,
-            "renderer": "flot",
-            "seriesOverrides": [],
-            "spaceLength": 10,
-            "stack": false,
-            "steppedLine": false,
-            "targets": [
-                {
-                    "expr": "sum(otelcol_processor_queued_retry_queue_latency_sum/ otelcol_processor_queued_retry_queue_latency_count)",
-                    "format": "time_series",
-                    "interval": "",
-                    "intervalFactor": 1,
-                    "legendFormat": "ms",
-                    "refId": "A"
-                }
-            ],
-            "thresholds": [],
-            "timeFrom": null,
-            "timeRegions": [],
-            "timeShift": null,
-            "title": "Queued Retry Processor In-queue Latency (ms)",
-            "tooltip": {
-                "shared": true,
-                "sort": 0,
-                "value_type": "individual"
-            },
-            "type": "graph",
-            "xaxis": {
-                "buckets": null,
-                "mode": "time",
-                "name": null,
-                "show": true,
-                "values": []
-            },
-            "yaxes": [
-                {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                },
-                {
-                    "format": "short",
-                    "label": null,
-                    "logBase": 1,
-                    "max": null,
-                    "min": null,
-                    "show": true
-                }
-            ],
-            "yaxis": {
-                "align": false,
-                "alignLevel": null
-            }
-        },
-        {
-            "aliasColors": {},
-            "bars": false,
-            "dashLength": 10,
-            "dashes": false,
-            "datasource": "prometheus",
-            "fieldConfig": {
-                "defaults": {
-                    "custom": {}
-                },
-                "overrides": []
-            },
-            "fill": 1,
-            "fillGradient": 0,
-            "gridPos": {
-                "h": 9,
-                "w": 8,
-                "x": 16,
-                "y": 21
+                "y": 20
             },
             "hiddenSeries": false,
             "id": 32,
@@ -713,9 +651,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -725,18 +664,22 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(otelcol_processor_queued_retry_send_latency_sum/ otelcol_processor_queued_retry_send_latency_count)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(otelcol_receiver_accepted_spans /  otelcol_exporter_send_failed_spans)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "ms",
+                    "range": true,
                     "refId": "A"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Queued Retry Processor Send Latency (ms)",
             "tooltip": {
                 "shared": true,
@@ -745,44 +688,64 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
+        },
+        {
+            "collapsed": false,
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 29
+            },
+            "id": 21,
+            "panels": [],
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "refId": "A"
+                }
+            ],
+            "title": "Processors",
+            "type": "row"
         },
         {
             "aliasColors": {},
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -810,9 +773,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -822,36 +786,46 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_processor_spans_received{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_processor_accepted_spans{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "{{processor}} | received",
+                    "range": true,
                     "refId": "A"
                 },
                 {
-                    "expr": "sum(rate(otelcol_processor_spans_dropped{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_processor_dropped_spans{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{processor}} | dropped",
+                    "range": true,
                     "refId": "B"
                 },
                 {
-                    "expr": "sum(rate(otelcol_processor_accepted_spans{processor=~\"$processor\"}[1m])) by (processor)",
-                    "interval": "",
-                    "legendFormat": "{{processor}} | accepted",
-                    "refId": "C"
-                },
-                {
-                    "expr": "sum(rate(otelcol_processor_refused_spans{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_processor_refused_spans{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{processor}} | refused",
+                    "range": true,
                     "refId": "E"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Processor Spans Received, Dropped, Accepted, Refused/Second",
             "tooltip": {
                 "shared": true,
@@ -860,34 +834,25 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
-                    "decimals": null,
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
                     "min": "0",
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -895,10 +860,13 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -926,9 +894,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -938,25 +907,35 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_processor_queued_retry_success_send{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_receiver_accepted_spans{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "hide": false,
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "{{processor}}",
+                    "range": true,
                     "refId": "A"
                 },
                 {
-                    "expr": "sum(rate(otelcol_processor_queued_retry_fail_send{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_exporter_send_failed_spans{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{processor}}",
+                    "range": true,
                     "refId": "B"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "QueuedRetry Successful vs Failed Sent/Second",
             "tooltip": {
                 "shared": true,
@@ -965,33 +944,24 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -999,10 +969,13 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -1031,9 +1004,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -1043,19 +1017,23 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_processor_spans_received{processor=~\"$processor\"}[1m]) / rate(otelcol_processor_batches_received{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_receiver_accepted_spans{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "hide": false,
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "{{processor}}",
+                    "range": true,
                     "refId": "A"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Spans per Batch (avg from rates)",
             "tooltip": {
                 "shared": true,
@@ -1064,33 +1042,24 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -1098,10 +1067,13 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -1130,9 +1102,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -1142,7 +1115,11 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(rate(otelcol_processor_batches_received{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "sum(rate(otelcol_processor_accepted_spans{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "interval": "",
                     "intervalFactor": 1,
@@ -1150,16 +1127,18 @@
                     "refId": "A"
                 },
                 {
-                    "expr": "sum(rate(otelcol_processor_trace_batches_dropped{processor=~\"$processor\"}[1m])) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "expr": "sum(rate(otelcol_processor_refused_spans{service=~\"$service\"}[2m])) by (service)",
                     "interval": "",
                     "legendFormat": "{{processor}} | trace dropped",
                     "refId": "B"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Batches Received vs Dropped /Second",
             "tooltip": {
                 "shared": true,
@@ -1168,33 +1147,24 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -1202,10 +1172,13 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -1234,9 +1207,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -1246,19 +1220,23 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(otelcol_processor_queued_retry_success_send{processor=~\"$processor\"}) by (processor)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_receiver_accepted_spans{service=~\"$service\"} [2m])) by (service)",
                     "format": "time_series",
                     "hide": false,
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "{{processor}}",
+                    "range": true,
                     "refId": "A"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Successful Batches Sent Cumulative",
             "tooltip": {
                 "shared": true,
@@ -1267,33 +1245,25 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
                     "min": "0",
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         },
         {
@@ -1301,10 +1271,13 @@
             "bars": false,
             "dashLength": 10,
             "dashes": false,
-            "datasource": "prometheus",
+            "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+            },
             "fieldConfig": {
                 "defaults": {
-                    "custom": {}
+                    "links": []
                 },
                 "overrides": []
             },
@@ -1332,9 +1305,10 @@
             "links": [],
             "nullPointMode": "null",
             "options": {
-                "dataLinks": []
+                "alertThreshold": true
             },
             "percentage": false,
+            "pluginVersion": "9.4.7",
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
@@ -1344,19 +1318,23 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "sum(otelcol_processor_spans_received{exporter=~\"$exporter\"}) by (exporter)",
+                    "datasource": {
+                        "type": "prometheus",
+                        "uid": "prometheus"
+                    },
+                    "editorMode": "code",
+                    "expr": "sum(rate(otelcol_exporter_queue_size{service=~\"$service\"}[2m])) by (service)",
                     "format": "time_series",
                     "hide": false,
                     "interval": "",
                     "intervalFactor": 1,
                     "legendFormat": "{{exporter}}",
+                    "range": true,
                     "refId": "A"
                 }
             ],
             "thresholds": [],
-            "timeFrom": null,
             "timeRegions": [],
-            "timeShift": null,
             "title": "Enqueued Spans Cumulative",
             "tooltip": {
                 "shared": true,
@@ -1365,38 +1343,30 @@
             },
             "type": "graph",
             "xaxis": {
-                "buckets": null,
                 "mode": "time",
-                "name": null,
                 "show": true,
                 "values": []
             },
             "yaxes": [
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 },
                 {
                     "format": "short",
-                    "label": null,
                     "logBase": 1,
-                    "max": null,
-                    "min": null,
                     "show": true
                 }
             ],
             "yaxis": {
-                "align": false,
-                "alignLevel": null
+                "align": false
             }
         }
     ],
-    "refresh": false,
-    "schemaVersion": 25,
+    "refresh": "",
+    "revision": 1,
+    "schemaVersion": 38,
     "style": "dark",
     "tags": [
         "opentelemetry"
@@ -1404,87 +1374,17 @@
     "templating": {
         "list": [
             {
-                "allValue": ".*",
-                "current": {
-                    "selected": false,
-                    "text": "All",
-                    "value": "$__all"
-                },
-                "datasource": "prometheus",
-                "definition": "label_values(otelsvc_receiver)",
-                "hide": 0,
-                "includeAll": true,
-                "label": "receiver",
-                "multi": true,
-                "name": "receiver",
-                "options": [],
-                "query": "label_values(otelsvc_receiver)",
-                "refresh": 2,
-                "regex": "",
+                "hide": 2,
+                "label": "service",
+                "name": "service",
+                "query": "opentelemetry-collector",
                 "skipUrlSync": false,
-                "sort": 0,
-                "tagValuesQuery": "",
-                "tags": [],
-                "tagsQuery": "",
-                "type": "query",
-                "useTags": false
-            },
-            {
-                "allValue": ".*",
-                "current": {
-                    "selected": false,
-                    "text": "All",
-                    "value": "$__all"
-                },
-                "datasource": "prometheus",
-                "definition": "label_values(otelsvc_exporter)",
-                "hide": 0,
-                "includeAll": true,
-                "label": "exporter",
-                "multi": true,
-                "name": "exporter",
-                "options": [],
-                "query": "label_values(otelsvc_exporter)",
-                "refresh": 2,
-                "regex": "",
-                "skipUrlSync": false,
-                "sort": 0,
-                "tagValuesQuery": "",
-                "tags": [],
-                "tagsQuery": "",
-                "type": "query",
-                "useTags": false
-            },
-            {
-                "allValue": null,
-                "current": {
-                    "selected": false,
-                    "text": "All",
-                    "value": "$__all"
-                },
-                "datasource": "prometheus",
-                "definition": "label_values(processor)",
-                "hide": 0,
-                "includeAll": true,
-                "label": "processor",
-                "multi": true,
-                "name": "processor",
-                "options": [],
-                "query": "label_values(processor)",
-                "refresh": 2,
-                "regex": "",
-                "skipUrlSync": false,
-                "sort": 1,
-                "tagValuesQuery": "",
-                "tags": [],
-                "tagsQuery": "",
-                "type": "query",
-                "useTags": false
+                "type": "constant"
             }
         ]
     },
     "time": {
-        "from": "now-15m",
+        "from": "now-5m",
         "to": "now"
     },
     "timepicker": {
@@ -1514,5 +1414,6 @@
     "timezone": "",
     "title": "OpenTelemetry Collector",
     "uid": "BKf2sowmj",
-    "version": 7
+    "version": 1,
+    "weekStart": ""
 }

@@ -98,7 +98,7 @@
             "targets": [
                 {
                     "datasource": "prometheus",
-                    "expr": "sum(rate(jaeger_spans_received_total[1m]))",
+                    "expr": "sum(rate(jaeger_spans_received_total[2m]))",
                     "format": "time_series",
                     "hide": false,
                     "interval": "",

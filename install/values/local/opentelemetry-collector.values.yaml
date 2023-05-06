@@ -68,7 +68,7 @@ config:
       tls:
         insecure: true
     prometheus:
-      endpoint: "0.0.0.0:9464"
+      endpoint: "${MY_POD_IP}:9464"
 
   extensions:
     # The health_check extension is mandatory for this chart.
@@ -88,17 +88,17 @@ config:
     jaeger:
       protocols:
         grpc:
-          endpoint: 0.0.0.0:14250
+          endpoint: ${MY_POD_IP}:14250
         thrift_http:
-          endpoint: 0.0.0.0:14268
+          endpoint: ${MY_POD_IP}:14268
         thrift_compact:
-          endpoint: 0.0.0.0:6831
+          endpoint: ${MY_POD_IP}:6831
     otlp:
       protocols:
         grpc:
-          endpoint: 0.0.0.0:4317
+          endpoint: ${MY_POD_IP}:4317
         http:
-          endpoint: 0.0.0.0:4318
+          endpoint: ${MY_POD_IP}:4318
           cors:
             allowed_origins:
               - "http://*"
@@ -114,7 +114,7 @@ config:
   service:
     telemetry:
       metrics:
-        address: 0.0.0.0:8888
+        address: ${MY_POD_IP}:8888
     extensions:
       - health_check
       - memory_ballast

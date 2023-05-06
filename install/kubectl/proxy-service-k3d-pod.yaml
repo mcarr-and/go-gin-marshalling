@@ -83,3 +83,70 @@ spec:
   restartPolicy: Always
   terminationGracePeriodSeconds: 30
 ---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: proxy-service-virtual-service
+  namespace: proxy-service
+spec:
+  gateways:
+    - proxy-service-gateway
+  hosts:
+    - proxy-service.local
+  http:
+    - route:
+        - destination:
+            host: proxy-service
+            port:
+              number: 9070
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: proxy-service-gateway
+  namespace: proxy-service
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - proxy-service.local
+      port:
+        name: http-proxy-service
+        number: 80
+        protocol: HTTP
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: proxy-service-destination-rule
+  namespace: proxy-service
+spec:
+  host: proxy-service
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app.kubernetes.io/instance: proxy-service
+    app.kubernetes.io/name: proxy-service
+    app.kubernetes.io/version: 0.2.2
+  name: proxy-service
+  namespace: proxy-service
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 90
+          type: Utilization
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: proxy-service
