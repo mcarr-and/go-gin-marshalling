@@ -50,7 +50,7 @@ profiles:
           - name: grafana-dashboards
             # chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
             remoteChart: grafana-dashboards
-            version: 1.0.4
+            version: 1.0.5
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: monitoring
             createNamespace: true
