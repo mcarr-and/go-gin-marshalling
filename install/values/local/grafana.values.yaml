@@ -371,7 +371,7 @@ initChownData:
 
 # Administrator credentials when not using an existing secret (see below)
 adminUser: admin
-# adminPassword: strongpassword
+adminPassword: prom-operator
 
 # Use an existing secret for the admin user.
 admin:
@@ -686,6 +686,22 @@ dashboardProviders:
         editable: true
         options:
           path: /var/lib/grafana/dashboards/otel-collector
+      - name: "album-store"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/album-store
+      - name: "proxy-service"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/proxy-service
 
 ## Reference to external ConfigMap per provider. Use provider name as key and ConfigMap name as value.
 ## A provider dashboards must be defined either by external ConfigMaps or in values.yaml, not in both.
@@ -700,6 +716,8 @@ dashboardsConfigMaps:
   golang: "grafana-dashboards-golang"
   prometheus: "grafana-dashboards-prometheus"
   otel-collector: "grafana-dashboards-otel-collector"
+  album-store: "grafana-dashboards-album-store"
+  proxy-service: "grafana-dashboards-proxy-service"
 
 ## Configure grafana dashboard to import
 ## NOTE: To use dashboards you must also enable/configure dashboardProviders

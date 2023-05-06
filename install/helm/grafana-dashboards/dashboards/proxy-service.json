@@ -3,10 +3,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
-        },
+        "datasource":"grafana",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -29,10 +26,7 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "jaeger",
-        "uid": "jaeger"
-      },
+      "datasource": "jaeger",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -83,10 +77,7 @@
       "pluginVersion": "9.4.7",
       "targets": [
         {
-          "datasource": {
-            "type": "jaeger",
-            "uid": "jaeger"
-          },
+          "datasource": "jaeger",
           "query": "",
           "queryType": "search",
           "refId": "A",
@@ -97,10 +88,7 @@
       "type": "table"
     },
     {
-      "datasource": {
-        "type": "jaeger",
-        "uid": "jaeger"
-      },
+      "datasource": "jaeger",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -173,10 +161,7 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "jaeger",
-            "uid": "jaeger"
-          },
+          "datasource": "jaeger",
           "queryType": "search",
           "refId": "A",
           "service": "proxy-service"
@@ -190,7 +175,7 @@
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
-  "tags": [],
+  "tags": ["proxy-service", "go"],
   "templating": {
     "list": []
   },
