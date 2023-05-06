@@ -571,7 +571,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "rate(go_memstats_mallocs_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
+                    "expr": "rate(go_memstats_mallocs_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[2m])",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -659,7 +659,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "rate(go_memstats_lookups_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
+                    "expr": "rate(go_memstats_lookups_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[2m])",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -833,7 +833,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "rate(go_memstats_alloc_bytes_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
+                    "expr": "rate(go_memstats_alloc_bytes_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[2m])",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"

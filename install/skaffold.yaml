@@ -50,7 +50,7 @@ profiles:
           - name: grafana-dashboards
             # chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
             remoteChart: grafana-dashboards
-            version: 1.0.5
+            version: 1.0.6
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: monitoring
             createNamespace: true
@@ -151,7 +151,7 @@ profiles:
           - name: album-store
             # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
             remoteChart: album-store
-            version: 0.1.2
+            version: 0.1.3
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: album-store
             createNamespace: true
@@ -171,7 +171,7 @@ profiles:
           - name: proxy-service
             # chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
             remoteChart: proxy-service
-            version: 0.1.2
+            version: 0.1.3
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: proxy-service
             createNamespace: true
