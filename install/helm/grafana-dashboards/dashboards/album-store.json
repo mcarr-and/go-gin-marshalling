@@ -3,10 +3,7 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": {
-          "type": "grafana",
-          "uid": "-- Grafana --"
-        },
+        "datasource": "grafana",
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -29,10 +26,7 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "jaeger",
-        "uid": "jaeger"
-      },
+      "datasource": "jaeger",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -106,10 +100,7 @@
       "pluginVersion": "9.4.7",
       "targets": [
         {
-          "datasource": {
-            "type": "jaeger",
-            "uid": "jaeger"
-          },
+          "datasource": "jaeger",
           "queryType": "search",
           "refId": "A",
           "service": "album-store"
@@ -119,10 +110,7 @@
       "type": "barchart"
     },
     {
-      "datasource": {
-        "type": "jaeger",
-        "uid": "jaeger"
-      },
+      "datasource": "jaeger",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -170,10 +158,7 @@
       "pluginVersion": "9.4.7",
       "targets": [
         {
-          "datasource": {
-            "type": "jaeger",
-            "uid": "jaeger"
-          },
+          "datasource": "jaeger",
           "key": "Q-e001d482-3f02-4670-b1d8-fba33bce1800-0",
           "queryType": "search",
           "refId": "A",
@@ -188,7 +173,7 @@
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
-  "tags": [],
+  "tags": ["album-store", "go", "applications"],
   "templating": {
     "list": []
   },

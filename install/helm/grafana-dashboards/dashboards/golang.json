@@ -59,50 +59,50 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "go_memstats_mspan_inuse_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_mspan_inuse_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
                 },
                 {
-                    "expr": "go_memstats_mspan_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_mspan_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "B"
                 },
                 {
-                    "expr": "go_memstats_mcache_inuse_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_mcache_inuse_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "C"
                 },
                 {
-                    "expr": "go_memstats_mcache_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_mcache_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "D"
                 },
                 {
-                    "expr": "go_memstats_buck_hash_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_buck_hash_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "E"
                 },
                 {
-                    "expr": "go_memstats_gc_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_gc_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "F"
                 },
                 {
-                    "expr": "go_memstats_other_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"} - go_memstats_other_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_other_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"} - go_memstats_other_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "legendFormat": "bytes of memory are used for other runtime allocations {pod={{kubernetes_pod_name}}}",
                     "refId": "G"
                 },
                 {
-                    "expr": "go_memstats_next_gc_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_next_gc_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "H"
@@ -189,32 +189,32 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "go_memstats_heap_alloc_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_heap_alloc_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "B"
                 },
                 {
-                    "expr": "go_memstats_heap_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_heap_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
                 },
                 {
-                    "expr": "go_memstats_heap_idle_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_heap_idle_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "C"
                 },
                 {
-                    "expr": "go_memstats_heap_inuse_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_heap_inuse_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "legendFormat": "",
                     "refId": "D"
                 },
                 {
-                    "expr": "go_memstats_heap_released_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_heap_released_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "E"
@@ -301,13 +301,13 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "go_memstats_stack_inuse_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_stack_inuse_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
                 },
                 {
-                    "expr": "go_memstats_stack_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_stack_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "B"
@@ -394,7 +394,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "go_memstats_sys_bytes{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_sys_bytes{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -483,7 +483,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "go_memstats_mallocs_total{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"} - go_memstats_frees_total{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_memstats_mallocs_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"} - go_memstats_frees_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -571,7 +571,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "rate(go_memstats_mallocs_total{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
+                    "expr": "rate(go_memstats_mallocs_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -659,7 +659,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "rate(go_memstats_lookups_total{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
+                    "expr": "rate(go_memstats_lookups_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -746,7 +746,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "go_goroutines{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_goroutines{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -833,7 +833,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "rate(go_memstats_alloc_bytes_total{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
+                    "expr": "rate(go_memstats_alloc_bytes_total{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}[1m])",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -921,7 +921,7 @@
             "steppedLine": false,
             "targets": [
                 {
-                    "expr": "go_gc_duration_seconds{kubernetes_namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
+                    "expr": "go_gc_duration_seconds{namespace=\"$namespace\", kubernetes_pod_name=~\"$pod\"}",
                     "format": "time_series",
                     "intervalFactor": 1,
                     "refId": "A"
@@ -982,14 +982,14 @@
                 "allValue": null,
                 "current": {},
                 "datasource": "prometheus",
-                "definition": "label_values(go_goroutines, kubernetes_namespace)",
+                "definition": "label_values(go_goroutines, namespace)",
                 "hide": 0,
                 "includeAll": false,
                 "label": "namespace",
                 "multi": false,
                 "name": "namespace",
                 "options": [],
-                "query": "label_values(go_goroutines, kubernetes_namespace)",
+                "query": "label_values(go_goroutines, namespace)",
                 "refresh": 1,
                 "regex": "",
                 "skipUrlSync": false,
@@ -1004,14 +1004,14 @@
                 "allValue": null,
                 "current": {},
                 "datasource": "prometheus",
-                "definition": "label_values(go_goroutines{kubernetes_namespace=\"$namespace\"}, kubernetes_pod_name)",
+                "definition": "label_values(go_goroutines{namespace=\"$namespace\"}, pod)",
                 "hide": 0,
                 "includeAll": false,
                 "label": "pod",
                 "multi": false,
                 "name": "pod",
                 "options": [],
-                "query": "label_values(go_goroutines{kubernetes_namespace=\"$namespace\"}, kubernetes_pod_name)",
+                "query": "label_values(go_goroutines{namespace=\"$namespace\"}, pod)",
                 "refresh": 1,
                 "regex": "",
                 "skipUrlSync": false,
