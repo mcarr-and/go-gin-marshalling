@@ -135,7 +135,7 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "unknown", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, "unknown", attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error contacting album-store getAlbums ERROR FROM WEB SERVER"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"error contacting album-store getAlbums ERROR FROM WEB SERVER"}`, returnedBody)
 }
 
 func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
@@ -177,7 +177,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "200", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
 
 func Test_getAllAlbums_Failure_Bad_Request(t *testing.T) {
@@ -218,7 +218,7 @@ func Test_getAllAlbums_Failure_Bad_Request(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"album-store returned error getAlbums"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"album-store returned error getAlbums"}`, returnedBody)
 }
 
 func Test_getAlbumById_Success(t *testing.T) {
@@ -299,7 +299,7 @@ func Test_getAlbumById_Failure_Bad_Request(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"album-store returned error getAlbumById"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"album-store returned error getAlbumById"}`, returnedBody)
 }
 
 func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
@@ -334,7 +334,7 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "unknown", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, "unknown", attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error contacting album-store getAlbumById ERROR FROM WEB SERVER"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"error contacting album-store getAlbumById ERROR FROM WEB SERVER"}`, returnedBody)
 }
 
 func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
@@ -369,7 +369,7 @@ func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
 	assert.Equal(t, "unknown", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, "unknown", attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error invalid ID [X] requested"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"error invalid ID [X] requested"}`, returnedBody)
 }
 
 func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
@@ -411,7 +411,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "200", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
 
 func Test_postAlbums_Success(t *testing.T) {
@@ -466,7 +466,7 @@ func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
 	requestBody := ``
 	requestBodyReader := io.NopCloser(bytes.NewReader([]byte(requestBody)))
 
-	responseBody := `{"message":"invalid request json body "}`
+	responseBody := `{"errors":null,"message":"invalid request json body "}`
 
 	//Mock not used so setup as ignored
 	MockResponseFunc = func(*http.Request) (*http.Response, error) {
@@ -493,7 +493,7 @@ func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
 	assert.Equal(t, "", attributeMap["proxy-service.request.body"].Emit())
 
 	assert.Equal(t, "400", attributeMap["proxy-service.response.code"].Emit())
-	assert.Equal(t, responseBody, attributeMap["proxy-service.response.body"].Emit())
+	assert.Equal(t, `{"message":"invalid request json body "}`, attributeMap["proxy-service.response.body"].Emit())
 
 	assert.Equal(t, "unknown", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, "unknown", attributeMap["album-store.response.body"].Emit())
@@ -537,7 +537,7 @@ func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
 	assert.Equal(t, "unknown", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, "unknown", attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"invalid request json body {\"title\":\"Ozzman Cometh\""}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"invalid request json body {\"title\":\"Ozzman Cometh\""}`, returnedBody)
 }
 
 func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
@@ -577,7 +577,7 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 	assert.Equal(t, "unknown", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, "unknown", attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error contacting album-store postAlbum ERROR FROM WEB SERVER"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"error contacting album-store postAlbum ERROR FROM WEB SERVER"}`, returnedBody)
 }
 
 func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
@@ -624,7 +624,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 	assert.Equal(t, "201", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"error from album-store Malformed JSON returned"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"error from album-store Malformed JSON returned"}`, returnedBody)
 }
 
 func Test_postAlbums_Failure_Bad_Request(t *testing.T) {
@@ -671,7 +671,7 @@ func Test_postAlbums_Failure_Bad_Request(t *testing.T) {
 	assert.Equal(t, "400", attributeMap["album-store.response.code"].Emit())
 	assert.Equal(t, responseBody, attributeMap["album-store.response.body"].Emit())
 
-	assert.Equal(t, `{"message":"album-store returned error postAlbum"}`, returnedBody)
+	assert.Equal(t, `{"errors":null,"message":"album-store returned error postAlbum"}`, returnedBody)
 }
 
 func Test_getSwagger(t *testing.T) {

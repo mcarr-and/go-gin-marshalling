@@ -188,7 +188,7 @@ func findAlbum(c *gin.Context, albumId int, span trace.Span) {
 	span.SetStatus(codes.Error, serverError.Message)
 	span.AddEvent(errorMessage)
 	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+	c.AbortWithStatusJSON(http.StatusBadRequest, serverError)
 }
 
 func bindJsonToModelFails(c *gin.Context, err error, id string, span trace.Span) bool {
@@ -199,7 +199,7 @@ func bindJsonToModelFails(c *gin.Context, err error, id string, span trace.Span)
 		span.AddEvent(errorMessage)
 		// span.RecordError(err, )// todo - figure out when to use this instead of event
 		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
+		c.AbortWithStatusJSON(http.StatusBadRequest, serverError)
 		return true
 	}
 	return false
@@ -241,7 +241,7 @@ func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error,
 	span.SetAttributes(attribute.Key("album-store.request.body").String(requestBodyJSON))
 	span.SetAttributes(attribute.Key("album-store.response.body").String(`{"message":"Malformed JSON. Not valid for Album"}`))
 	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Malformed JSON. Not valid for Album"})
+	c.AbortWithStatusJSON(http.StatusBadRequest, model.ServerError{Message: "Malformed JSON. Not valid for Album"})
 	return true
 }
 
@@ -249,14 +249,14 @@ func processValidationBindingError(c *gin.Context, err error, span trace.Span, r
 	var newAlbum model.Album
 	var validationErrors validator.ValidationErrors
 	if errors.As(err, &validationErrors) {
-		bindingErrorMessages := make([]model.BindingErrorMsg, len(validationErrors))
+		bindingErrorMessages := make([]*model.BindingErrorMsg, len(validationErrors))
 		for index, fieldError := range validationErrors {
 			field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fieldError.Field())
 			fieldJSONName, okay := field.Tag.Lookup("json")
 			if !okay {
 				log.Fatal().Msg(fmt.Sprintf("No json type on Struct model.Album %s Expecting : `json:\"title\" ...`", fieldError.Field()))
 			}
-			bindingErrorMessages[index] = model.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fieldError)}
+			bindingErrorMessages[index] = &model.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fieldError)}
 		}
 		bindingErrorMessage, _ := json.Marshal(bindingErrorMessages)
 		span.SetStatus(codes.Error, "Album JSON field validation failed")
@@ -264,7 +264,7 @@ func processValidationBindingError(c *gin.Context, err error, span trace.Span, r
 		span.SetAttributes(attribute.Key("album-store.request.body").String(requestBodyJSON))
 		span.SetAttributes(attribute.Key("album-store.response.body").String(fmt.Sprintf(`{"errors":%s}`, bindingErrorMessage)))
 		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": bindingErrorMessages})
+		c.AbortWithStatusJSON(http.StatusBadRequest, model.ServerError{BindingErrors: bindingErrorMessages})
 		return true
 	}
 	return false

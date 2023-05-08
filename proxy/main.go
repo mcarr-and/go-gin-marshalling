@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/mcarr-and/go-gin-otelcollector/proxy-service/api"
-	_ "github.com/mcarr-and/go-gin-otelcollector/proxy-service/model"
+	"github.com/mcarr-and/go-gin-otelcollector/proxy-service/model"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
 	swaggerFiles "github.com/swaggo/files"
@@ -218,7 +218,7 @@ func processResponseBody(c *gin.Context, span trace.Span, body io.ReadCloser) (i
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("http.response.code").Int(http.StatusInternalServerError))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": errorMessage})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, model.ServerError{Message: errorMessage})
 		return jsonBody, true
 	}
 	span.SetAttributes(attribute.Key("album-store.response.body").String(jsonBodyString))
@@ -247,7 +247,7 @@ func buildMalformedRequestJsonErrorResponse(c *gin.Context, span trace.Span, res
 	span.AddEvent(errorMessage)
 	span.SetAttributes(attribute.Key("proxy-service.request.body").String(response))
 	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(errorCode))
-	c.AbortWithStatusJSON(errorCode, gin.H{"message": errorMessage})
+	c.AbortWithStatusJSON(errorCode, model.ServerError{Message: errorMessage})
 	return true
 }
 
@@ -257,7 +257,7 @@ func buildMalformedResponseJsonErrorResponse(c *gin.Context, span trace.Span, re
 	span.SetAttributes(attribute.Key("album-store.response.body").String(response))
 	span.SetAttributes(attribute.Key("proxy-service.response.body").String(fmt.Sprintf(`{"message":"%v"}`, errorMessage)))
 	span.SetAttributes(attribute.Key("proxy-service.response.code").Int(errorCode))
-	c.AbortWithStatusJSON(errorCode, gin.H{"message": errorMessage})
+	c.AbortWithStatusJSON(errorCode, model.ServerError{Message: errorMessage})
 	return true
 }
 
@@ -268,7 +268,7 @@ func handleResponseHasError(c *gin.Context, err error, methodName string, span t
 		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("proxy-service.response.body").String(fmt.Sprintf(`{"message":"%v"}`, errorMessage)))
 		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusInternalServerError))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": errorMessage})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, model.ServerError{Message: errorMessage})
 		return true
 	}
 	return false
@@ -280,7 +280,7 @@ func handleResponseCodeHasError(c *gin.Context, responseCode int, methodName str
 		span.AddEvent(errorMessage)
 		span.SetStatus(codes.Error, errorMessage)
 		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(responseCode))
-		c.AbortWithStatusJSON(responseCode, gin.H{"message": errorMessage})
+		c.AbortWithStatusJSON(responseCode, model.ServerError{Message: errorMessage})
 		return true
 	}
 	return false
@@ -293,7 +293,7 @@ func buildErrorInvalidRequestParameters(c *gin.Context, err error, id string, sp
 		span.AddEvent(errorMessage)
 		span.SetAttributes(attribute.Key("proxy-service.response.code").Int(http.StatusBadRequest))
 		span.SetAttributes(attribute.Key("proxy-service.response.body").String(fmt.Sprintf(`{"message":"%v"}`, errorMessage)))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": errorMessage})
+		c.AbortWithStatusJSON(http.StatusBadRequest, model.ServerError{Message: errorMessage})
 		return true
 	}
 	return false
