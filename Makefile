@@ -3,7 +3,7 @@ docker-compose-full-start: docker-build-album docker-build-proxy
 	docker-compose -f ./install/docker/docker-compose.yaml up -d --remove-orphans;
 
 .PHONY: build
-build:
+build: generate-swagger
 	go mod tidy;
 	go get;
 	go clean;
@@ -100,14 +100,6 @@ docker-tag-k3d-registry-album: docker-build-album
 	docker push localhost:54094/album-store:latest
 	docker push localhost:54094/album-store:0.2.2
 
-.PHONY: docker-build-proxy
-docker-build-proxy:
-	pushd proxy && $(MAKE) docker-build-proxy && popd
-
-.PHONY: docker-tag-k3d-registry-proxy
-docker-tag-k3d-registry-proxy: docker-build-proxy
-	pushd && $(MAKE) docker-tag-k3d-registry-proxy && popd
-
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment: docker-tag-k3d-registry-album
 	kubectl apply -f ./install/kubectl/album-store-k3d-deployment.yaml
@@ -123,22 +115,6 @@ k3d-album-deploy-pod: docker-tag-k3d-registry-album
 .PHONY: k3d-album-undeploy-pod
 k3d-album-undeploy-pod:
 	kubectl delete -f ./install/kubectl/album-store-k3d-pod.yaml
-
-.PHONY: k3d-proxy-deploy-deployment
-k3d-proxy-deploy-deployment: docker-tag-k3d-registry-proxy
-	pushd proxy && make k3d-proxy-deploy-deployment && popd
-
-.PHONY: k3d-proxy-undeploy-deployment
-k3d-proxy-undeploy-deployment:
-	pushd proxy && make k3d-proxy-undeploy-deployment && popd
-
-.PHONY: k3d-proxy-deploy-pod
-k3d-proxy-deploy-pod: docker-tag-k3d-registry-proxy
-	pushd proxy && make k3d-proxy-deploy-pod && popd
-
-.PHONY: k3d-proxy-undeploy-pod
-k3d-proxy-undeploy-pod:
-	push proxy && make k3d-proxy-un	deploy-pod && popd
 
 setup-album-properties:
 	$(eval album_setup := NAMESPACE=no-namespace INSTANCE_NAME=album-store-1)
@@ -156,11 +132,11 @@ docker-local-start: docker-build-album setup-album-docker-properties
 
 .PHONY: local-start-k3d
 local-start-k3d: build setup-album-properties
-	$(album_setup) OTEL_LOCATION=otel-collector.local:8070 ./album-store
+	$(album_setup) OTEL_LOCATION=otel-collector.local:8070 ./album-store-bin
 
-.PHONY: local-start-grpc
-local-start-grpc: build setup-album-properties
-	$(album_setup) OTEL_LOCATION=localhost:4327 ./album-store
+.PHONY: local-start
+local-start: build setup-album-properties
+	$(album_setup) OTEL_LOCATION=localhost:4327 ./album-store-bin
 
 .PHONY: docker-local-stop
 docker-local-stop:
@@ -181,11 +157,6 @@ docker-compose-limited-stop:
 .PHONY: k3d-cluster-create
 k3d-cluster-create:
 	k3d cluster create k3s-default --config ./install/k3d-config.yaml
-	kubectl create namespace album-store
-	kubectl create namespace proxy-service
-	# add CRD for gateways
-	kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
-  		{ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.6.1" | kubectl apply -f -; }
 
 .PHONY: k3d-cluster-delete
 k3d-cluster-delete:
@@ -195,3 +166,7 @@ k3d-cluster-delete:
 coverage:
 	go test -coverprofile=coverage.out;
 	go tool cover -html=coverage.out -o coverage.html;
+
+.PHONY: generate-swagger
+generate-swagger:
+	swag init -o api --exclude proxy

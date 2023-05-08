@@ -1,4 +1,4 @@
-package models
+package model
 
 type Album struct {
 	ID     int     `json:"id" binding:"min=1,max=10000"`

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"io"
 	"net/http"
 	"os"
@@ -15,7 +17,9 @@ import (
 	"syscall"
 	"time"
 
-	"example.com/album-store/models"
+	_ "github.com/mcarr-and/go-gin-otelcollector/album-store/api"
+	"github.com/mcarr-and/go-gin-otelcollector/album-store/model"
+
 	"github.com/gin-gonic/gin/binding"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
@@ -37,24 +41,40 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var albums = []models.Album{
+var albums = []model.Album{
 	{ID: 1, Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
 	{ID: 2, Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
 	{ID: 3, Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 }
 
-func listAlbums() []models.Album {
+func listAlbums() []model.Album {
 	return albums
 }
 
 func resetAlbums() {
-	albums = []models.Album{
+	albums = []model.Album{
 		{ID: 1, Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
 		{ID: 2, Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
 		{ID: 3, Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
 	}
 }
 
+// @title           Album Store API
+// @version         1.0
+// @description     Simple golang album store CRUD application
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// @host      localhost:9080
+// @BasePath /
+
+// GetAlbums godoc
+// @Summary Get all Albums
+// @Schemes
+// @Description get all the albums in the store
+// @Tags albums
+// @Produce json
+// @Success 200 {array} model.Album
+// @Router /albums [get]
 func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
@@ -64,6 +84,16 @@ func getAlbums(c *gin.Context) {
 	c.JSON(http.StatusOK, albums)
 }
 
+// GetAlbumById godoc
+// @Summary Get Album by id
+// @Schemes
+// @Description get as single album by id
+// @Tags albums
+// @Param  id query int true  "int valid" minimum(1)
+// @Produce json
+// @Success 200 {object} model.Album
+// @Failure 400 {object} model.ServerError
+// @Router /albums/{id} [get]
 func getAlbumByID(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums/:id GET")
@@ -78,6 +108,17 @@ func getAlbumByID(c *gin.Context) {
 	findAlbum(c, albumId, span)
 }
 
+// PostAlbum godoc
+// @Summary Create album
+// @Schemes
+// @Description add a new album to the store
+// @Tags albums
+// @Param request body model.Album true "album"
+// @Accept json
+// @Produce json
+// @Success 201 {object} model.Album
+// @Failure 400 {object} model.ServerError
+// @Router /albums [post]
 func postAlbum(log zerolog.Logger) gin.HandlerFunc {
 	fn := func(context *gin.Context) {
 		span := trace.SpanFromContext(context.Request.Context())
@@ -99,6 +140,14 @@ func postAlbum(log zerolog.Logger) gin.HandlerFunc {
 	return fn
 }
 
+// Status godoc
+// @Summary Status of service
+// @Schemes
+// @Description get the status of the service
+// @Tags albums
+// @Produce json
+// @Success 200 {string} status
+// @Router /status [get]
 func status(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/status")
@@ -107,6 +156,14 @@ func status(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+// Metrics godoc
+// @Summary Prometheus metrics
+// @Schemes
+// @Description get Prometheus metrics for the service
+// @Tags albums
+// @Produce plain
+// @Success 200 {string} metrics
+// @Router /status [get]
 func metrics(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/metrics")
@@ -127,7 +184,7 @@ func findAlbum(c *gin.Context, albumId int, span trace.Span) {
 		}
 	}
 	errorMessage := fmt.Sprintf("Album [%v] not found", albumId)
-	serverError := models.ServerError{Message: errorMessage}
+	serverError := model.ServerError{Message: errorMessage}
 	span.SetStatus(codes.Error, serverError.Message)
 	span.AddEvent(errorMessage)
 	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
@@ -137,9 +194,10 @@ func findAlbum(c *gin.Context, albumId int, span trace.Span) {
 func bindJsonToModelFails(c *gin.Context, err error, id string, span trace.Span) bool {
 	if err != nil {
 		errorMessage := fmt.Sprintf("Album [%s] not found, invalid request", id)
-		serverError := models.ServerError{Message: errorMessage}
+		serverError := model.ServerError{Message: errorMessage}
 		span.SetStatus(codes.Error, serverError.Message)
 		span.AddEvent(errorMessage)
+		// span.RecordError(err, )// todo - figure out when to use this instead of event
 		span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusBadRequest))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": serverError.Message})
 		return true
@@ -158,7 +216,7 @@ func getRequestBody(c *gin.Context, span trace.Span) (string, bool) {
 	return requestBodyString, false
 }
 
-func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString string, responseAlbum models.Album) {
+func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString string, responseAlbum model.Album) {
 	span.SetStatus(codes.Ok, "")
 	span.SetAttributes(attribute.Key("album-store.request.body").String(requestBodyString))
 	span.SetAttributes(attribute.Key("album-store.response.code").Int(http.StatusCreated))
@@ -167,8 +225,8 @@ func buildSuccessResponse(c *gin.Context, span trace.Span, requestBodyString str
 	c.JSON(http.StatusCreated, responseAlbum)
 }
 
-func bindJsonBody(c *gin.Context, span trace.Span, requestBodyString string, log zerolog.Logger) (bool, models.Album) {
-	var album models.Album
+func bindJsonBody(c *gin.Context, span trace.Span, requestBodyString string, log zerolog.Logger) (bool, model.Album) {
+	var album model.Album
 	if err := binding.JSON.BindBody([]byte(requestBodyString), &album); err != nil {
 		if processValidationBindingError(c, err, span, requestBodyString, log) {
 			return true, album
@@ -188,17 +246,17 @@ func buildMalformedJsonErrorResponse(c *gin.Context, span trace.Span, err error,
 }
 
 func processValidationBindingError(c *gin.Context, err error, span trace.Span, requestBodyJSON string, log zerolog.Logger) bool {
-	var newAlbum models.Album
+	var newAlbum model.Album
 	var validationErrors validator.ValidationErrors
 	if errors.As(err, &validationErrors) {
-		bindingErrorMessages := make([]models.BindingErrorMsg, len(validationErrors))
+		bindingErrorMessages := make([]model.BindingErrorMsg, len(validationErrors))
 		for index, fieldError := range validationErrors {
 			field, _ := reflect.TypeOf(&newAlbum).Elem().FieldByName(fieldError.Field())
 			fieldJSONName, okay := field.Tag.Lookup("json")
 			if !okay {
 				log.Fatal().Msg(fmt.Sprintf("No json type on Struct model.Album %s Expecting : `json:\"title\" ...`", fieldError.Field()))
 			}
-			bindingErrorMessages[index] = models.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fieldError)}
+			bindingErrorMessages[index] = model.BindingErrorMsg{Field: fieldJSONName, Message: getErrorMsg(fieldError)}
 		}
 		bindingErrorMessage, _ := json.Marshal(bindingErrorMessages)
 		span.SetStatus(codes.Error, "Album JSON field validation failed")
@@ -228,7 +286,7 @@ func getErrorMsg(fe validator.FieldError) string {
 func setupRouter(log zerolog.Logger) *gin.Engine {
 	router := gin.Default()
 	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Gin
-	router.StaticFS("/v3/api-docs/", http.Dir("cmd/api/swaggerui"))
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum(log))

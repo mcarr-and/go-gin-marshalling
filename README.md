@@ -60,12 +60,10 @@ Run the project with a local Kubernetes cluster with K3D.
 
 
 ## TODO
-* helm up creating the namespaces for album-store and proxy-service to include the istio annotation
-* Add istio open telemetry configuration ConfigMap & Telemetry. ? ServiceEntry & Gateway(egressgateway) - staying in cluster so not clear?  
+* helm up creating the namespaces for album-store and proxy-service to include the istio label 
 * Add documentation to use IDE with Docker-Compose?
 * Emit events when data is changed.
 * Adding CI server integration
-* Add open-telemetry to the istio-ingress so spans are created from the entry point to the cluster.
 * Contract tests compare swagger output to actual output
 * Async processing of requests 
 * Back pressure on APIs & rate limiting

@@ -1,0 +1,144 @@
+basePath: /
+definitions:
+  model.Album:
+    properties:
+      artist:
+        maxLength: 1000
+        minLength: 2
+        type: string
+      id:
+        maximum: 10000
+        minimum: 1
+        type: integer
+      price:
+        maximum: 10000
+        minimum: 0
+        type: number
+      title:
+        maxLength: 1000
+        minLength: 2
+        type: string
+    required:
+    - artist
+    - price
+    - title
+    type: object
+  model.BindingErrorMsg:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
+    required:
+    - field
+    - message
+    type: object
+  model.ServerError:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/model.BindingErrorMsg'
+        type: array
+      message:
+        type: string
+    type: object
+host: localhost:9070
+info:
+  contact: {}
+  description: Simple golang application that proxies calls to Album-Store
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Proxy Service API
+  version: "1.0"
+paths:
+  /albums:
+    get:
+      description: get all the albums in the store
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Album'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ServerError'
+      summary: Get all Albums
+      tags:
+      - albums
+    post:
+      consumes:
+      - application/json
+      description: add a new album to the store
+      parameters:
+      - description: album
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Album'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Album'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ServerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ServerError'
+      summary: Create album
+      tags:
+      - albums
+  /albums/{id}:
+    get:
+      description: get as single album by id
+      parameters:
+      - description: int valid
+        in: query
+        minimum: 1
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Album'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ServerError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ServerError'
+      summary: Get Album by id
+      tags:
+      - albums
+  /status:
+    get:
+      description: get Prometheus metrics for the service
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Prometheus metrics
+      tags:
+      - albums
+swagger: "2.0"

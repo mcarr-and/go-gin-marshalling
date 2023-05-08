@@ -78,7 +78,7 @@ func Test_getAllAlbums_Success(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	bytesArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(bytesArr)
@@ -112,7 +112,7 @@ func Test_getAllAlbums_Failure_Album_Returns_Error(t *testing.T) {
 		return nil, errors.New("ERROR FROM WEB SERVER")
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -154,7 +154,7 @@ func Test_getAllAlbums_Failure_Malformed_Response(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -195,7 +195,7 @@ func Test_getAllAlbums_Failure_Bad_Request(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -236,7 +236,7 @@ func Test_getAlbumById_Success(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -276,7 +276,7 @@ func Test_getAlbumById_Failure_Bad_Request(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -311,7 +311,7 @@ func Test_getAlbumById_Failure_Album_Returns_Error(t *testing.T) {
 		return nil, errors.New("ERROR FROM WEB SERVER")
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -346,7 +346,7 @@ func Test_getAlbumById_Failure_Album_BadId(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/X", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums/X", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -388,7 +388,7 @@ func Test_getAlbumById_Failure_Malformed_Response(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodGet, "/albums/1", nil)
+	req := httptest.NewRequest(http.MethodGet, "/albums/1", nil)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -432,7 +432,7 @@ func Test_postAlbums_Success(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := httptest.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -473,7 +473,7 @@ func Test_postAlbums_Failure_Album_Empty_Request_Body(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := httptest.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -512,7 +512,7 @@ func Test_postAlbums_Failure_Album_Malformed_Request_Body(t *testing.T) {
 		return nil, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := httptest.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -552,7 +552,7 @@ func Test_postAlbums_Failure_Album_Returns_Error(t *testing.T) {
 		return nil, errors.New("ERROR FROM WEB SERVER")
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := httptest.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -599,7 +599,7 @@ func Test_postAlbums_Failure_Malformed_Response(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := httptest.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -646,7 +646,7 @@ func Test_postAlbums_Failure_Bad_Request(t *testing.T) {
 		}, nil
 	}
 
-	req, _ := http.NewRequest(http.MethodPost, "/albums", requestBodyReader)
+	req := httptest.NewRequest(http.MethodPost, "/albums", requestBodyReader)
 	router.ServeHTTP(testRecorder, req)
 	byteArr, _ := io.ReadAll(testRecorder.Body)
 	returnedBody := string(byteArr)
@@ -674,10 +674,21 @@ func Test_postAlbums_Failure_Bad_Request(t *testing.T) {
 	assert.Equal(t, `{"message":"album-store returned error postAlbum"}`, returnedBody)
 }
 
+func Test_getSwagger(t *testing.T) {
+	testRecorder, _, router := setupTestRouter()
+
+	req := httptest.NewRequest(http.MethodGet, "/swagger/index.html", nil)
+	router.ServeHTTP(testRecorder, req)
+	bodyString := testRecorder.Body.String()
+
+	assert.Equal(t, http.StatusOK, testRecorder.Code)
+	assert.Contains(t, bodyString, "swagger-ui.css")
+}
+
 func Test_getStatus(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/status", nil)
+	req := httptest.NewRequest(http.MethodGet, "/status", nil)
 	router.ServeHTTP(testRecorder, req)
 
 	responseBodyString := testRecorder.Body.String()
@@ -697,7 +708,7 @@ func Test_getStatus(t *testing.T) {
 func Test_getMetrics(t *testing.T) {
 	testRecorder, spanRecorder, router := setupTestRouter()
 
-	req, _ := http.NewRequest(http.MethodGet, "/metrics", nil)
+	req := httptest.NewRequest(http.MethodGet, "/metrics", nil)
 	router.ServeHTTP(testRecorder, req)
 
 	responseBodyString := testRecorder.Body.String()

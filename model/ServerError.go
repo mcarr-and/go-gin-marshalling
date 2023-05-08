@@ -1,4 +1,4 @@
-package models
+package model
 
 type BindingErrorMsg struct {
 	Field   string `json:"field" validate:"required"`

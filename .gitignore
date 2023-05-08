@@ -29,8 +29,8 @@ coverage.*
 __debug_bin
 
 # project binaries
-/album-store
-/proxy/proxy-service
+/album-store-bin
+/proxy/proxy-service-bin
 
 # skaffold single file ignore.
 install/skaffold-solo.yaml

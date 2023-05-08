@@ -1,9 +1,9 @@
 .PHONY: build
-build:
+build: generate-swagger
 	go mod tidy;
 	go get;
 	go clean;
-	go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o proxy-service
+	go build -ldflags "-X main.version=0.1 -X main.gitHash=`git rev-parse --short HEAD`" -v -o proxy-service-bin
 
 .PHONY: test
 test:
@@ -51,7 +51,7 @@ eval-git-hash:
 	echo $(GIT_HASH)
 
 .PHONY: docker-build-proxy
-docker-build-proxy:eval-git-hash
+docker-build-proxy: eval-git-hash
 	 DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t proxy-service:0.2.2 -t proxy-service:latest  .
 
 .PHONY: docker-tag-k3d-registry-proxy
@@ -60,14 +60,6 @@ docker-tag-k3d-registry-proxy: docker-build-proxy
 	docker tag proxy-service:0.2.2 localhost:54094/proxy-service:0.2.2
 	docker push localhost:54094/proxy-service:latest
 	docker push localhost:54094/proxy-service:0.2.2
-
-.PHONY: docker-build-album
-docker-build-album:
-	pushd .. && $(MAKE) docker-build-album && popd
-
-.PHONY: docker-tag-k3d-registry-album
-docker-tag-k3d-registry-album:
-	pushd .. && $(MAKE) docker-tag-k3d-registry-album && popd
 
 .PHONY: k3d-proxy-deploy-deployment
 k3d-proxy-deploy-deployment:
@@ -101,45 +93,21 @@ docker-local-start: setup-proxy-docker-properties
 
 .PHONY: local-start-k3d
 local-start-k3d: build setup-proxy-properties
-	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_URL=http://album-store.album-store.svc.cluster.local:9080 ./proxy-service
+	$(proxy_setup) OTEL_LOCATION=otel-collector.local:8070 ALBUM_STORE_URL=http://album-store.album-store.svc.cluster.local:9080 ./proxy-service-bin
 
-.PHONY: local-start-proxy-grpc
-local-start-proxy-grpc: build setup-proxy-properties
-	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_URL=http://localhost:9080 ./proxy-service
-
-.PHONY: local-start-album-grpc
-local-start-album-grpc: build setup-proxy-properties
-	pushd ../ && $(proxy_setup) OTEL_LOCATION=localhost:4327 ./album-store && popd
+.PHONY: local-start-proxy
+local-start-proxy: build setup-proxy-properties
+	$(proxy_setup) OTEL_LOCATION=localhost:4327 ALBUM_STORE_URL=http://localhost:9080 ./proxy-service-bin
 
 .PHONY: docker-stop
 docker-stop:
 	docker stop proxy-service;
 
-.PHONY: docker-compose-limited-start
-docker-compose-limited-start:
-	pushd .. && $(MAKE) docker-compose-limited-start && popd
-
-.PHONY: skaffold-dev-k3d
-skaffold-dev-k3d:
-	pushd .. && $(MAKE) skaffold-dev-k3d && popd
-
-.PHONY: k3d-cluster-create
-k3d-cluster-create:
-	pushd .. && $(MAKE) k3d-cluster-create && popd
-
-.PHONY: k3d-cluster-delete
-k3d-cluster-create:
-	pushd .. && $(MAKE) k3d-cluster-delete && popd
-
-.PHONY: k3d-album-deploy-deployment
-k3d-album-deploy-deployment:
-	pushd .. && $(MAKE) k3d-album-deploy-deployment && popd
-
-.PHONY: k3d-album-undeploy-deployment
-k3d-album-undeploy-deployment:
-	pushd .. && $(MAKE) k3d-album-undeploy-deployment && popd
-
 .PHONY: coverage
 coverage:
 	go test -coverprofile=coverage.out;
 	go tool cover -html=coverage.out -o coverage.html;
+
+.PHONY: generate-swagger
+generate-swagger:
+	swag init -o api

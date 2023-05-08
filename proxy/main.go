@@ -4,8 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	_ "github.com/mcarr-and/go-gin-otelcollector/proxy-service/api"
+	_ "github.com/mcarr-and/go-gin-otelcollector/proxy-service/model"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -44,6 +48,23 @@ func init() {
 	DefaultClient = otelhttp.DefaultClient
 }
 
+// @title           Proxy Service API
+// @version         1.0
+// @description     Simple golang application that proxies calls to Album-Store
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// @host      localhost:9070
+// @BasePath /
+
+// GetAlbums godoc
+// @Summary Get all Albums
+// @Schemes
+// @Description get all the albums in the store
+// @Tags albums
+// @Produce json
+// @Success 200 {array} model.Album
+// @Failure 500 {object} model.ServerError
+// @Router /albums [get]
 func getAlbums(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums GET")
@@ -66,6 +87,17 @@ func getAlbums(c *gin.Context) {
 	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
 }
 
+// GetAlbumById godoc
+// @Summary Get Album by id
+// @Schemes
+// @Description get as single album by id
+// @Tags albums
+// @Param  id query int true  "int valid" minimum(1)
+// @Produce json
+// @Success 200 {object} model.Album
+// @Failure 400 {object} model.ServerError
+// @Failure 500 {object} model.ServerError
+// @Router /albums/{id} [get]
 func getAlbumByID(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums/:id GET")
@@ -95,6 +127,18 @@ func getAlbumByID(c *gin.Context) {
 	c.JSON(http.StatusOK, albumStoreResponseBodyJson)
 }
 
+// PostAlbum godoc
+// @Summary Create album
+// @Schemes
+// @Description add a new album to the store
+// @Tags albums
+// @Param request body model.Album true "album"
+// @Accept json
+// @Produce json
+// @Success 201 {object} model.Album
+// @Failure 400 {object} model.ServerError
+// @Failure 500 {object} model.ServerError
+// @Router /albums [post]
 func postAlbum(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/albums POST")
@@ -127,6 +171,14 @@ func setResponseCodeIfPresent(resp *http.Response, span trace.Span) {
 	}
 }
 
+// Status godoc
+// @Summary Status of service
+// @Schemes
+// @Description get the status of the service
+// @Tags albums
+// @Produce json
+// @Success 200 {string} status
+// @Router /status [get]
 func status(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/status")
@@ -135,6 +187,14 @@ func status(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK"})
 }
 
+// Metrics godoc
+// @Summary Prometheus metrics
+// @Schemes
+// @Description get Prometheus metrics for the service
+// @Tags albums
+// @Produce plain
+// @Success 200 {string} metrics
+// @Router /status [get]
 func metrics(c *gin.Context) {
 	span := trace.SpanFromContext(c.Request.Context())
 	span.SetName("/metrics")
@@ -242,6 +302,7 @@ func buildErrorInvalidRequestParameters(c *gin.Context, err error, id string, sp
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(otelgin.Middleware(serviceName)) // add OpenTelemetry to Gin
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbum)
