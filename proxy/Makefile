@@ -110,4 +110,7 @@ coverage:
 
 .PHONY: generate-swagger
 generate-swagger:
+	go install github.com/swaggo/swag/cmd/swag@latest
+	go install github.com/swaggo/gin-swagger
+	go install github.com/swaggo/files
 	swag init -o api
