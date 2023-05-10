@@ -4,16 +4,26 @@
 2. Docker
 3. [Skaffold](https://skaffold.dev/)
 4. [K3D](https://k3d.io/v5.4.6/)
+5. [homebrew](https://brew.sh/)
 
-## 0. Expected tooling to run this project in K3D
+Extra Documentation for K3D.
+
+1. [K3d Registry info](K3D-registry.md)
+2. [K3d Debugging commands for cluster](K3D-Debugging.md)
+
+## 0 Expected installs
+
+## 0.1 Install tools need for Apple developers
+
+```bash
+    brew install skaffold helm go kubernetes-cli docker k3d;
+```
+
+### 0.2 /etc/hosts
 
 local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
-```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local album-store.local proxy-serivce.local```
-
-### 0.1 K3D Registry info
-
-[K3d Registry info](K3D-registry.md)
+```127.0.0.1	localhost k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local kiali.local album-store.local proxy-serivce.local```
 
 ## 1. Create K3d Kubernetes Cluster with Internal Registry
 
@@ -39,10 +49,6 @@ The album-store will not start after printing its version number if OpenTelemetr
 
 This will mean the liveness probe will fail and the album-store will eventually be in a CrashLoopBackoff state when you get pods.
 
-
-### 3.1 Debugging Advice  
-
-[Debugging commands for cluster](K3D-Debugging.md)
 
 ## 4. Run Some Tests
 
