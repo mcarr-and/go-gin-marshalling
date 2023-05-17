@@ -12,48 +12,100 @@ Follow instructions to add a `--worker` node
 
 ## Post install instructions
 
-### Allow ssh onto Ubuntu machine
-
-This has to be done on each Raspberry Pi as it is not enough from the raspberry Pi Imager to allow ssh alone. 
+### Turn on services
 
 ```bash
- sudo systemctl enable ssh
+  sudo systemctl enable ssh;
+  sudo ufw enable;
  ```
 
 ### Install Docker & allow running Docker as current user
  ```bash
-sudo apt-get install docker.io;
-sudo usermod -aG docker $USER
-sudo groupadd docker
-newgrp docker
+  sudo apt-get install docker.io;
+  sudo usermod -aG docker $USER;
+  sudo groupadd docker;
+  newgrp docker;
 ```
 
 ### allow access to Microk8s as current user
 ```bash
-sudo usermod -aG microk8s $USER
-sudo groupadd microk8s
-newgrp microk8s
+  sudo usermod -aG microk8s $USER;
+  sudo groupadd microk8s;
+  newgrp microk8s;
 ```
 
-### get nodes & enable services for later.
+### Create Docker Registry on Control Plane 
 
-* registry
-    * allow images in kubernetes
-* ingress
-    * allow ingress into cluster
-* dns
-    * publicly reachable dns???
-
+```bash
+sudo bash -c "cat > /etc/docker/daemon.json << EOF 
+{
+  \"insecure-registries\" : [\"localhost:32000\"]
+}
+EOF";
+sudo systemctl restart docker;
 ```
-microk8s.kubectl get node
-microk8s enable registry ingress dns
+
+### Enable microk8s services that are needed
+
+```bash
+microk8s.kubectl get nodes;
+microk8s enable community;
+microk8s enable hostpath-storage; # needed for Jaeger to mount a volume
+microk8s enable dns; # needed for default DNS resolution
+microk8s enable registry # allow saving of local docker images 
+
  ```
 
+### Fix /etc/resolv.conf 
 
-## Opened ports
+Do on both Control Plane and all Worker Nodes.
 
-|purpose                | port number |
-|-----------------------|-------------|
-| ssh                   | 22 |
-| http traffic          | 80 |
-| K8s Image registry    | 32000 |
+```bash
+sudo sed -i 's/#Domains=/Domains=svc.cluster.local cluster.local/g' /etc/systemd/resolved.conf;
+sudo systemctl restart systemd-resolved;
+```
+
+### Firewall Rules Control Plane
+
+```bash
+sudo ufw enable;
+sudo ufw allow 22/tcp; # ssh
+sudo ufw allow 80/tcp; # http
+sudo ufw allow 6443/tcp; # kubectl
+sudo ufw allow 16443/tcp; # kubectl
+sudo ufw allow 10250:10252/tcp; # kubelet, kube-schedule, kube-controller 
+sudo ufw allow 25000/tcp; # worker nodes to join the node group
+sudo ufw allow 10255/tcp; # kubelet
+sudo ufw allow 2379:2380/tcp; 
+sudo ufw allow 15090/tcp; # prometheus
+sudo ufw allow 15012/tcp; #istio health check
+sudo ufw allow 15021/tcp; # istio traffic
+sudo ufw allow 32000/tcp; # docker registry
+sudo ufw allow 53/tcp; # certificate
+```
+
+### Firewall Rules Worker Node
+
+```bash
+sudo ufw enable;
+sudo ufw allow 22/tcp; # ssh
+sudo ufw allow 10250/tcp;
+sudo ufw allow 10255/tcp;
+sudo ufw allow 30000:32767/tcp; # allow external traffic
+sudo ufw allow 15012/tcp; #istio health check
+sudo ufw allow 15021/tcp; # istio traffic
+sudo ufw allow 15090/tcp; # prometheus
+## unsure
+sudo ufw allow 53/tcp; # certificate
+sudo ufw allow 80/tcp; # http
+```
+
+
+### 0.2 /etc/hosts on your local machine
+
+local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
+
+change `192.168.XX.XX` to the IP Address of the raspberrypi that is the control plane.
+
+```192.168.XX.XX	k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local kiali.local album-store.local proxy-serivce.local registry.local```
+
