@@ -27,7 +27,7 @@ require (
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	golang.org/x/tools v0.8.0 // indirect
+	golang.org/x/tools v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
@@ -64,8 +64,8 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.1 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.8.0 // indirect; exclude
-	golang.org/x/net v0.9.0
+	golang.org/x/crypto v0.9.0 // indirect; exclude
+	golang.org/x/net v0.10.0
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
