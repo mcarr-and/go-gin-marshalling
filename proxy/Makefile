@@ -7,7 +7,7 @@ build: generate-swagger
 
 .PHONY: test
 test:
-	go test -v
+	go test -v -json > test-results.json
 
 #.PHONY: test-benchmark
 #test-benchmark:
@@ -61,6 +61,14 @@ docker-tag-k3d-registry-proxy: docker-build-proxy
 	docker push localhost:54094/proxy-service:latest
 	docker push localhost:54094/proxy-service:0.2.2
 
+.PHONY: docker-tag-microk8s-registry-proxy
+docker-tag-microk8s-registry-proxy: docker-build-proxy
+	docker tag proxy-service:latest registry.local:32000/proxy-service:latest
+	docker tag proxy-service:0.2.2 registry.local:32000/proxy-service:0.2.2
+	docker push registry.local:32000/proxy-service:latest
+	docker push registry.local:32000/proxy-service:0.2.2
+
+
 .PHONY: k3d-proxy-deploy-deployment
 k3d-proxy-deploy-deployment:
 	kubectl apply -f ../install/kubectl/proxy-service-k3d-deployment.yaml
@@ -110,7 +118,7 @@ coverage:
 
 .PHONY: generate-swagger
 generate-swagger:
-	go install github.com/swaggo/swag/cmd/swag@latest
-	go install github.com/swaggo/gin-swagger
-	go install github.com/swaggo/files
+	go get -u github.com/swaggo/swag/cmd/swag
+	go get -u github.com/swaggo/gin-swagger
+	go get -u github.com/swaggo/files
 	swag init -o api

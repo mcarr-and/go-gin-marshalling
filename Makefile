@@ -3,7 +3,7 @@ docker-compose-full-start: docker-build-album docker-build-proxy
 	docker-compose -f ./install/docker/docker-compose.yaml up -d --remove-orphans;
 
 .PHONY: build
-build: generate-swagger
+build:
 	go mod tidy;
 	go get;
 	go clean;
@@ -11,7 +11,7 @@ build: generate-swagger
 
 .PHONY: test
 test:
-	go test -v
+	go test -v -json > test-results.json
 
 .PHONY: test-benchmark
 test-benchmark:
@@ -30,13 +30,13 @@ skaffold-helm-repos:
 	helm repo add argo                	https://argoproj.github.io/argo-helm;
 	helm repo update;
 
-.PHONY: skaffold-dev-k3d
-skaffold-dev-k3d:
-	skaffold dev -f install/skaffold.yaml -p k3d
+.PHONY: skaffold-dev
+skaffold-dev:
+	skaffold dev -p k3d -f install/skaffold.yaml
 
-.PHONY: skaffold-infra-dev-k3d
-skaffold-infra-dev-k3d:
-	skaffold dev -f install/skaffold-infra.yaml -p k3d
+.PHONY: skaffold-infra-dev
+skaffold-infra-dev:
+	skaffold dev -p k3d -f install/skaffold-infra.yaml
 
 set-local-test:
 	$(eval url_value := http://localhost:9080)
@@ -99,6 +99,14 @@ docker-tag-k3d-registry-album: docker-build-album
 	docker tag album-store:0.2.2 localhost:54094/album-store:0.2.2
 	docker push localhost:54094/album-store:latest
 	docker push localhost:54094/album-store:0.2.2
+
+.PHONY: docker-tag-microk8s-registry-album
+docker-tag-microk8s-registry-album: docker-build-album
+	docker tag album-store:latest registry.local:32000/album-store:latest
+	docker tag album-store:0.2.2 registry.local:32000/album-store:0.2.2
+	docker push registry.local:32000/album-store:latest
+	docker push registry.local:32000/album-store:0.2.2
+
 
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment: docker-tag-k3d-registry-album
@@ -169,7 +177,7 @@ coverage:
 
 .PHONY: generate-swagger
 generate-swagger:
-	go install github.com/swaggo/swag/cmd/swag@latest
-	go install github.com/swaggo/gin-swagger
-	go install github.com/swaggo/files
+	go get -u github.com/swaggo/swag/cmd/swag
+	go get -u github.com/swaggo/gin-swagger
+	go get -u github.com/swaggo/files
 	swag init -o api --exclude proxy
