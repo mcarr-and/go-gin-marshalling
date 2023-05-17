@@ -22,6 +22,7 @@ profiles:
             repo: https://istio-release.storage.googleapis.com/charts
             namespace: istio-system
             createNamespace: true
+            wait: true
             valuesFiles: ["./install/values/local/istio-istiod.values.yaml"]
           - name: istio-ingressgateway
             remoteChart: gateway
