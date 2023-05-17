@@ -58,7 +58,13 @@ microk8s enable registry # allow saving of local docker images
 
 ### Fix /etc/resolv.conf 
 
-Do on both Control Plane and all Worker Nodes.
+This allows the searching of internal domains `svc.cluster.local` and `cluster.local` in the K8s cluster.
+
+The below change will add those 2 entries in your `/etc/resolv.conf` and it will end with the name of your router.
+
+It will try to DNS resolve inside the cluster first before going external.  
+
+**Note: Do on both Control Plane and all Worker Nodes.**
 
 ```bash
 sudo sed -i 's/#Domains=/Domains=svc.cluster.local cluster.local/g' /etc/systemd/resolved.conf;
