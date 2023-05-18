@@ -127,3 +127,8 @@ sudo ufw allow 15090/tcp; # prometheus
 sudo ufw allow 53/tcp; # certificate
 sudo ufw allow 80/tcp; # http
 ```
+
+
+## Bibliography
+
+[resolv.conf issues and cluster resolution for istio base](https://rtfm.co.ua/en/kubernetes-load-testing-and-high-load-tuning-problems-and-solutions/#php_network_getaddresses_getaddrinfo_failed_%D0%B8_DNS)
