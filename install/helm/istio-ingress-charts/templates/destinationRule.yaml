@@ -5,7 +5,7 @@ metadata:
   name: {{.name}}-destination-rule
   namespace: {{.namespace}}
 spec:
-  host: {{.name}}
+  host: {{.serviceName}}
   trafficPolicy:
     tls:
       mode: {{.tlsMode}}
