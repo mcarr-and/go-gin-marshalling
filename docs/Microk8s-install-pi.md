@@ -4,16 +4,23 @@ These are my notes for creating a Microk8s cluster on Raspberry Pis.
 
 I have included instructions on using Rancher-Desktop Docker and the changes needed for Rancher-Desktop internal tooling.
 
+### Original Microk8s install for Raspberry Pi instructions
+
+[Ubuntu Microk8s Pi cluster](https://ubuntu.com/tutorials/how-to-kubernetes-cluster-on-raspberry-pi#1-overview)
+
 ## Changes to your laptop/computer
 
 ### /etc/hosts on your local machine
 
-local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
+local changes to your `/etc/hosts` to use nginx-ingress with the microk8s cluster.
 
 change `192.168.XX.XX` to the IP Address of a Worker Node raspberrypi. 
 
-```
-    192.168.XX.XX	k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local kiali.local album-store.local proxy-serivce.local registry.local
+```bash
+export REGISTRY_IP=XXX.XXX.XX.XX;
+sudo bash -c "cat >> /etc/hosts << EOF
+$REGISTRY_IP k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local kiali.local album-store.local proxy-serivce.local registry.local
+EOF";
 ```
 
 ### Mac/Apple Rancher-Desktop with Docker to use insecure registry
@@ -35,9 +42,9 @@ EOF";
 exit;
 ```
 
-#### Docker Error message if above is not done
+#### Docker Error messages you will get if above is not done
 
-The first section fixes the following:
+The first section on `DOCKER_OPTS` fixes the following:
 
 You will get an error message when you try and do a `docker image push.` if your registry is not in your DOCKER_OPTS
 
@@ -57,10 +64,6 @@ docker push registry.local:32000/album-store:0.2.2;
 The push refers to repository [registry.local:32000/album-store]
 Get "http://registry.local:32000/v2/": dial tcp: lookup registry.local: Try again
 ```
-
-## Original Microk8s install for Raspberry Pi instructions
-
-[Ubuntu Microk8s Pi cluster](https://ubuntu.com/tutorials/how-to-kubernetes-cluster-on-raspberry-pi#1-overview)
 
 ## Post install instructions 
 
