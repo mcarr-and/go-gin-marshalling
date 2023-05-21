@@ -10,7 +10,7 @@ I have included instructions on using Rancher-Desktop Docker and the changes nee
 
 local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
-change `192.168.XX.XX` to the IP Address a Worker Node raspberrypi. 
+change `192.168.XX.XX` to the IP Address of a Worker Node raspberrypi. 
 
 ```
     192.168.XX.XX	k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local kiali.local album-store.local proxy-serivce.local registry.local
