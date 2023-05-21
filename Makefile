@@ -1,5 +1,5 @@
 .PHONY: docker-compose-full-start
-docker-compose-full-start: docker-build-album docker-build-proxy
+docker-compose-full-start: docker-build-album
 	docker-compose -f ./install/docker/docker-compose.yaml up -d --remove-orphans;
 
 .PHONY: build
@@ -111,11 +111,10 @@ docker-tag-k3d-registry-album: docker-build-album
 
 .PHONY: docker-tag-microk8s-registry-album
 docker-tag-microk8s-registry-album: docker-build-album
-	docker image tag album-store:latest registry.local:32000/album-store:latest;
-	docker image tag album-store:0.2.2 registry.local:32000/album-store:0.2.2;
-	docker image push registry.local:32000/album-store:latest;
-	docker image push registry.local:32000/album-store:0.2.2;
-
+	docker tag album-store:latest registry.local:32000/album-store:latest;
+	docker tag album-store:0.2.2 registry.local:32000/album-store:0.2.2;
+	docker push registry.local:32000/album-store:latest;
+	docker push registry.local:32000/album-store:0.2.2;
 
 .PHONY: k3d-album-deploy-deployment
 k3d-album-deploy-deployment: docker-tag-k3d-registry-album
