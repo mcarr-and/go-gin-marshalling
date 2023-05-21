@@ -48,6 +48,8 @@ Selector labels
 {{- define "proxy-service.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "proxy-service.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ include "proxy-service.name" . }}
+version: {{ .Chart.Version }}
 {{- end }}
 
 {{/*

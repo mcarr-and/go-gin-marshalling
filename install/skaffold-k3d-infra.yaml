@@ -15,6 +15,7 @@ profiles:
             repo: https://prometheus-community.github.io/helm-charts
             namespace: monitoring
             createNamespace: true
+            wait: true
             valuesFiles: ["./install/values/k3d/prometheus.values.yaml"]
 ---
 apiVersion: skaffold/v4beta2
@@ -54,7 +55,7 @@ profiles:
             valuesFiles: ["./install/values/k3d/istio-gateway.values.yaml"]
           - name: kiali
             remoteChart: kiali-server
-            version: 1.66.0
+            version: 1.68.0
             repo: https://kiali.org/helm-charts
             namespace: istio-system
             createNamespace: true
@@ -74,7 +75,7 @@ profiles:
           - name: grafana-dashboards
             # chartPath: ./install/helm/grafana-dashboards # comment out repoChart and repo to use local version
             remoteChart: grafana-dashboards
-            version: 1.0.6
+            version: 1.0.7
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: monitoring
             createNamespace: true
@@ -94,7 +95,7 @@ profiles:
         releases:
           - name: grafana
             remoteChart: grafana
-            version: 6.52.9
+            version: 6.56.5
             repo: https://grafana.github.io/helm-charts
             namespace: monitoring
             createNamespace: true
@@ -170,7 +171,7 @@ profiles:
       helm:
         releases:
           - name: istio-ingress-charts
-            version: 0.1.4
+            version: 0.1.5
             # chartPath: ./install/helm/istio-ingress-charts # comment out repoChart and repo to use local version
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             remoteChart: istio-ingress-charts

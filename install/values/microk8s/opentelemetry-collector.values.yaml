@@ -266,7 +266,9 @@ resources:
 
 podAnnotations: {}
 
-podLabels: {}
+podLabels:
+  app: opentelemetry-collector
+  version: 0.53.0
 
 # Host networking requested for this pod. Use the host's network namespace.
 hostNetwork: false
@@ -370,7 +372,10 @@ podMonitor:
       # interval: 15s
 
   # additional labels for the PodMonitor
-  extraLabels: {}
+  extraLabels:
+    app: opentelemetry-collector
+    version: 0.53.0
+
   #   release: kube-prometheus-stack
 
 serviceMonitor:
@@ -382,7 +387,10 @@ serviceMonitor:
       # interval: 15s
 
   # additional labels for the ServiceMonitor
-  extraLabels: {}
+  extraLabels:
+    app: opentelemetry-collector
+    version: 0.53.0
+
   #  release: kube-prometheus-stack
 
 # PodDisruptionBudget is used only if deployment enabled
@@ -414,7 +422,10 @@ prometheusRule:
     enabled: true
 
   # additional labels for the PrometheusRule
-  extraLabels: {}
+  extraLabels:
+    app: opentelemetry-collector
+    version: 0.53.0
+
 
 statefulset:
   # volumeClaimTemplates for a statefulset

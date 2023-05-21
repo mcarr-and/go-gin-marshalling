@@ -33,7 +33,9 @@ serviceAccount:
   name:
   nameTest:
   ## ServiceAccount labels.
-  labels: {}
+  labels:
+    version: 6.56.5
+    app: grafana-service-account
   ## Service account annotations. Can be templated.
   #  annotations:
   #    eks.amazonaws.com/role-arn: arn:aws:iam::123456789000:role/iam-role-name-here
@@ -84,7 +86,7 @@ livenessProbe:
 # schedulerName: "default-scheduler"
 
 image:
-  repository: grafana/grafana
+  repository: docker.io/grafana/grafana
   # Overrides the Grafana image tag whose default is the chart appVersion
   tag: ""
   sha: ""
@@ -100,17 +102,24 @@ image:
 
 testFramework:
   enabled: true
-  image: "bats/bats"
+  image: docker.io/bats/bats
   tag: "v1.4.1"
   imagePullPolicy: IfNotPresent
   securityContext: {}
 
 securityContext:
+  runAsNonRoot: true
   runAsUser: 472
   runAsGroup: 472
   fsGroup: 472
 
-containerSecurityContext: {}
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  seccompProfile:
+    type: RuntimeDefault
 
 # Enable creating the grafana configmap
 createConfigmap: true
@@ -131,13 +140,15 @@ extraEmptyDirMounts:
   #   mountPath: /etc/grafana/provisioning/notifiers
 
 # Apply extra labels to common labels.
-extraLabels: {}
+extraLabels:
+  version: 6.56.5
+  app: grafana
 
 ## Assign a PriorityClassName to pods if set
 # priorityClassName:
 
 downloadDashboardsImage:
-  repository: curlimages/curl
+  repository: docker.io/curlimages/curl
   tag: 7.85.0
   sha: ""
   pullPolicy: IfNotPresent
@@ -146,7 +157,13 @@ downloadDashboards:
   env: {}
   envFromSecret: ""
   resources: {}
-  securityContext: {}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    seccompProfile:
+      type: RuntimeDefault
   envValueFrom: {}
   #  ENV_NAME:
   #    configMapKeyRef:
@@ -157,7 +174,9 @@ downloadDashboards:
 # podAnnotations: {}
 
 ## Pod Labels
-# podLabels: {}
+podLabels:
+  version: 6.56.5
+  app: grafana
 
 podPortName: grafana
 gossipPortName: gossip
@@ -177,7 +196,9 @@ service:
     # targetPort: 4181 To be used with a proxy extraContainer
   ## Service annotations. Can be templated.
   annotations: {}
-  labels: {}
+  labels:
+    version: 6.56.5
+    app: grafana
   portName: service
   # Adds the appProtocol field to the service. This allows to work with istio protocol selection. Ex: "http" or "tcp"
   appProtocol: ""
@@ -189,7 +210,9 @@ serviceMonitor:
   enabled: false
   path: /metrics
   #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
-  labels: {}
+  labels:
+    version: 6.56.5
+    app: grafana-service-monitor
   interval: 1m
   scheme: http
   tlsConfig: {}
@@ -218,11 +241,13 @@ ingress:
   # ingressClassName: nginx
   # Values can be templated
   annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
   labels: {}
   path: /
 
   # pathType is only for k8s >= 1.1=
-  pathType: ImplementationSpecific
+  pathType: Prefix
 
   hosts: []
   ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
@@ -345,7 +370,7 @@ initChownData:
   ## initChownData container image
   ##
   image:
-    repository: busybox
+    repository: docker.io/library/busybox
     tag: "1.31.1"
     sha: ""
     pullPolicy: IfNotPresent
@@ -363,6 +388,11 @@ initChownData:
   securityContext:
     runAsNonRoot: false
     runAsUser: 0
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      add:
+        - CHOWN
 
 # Administrator credentials when not using an existing secret (see below)
 adminUser: admin
@@ -797,27 +827,27 @@ grafana.ini:
   server:
     domain: "{{ if (and .Values.ingress.enabled .Values.ingress.hosts) }}{{ .Values.ingress.hosts | first }}{{ else }}''{{ end }}"
 ## grafana Authentication can be enabled with the following values on grafana.ini
-# server:
-# The full public facing url you use in browser, used for redirects and emails
-#    root_url:
-# https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
-# auth.github:
-#    enabled: false
-#    allow_sign_up: false
-#    scopes: user:email,read:org
-#    auth_url: https://github.com/login/oauth/authorize
-#    token_url: https://github.com/login/oauth/access_token
-#    api_url: https://api.github.com/user
-#    team_ids:
-#    allowed_organizations:
-#    client_id:
-#    client_secret:
+ # server:
+      # The full public facing url you use in browser, used for redirects and emails
+ #    root_url:
+ # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
+ # auth.github:
+ #    enabled: false
+ #    allow_sign_up: false
+ #    scopes: user:email,read:org
+ #    auth_url: https://github.com/login/oauth/authorize
+ #    token_url: https://github.com/login/oauth/access_token
+ #    api_url: https://api.github.com/user
+ #    team_ids:
+ #    allowed_organizations:
+ #    client_id:
+ #    client_secret:
 ## LDAP Authentication can be enabled with the following values on grafana.ini
 ## NOTE: Grafana will fail to start if the value for ldap.toml is invalid
-# auth.ldap:
-#   enabled: true
-#   allow_sign_up: true
-#   config_file: /etc/grafana/ldap.toml
+  # auth.ldap:
+  #   enabled: true
+  #   allow_sign_up: true
+  #   config_file: /etc/grafana/ldap.toml
 
 ## Grafana's LDAP configuration
 ## Templated by the template in _helpers.tpl
@@ -861,13 +891,19 @@ sidecar:
     sha: ""
   imagePullPolicy: IfNotPresent
   resources: {}
-  #   limits:
-  #     cpu: 100m
-  #     memory: 100Mi
-  #   requests:
-  #     cpu: 50m
-  #     memory: 50Mi
-  securityContext: {}
+#   limits:
+#     cpu: 100m
+#     memory: 100Mi
+#   requests:
+#     cpu: 50m
+#     memory: 50Mi
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    seccompProfile:
+      type: RuntimeDefault
   # skipTlsVerify Set to true to skip tls verification for kube api calls
   # skipTlsVerify: true
   enableUniqueFilenames: false
@@ -963,7 +999,7 @@ sidecar:
       # orgid as configured in grafana
       orgid: 1
       # folder in which the dashboards should be imported in grafana
-      folder: ""
+      folder: ''
       # type of the provider
       type: file
       # disableDelete to activate a import-only behaviour
@@ -1120,7 +1156,7 @@ imageRenderer:
     behavior: {}
   image:
     # image-renderer Image repository
-    repository: grafana/grafana-image-renderer
+    repository: docker.io/grafana/grafana-image-renderer
     # image-renderer Image tag
     tag: latest
     # image-renderer Image sha (optional)
@@ -1133,25 +1169,42 @@ imageRenderer:
     # RENDERING_ARGS: --no-sandbox,--disable-gpu,--window-size=1280x758
     # RENDERING_MODE: clustered
     # IGNORE_HTTPS_ERRORS: true
+
+  ## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
+  ## ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#envvarsource-v1-core
+  ## Renders in container spec as:
+  ##   env:
+  ##     ...
+  ##     - name: <key>
+  ##       valueFrom:
+  ##         <value rendered as YAML>
+  envValueFrom: {}
+    #  ENV_NAME:
+    #    configMapKeyRef:
+    #      name: configmap-name
+    #      key: value_key
+
   # image-renderer deployment serviceAccount
   serviceAccountName: ""
   # image-renderer deployment securityContext
   securityContext: {}
   # image-renderer deployment container securityContext
   containerSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
     capabilities:
-      drop: ["ALL"]
+      drop: ['ALL']
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
   # image-renderer deployment Host Aliases
   hostAliases: []
   # image-renderer deployment priority class
-  priorityClassName: ""
+  priorityClassName: ''
   service:
     # Enable the image-renderer service
     enabled: true
     # image-renderer service port name
-    portName: "http"
+    portName: 'http'
     # image-renderer service port used by both service and deployment
     port: 8081
     targetPort: 8081
@@ -1164,7 +1217,9 @@ imageRenderer:
     enabled: false
     path: /metrics
     #  namespace: monitoring  (defaults to use the namespace this chart is deployed to)
-    labels: {}
+    labels:
+      version: 6.56.5
+      app: grafana-service-monitor
     interval: 1m
     scheme: http
     tlsConfig: {}

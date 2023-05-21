@@ -75,7 +75,8 @@ autoscaling:
 env: {}
 
 # Labels to apply to all resources
-labels: {}
+labels:
+  version: 1.17.2
 
 # Annotations to apply to all resources
 annotations: {}

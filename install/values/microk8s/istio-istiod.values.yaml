@@ -59,7 +59,8 @@ pilot:
   keepaliveMaxServerConnectionAge: 30m
 
   # Additional labels to apply to the deployment.
-  deploymentLabels: {}
+  deploymentLabels:
+    version: 1.17.2
 
   ## Mesh config settings
 

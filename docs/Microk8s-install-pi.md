@@ -1,11 +1,12 @@
 ## Instructions to get Microk8s working on Raspberry-Pi
 
-WIP - cannot get my applications to start in K8s. DNS does not seem to be working.
-
 Things not working:
-1. Kiali cannot find prometheus on home screen prometheus.local
+Kiali is saying are not in istio even with the label on the namespace.
 
-
+   1. jaeger
+   1. prometheus
+   1. grafana
+   1. custom dashboards
 
 These are my notes for creating a Microk8s cluster on Raspberry Pis.
 

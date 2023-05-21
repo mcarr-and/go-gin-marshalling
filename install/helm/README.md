@@ -18,7 +18,7 @@ Check out this example:
 
 ```bash
 cd install/helm
-#This will create tgz file with chart in charts directory
+helm-docs  
 helm package album-store -d charts; 
 helm package proxy-service -d charts;
 helm package grafana-dashboards -d charts;

@@ -48,6 +48,8 @@ Selector labels
 {{- define "istio-ingress-charts.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "istio-ingress-charts.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ include "istio-ingress-charts.name" . }}
+version: {{ .Chart.Version }}
 {{- end }}
 
 {{/*

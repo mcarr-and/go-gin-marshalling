@@ -29,7 +29,7 @@ deployment:
   # This only limits what Kiali will attempt to see, but Kiali Service Account has permissions to see everything.
   # For more control over what the Kial Service Account can see, use the Kiali Operator
   accessible_namespaces:
-    - "**"
+  - "**"
   additional_service_yaml: {}
   affinity:
     node: {}
@@ -45,7 +45,7 @@ deployment:
   image_name: quay.io/kiali/kiali
   image_pull_policy: "Always"
   image_pull_secrets: []
-  image_version: v1.65.0 # version like "v1.39" (see: https://quay.io/repository/kiali/kiali?tab=tags) or a digest hash
+  image_version: v1.68.0 # version like "v1.39" (see: https://quay.io/repository/kiali/kiali?tab=tags) or a digest hash
   ingress:
     additional_labels: {}
     class_name: "nginx"
@@ -74,7 +74,7 @@ deployment:
   service_annotations: {}
   service_type: ""
   tolerations: []
-  version_label: v1.65.0 # v1.39 # v1.39.0 # see: https://quay.io/repository/kiali/kiali?tab=tags
+  version_label: v1.68.0 # v1.39 # v1.39.0 # see: https://quay.io/repository/kiali/kiali?tab=tags
   view_only_mode: false
 
 external_services:
@@ -82,9 +82,10 @@ external_services:
     enabled: true
   istio:
     root_namespace: ""
+  prometheus:
+    url: "http://prometheus.monitoring:80"
 
-identity:
-  {}
+identity: {}
   #cert_file:
   #private_key_file:
 
@@ -92,8 +93,8 @@ kiali_feature_flags:
   certificates_information_indicators:
     enabled: true
     secrets:
-      - cacerts
-      - istio-ca-secret
+    - cacerts
+    - istio-ca-secret
   clustering:
     autodetect_secrets:
       enabled: true

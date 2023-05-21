@@ -64,7 +64,7 @@ Run the project with a local Kubernetes cluster with K3D.
 
 
 ## TODO
-* helm up creating the namespaces for album-store and proxy-service to include the istio label 
+* add istio label to all namespaces when deploying with skaffold 
 * Add documentation to use IDE with Docker-Compose?
 * Emit events when data is changed.
 * Adding CI server integration

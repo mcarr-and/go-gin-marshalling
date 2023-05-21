@@ -553,7 +553,9 @@ server:
     enabled: true
 
     annotations: {}
-    labels: {}
+    labels:
+      version: 20.2.0
+      app: prometheus
     clusterIP: ""
 
     ## List of IP addresses at which the Prometheus server service is available

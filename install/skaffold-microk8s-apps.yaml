@@ -10,7 +10,7 @@ profiles:
       helm:
         releases:
           - name: album-store
-            version: 0.2.3
+            version: 0.2.4
             # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
             remoteChart: album-store
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
@@ -30,7 +30,7 @@ profiles:
       helm:
         releases:
           - name: proxy-service
-            version: 0.2.3
+            version: 0.2.4
             # chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
             remoteChart: proxy-service
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts

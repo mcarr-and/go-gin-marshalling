@@ -48,6 +48,8 @@ Selector labels
 {{- define "grafana-dashboards.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "grafana-dashboards.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ include "grafana-dashboards.name" . }}
+version: {{ .Chart.Version }}
 {{- end }}
 
 {{/*

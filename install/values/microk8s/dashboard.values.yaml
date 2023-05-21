@@ -16,7 +16,9 @@ replicaCount: 1
 
 ## @param commonLabels Labels to add to all deployed objects
 ##
-commonLabels: {}
+commonLabels:
+  app: kubernetes-dashboard
+  version: 6.0.6
 ## @param commonAnnotations Annotations to add to all deployed objects
 ##
 commonAnnotations: {}

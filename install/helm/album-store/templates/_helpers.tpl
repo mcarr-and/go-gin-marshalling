@@ -48,6 +48,8 @@ Selector labels
 {{- define "album-store.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "album-store.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ include "album-store.name" . }}
+version: {{ .Chart.Version }}
 {{- end }}
 
 {{/*

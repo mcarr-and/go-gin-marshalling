@@ -58,6 +58,9 @@ service:
     prometheus.io/port: "14269"
   headless:
     annotations: {}
+  labels:
+    version: 0.1.8
+    app: jaeger-all-in-one
 
 ingress:
   enabled: true
