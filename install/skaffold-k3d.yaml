@@ -1,6 +1,25 @@
 apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
+  name: prometheus
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: prometheus
+            remoteChart: prometheus
+            version: 20.2.0
+            repo: https://prometheus-community.github.io/helm-charts
+            namespace: monitoring
+            createNamespace: true
+            valuesFiles: [ "./install/values/k3d/prometheus.values.yaml" ]
+---
+apiVersion: skaffold/v4beta2
+kind: Config
+metadata:
   name: istio
 profiles:
   - name: k3d
@@ -40,25 +59,6 @@ profiles:
             namespace: istio-system
             createNamespace: true
             valuesFiles: [ "./install/values/k3d/kiali-server.values.yaml" ]
----
-apiVersion: skaffold/v4beta2
-kind: Config
-metadata:
-  name: prometheus
-profiles:
-  - name: k3d
-    activation:
-      - kubeContext: k3d-k3s-default
-    deploy:
-      helm:
-        releases:
-          - name: prometheus
-            remoteChart: prometheus
-            version: 20.2.0
-            repo: https://prometheus-community.github.io/helm-charts
-            namespace: monitoring
-            createNamespace: true
-            valuesFiles: [ "./install/values/k3d/prometheus.values.yaml" ]
 ---
 apiVersion: skaffold/v4beta2
 kind: Config
