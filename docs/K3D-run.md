@@ -40,6 +40,7 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 ## 3. Install to cluster: Applications, Observability tooling, Monitoring tooling. 
  
 ```bash
+  export ISTIO_GATEWAY_EXTERNAL_IP=XXX.XXX.XX.XX;
   make skaffold-dev-k3d;
 ```
 

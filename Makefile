@@ -95,17 +95,17 @@ docker-build-album: eval-git-hash
 
 .PHONY: docker-tag-k3d-registry-album
 docker-tag-k3d-registry-album: docker-build-album
-	docker tag album-store:latest localhost:54094/album-store:latest
-	docker tag album-store:0.2.2 localhost:54094/album-store:0.2.2
-	docker push localhost:54094/album-store:latest
-	docker push localhost:54094/album-store:0.2.2
+	docker tag album-store:latest localhost:54094/album-store:latest;
+	docker tag album-store:0.2.2 localhost:54094/album-store:0.2.2;
+	docker push localhost:54094/album-store:latest;
+	docker push localhost:54094/album-store:0.2.2;
 
 .PHONY: docker-tag-microk8s-registry-album
 docker-tag-microk8s-registry-album: docker-build-album
-	docker tag album-store:latest registry.local:32000/album-store:latest
-	docker tag album-store:0.2.2 registry.local:32000/album-store:0.2.2
-	docker push registry.local:32000/album-store:latest
-	docker push registry.local:32000/album-store:0.2.2
+	docker image tag album-store:latest registry.local:32000/album-store:latest;
+	docker image tag album-store:0.2.2 registry.local:32000/album-store:0.2.2;
+	docker image push registry.local:32000/album-store:latest;
+	docker image push registry.local:32000/album-store:0.2.2;
 
 
 .PHONY: k3d-album-deploy-deployment

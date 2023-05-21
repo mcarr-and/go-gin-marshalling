@@ -30,6 +30,8 @@ profiles:
             repo: https://istio-release.storage.googleapis.com/charts
             namespace: istio-system
             createNamespace: true
+            setValueTemplates:
+              service.externalIPs[0]: "{{.ISTIO_GATEWAY_EXTERNAL_IP}}"
             valuesFiles: ["./install/values/local/istio-gateway.values.yaml"]
           - name: kiali
             remoteChart: kiali-server
