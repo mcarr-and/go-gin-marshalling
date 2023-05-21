@@ -23,7 +23,7 @@ Terminal window 2:
 Terminal window 3:
 
 ```bash
-  make local-start-proxy-grpc;
+  make local-start;
 ```
 
 ### Start via IDE 

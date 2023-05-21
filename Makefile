@@ -30,13 +30,22 @@ skaffold-helm-repos:
 	helm repo add argo                	https://argoproj.github.io/argo-helm;
 	helm repo update;
 
-.PHONY: skaffold-dev
-skaffold-dev:
-	skaffold dev -p k3d -f install/skaffold.yaml
+.PHONY: skaffold-microk8s-dev
+skaffold-microk8s-dev:
+	skaffold dev -p microk8s -f install/skaffold-microk8s.yaml
 
-.PHONY: skaffold-infra-dev
-skaffold-infra-dev:
-	skaffold dev -p k3d -f install/skaffold-infra.yaml
+.PHONY: skaffold-microk8s-infra-dev
+skaffold-microk8s-infra-dev:
+	skaffold dev -p microk8s -f install/skaffold-microk8s-infra.yaml
+
+.PHONY: skaffold-k3d-dev
+skaffold-k3d-dev:
+	skaffold dev -p k3d -f install/skaffold-k3d.yaml
+
+.PHONY: skaffold-k3d-infra-dev
+skaffold-k3d-infra-dev:
+	skaffold dev -p k3d -f install/skaffold-k3d-infra.yaml
+
 
 set-local-test:
 	$(eval url_value := http://localhost:9080)

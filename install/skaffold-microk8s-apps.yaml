@@ -3,9 +3,9 @@ kind: Config
 metadata:
   name: album-store
 profiles:
-  - name: k3d
+  - name: microk8s
     activation:
-      - kubeContext: k3d-k3s-default
+      - kubeContext: microk8s
     deploy:
       helm:
         releases:
@@ -16,16 +16,16 @@ profiles:
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: album-store
             createNamespace: true
-            valuesFiles: ["./install/values/local/album-store.values.yaml"]
+            valuesFiles: ["./install/values/microk8s/album-store.values.yaml"]
 ---
 apiVersion: skaffold/v4beta2
 kind: Config
 metadata:
   name: proxy-service
 profiles:
-  - name: k3d
+  - name: microk8s
     activation:
-      - kubeContext: k3d-k3s-default
+      - kubeContext: microk8s
     deploy:
       helm:
         releases:
@@ -36,4 +36,4 @@ profiles:
             repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
             namespace: proxy-service
             createNamespace: true
-            valuesFiles: ["./install/values/local/proxy-service.values.yaml"]
+            valuesFiles: ["./install/values/microk8s/proxy-service.values.yaml"]

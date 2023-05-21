@@ -25,7 +25,7 @@ make docker-compose-limited-start;
 ### 3.1 From the Command line 
 
 ```bash
-make local-start-grpc;
+make local-start;
 ```
 
 ### 3.2 From your IDE

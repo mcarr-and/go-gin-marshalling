@@ -1,0 +1,39 @@
+apiVersion: skaffold/v4beta2
+kind: Config
+metadata:
+  name: album-store
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: album-store
+            version: 0.2.3
+            # chartPath: ./install/helm/album-store # comment out repoChart and repo to use local version
+            remoteChart: album-store
+            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            namespace: album-store
+            createNamespace: true
+            valuesFiles: ["./install/values/k3d/album-store.values.yaml"]
+---
+apiVersion: skaffold/v4beta2
+kind: Config
+metadata:
+  name: proxy-service
+profiles:
+  - name: k3d
+    activation:
+      - kubeContext: k3d-k3s-default
+    deploy:
+      helm:
+        releases:
+          - name: proxy-service
+            version: 0.2.3
+            # chartPath: ./install/helm/proxy-service # comment out repoChart and repo to use local version
+            remoteChart: proxy-service
+            repo: https://mcarr-and.github.io/go-gin-otelcollector/install/helm/charts
+            namespace: proxy-service
+            createNamespace: true
+            valuesFiles: ["./install/values/k3d/proxy-service.values.yaml"]
