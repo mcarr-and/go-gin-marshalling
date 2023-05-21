@@ -4,10 +4,6 @@ WIP - cannot get my applications to start in K8s. DNS does not seem to be workin
 
 Things not working:
 1. Kiali cannot find prometheus on home screen prometheus.local
-   2. Is DNS working at all?
-1. K8s can find and pull album-store and proxy-service 
-   2. they get stuck in some crash loop backoff before starting.
-1. Jaeger is not seeing any spans at all.
 
 
 
