@@ -1,40 +1,77 @@
+## Instructions to get Microk8s working on Raspberry-Pi
 
-## Dump of notes of what was needed to get a RaspberryPi cluster working. 
+These are my notes for creating a Microk8s cluster on Raspberry Pis.
 
-WIP - DNS not resolving urls 
+I have included instructions on using Rancher-Desktop Docker and the changes needed for Rancher-Desktop internal tooling.
 
-TODO: 
-* DNS resolution is still a work in progress.
+## Changes to your laptop/computer
 
-## /etc/hosts on your local machine
+### /etc/hosts on your local machine
 
 local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 
-change `192.168.XX.XX` to the IP Address of the raspberrypi that is the control plane.
+change `192.168.XX.XX` to the IP Address a Worker Node raspberrypi. 
 
-```192.168.XX.XX	k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local kiali.local album-store.local proxy-serivce.local registry.local```
+```
+    192.168.XX.XX	k-dashboard.local jaeger.local otel-collector.local grafana.local prometheus.local kiali.local album-store.local proxy-serivce.local registry.local
+```
 
+### Mac/Apple Rancher-Desktop with Docker to use insecure registry
 
-## Original instructions
+**The following needs to be run each time the computer is restarted or Rancher Desktop is updated.**
+
+This allows docker to push to the microk8s registry that is running on http
+
+You must change `export REGISTRY_IP=XXX.XXX.XX.XX;` to be the IP of one of the worker nodes.
+
+```bash
+LIMA_HOME="$HOME/Library/Application Support/rancher-desktop/lima" "/Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/lima/bin/limactl" shell 0;
+sudo sed -i 's/DOCKER_OPTS=\"\"/DOCKER_OPTS=\"--insecure-registry=registry.local:32000\"/g' /etc/conf.d/docker;
+sudo service docker restart;
+export REGISTRY_IP=XXX.XXX.XX.XX;
+sudo bash -c "cat >> /etc/hosts << EOF
+$REGISTRY_IP registry.local
+EOF";
+exit;
+```
+
+#### Docker Error message if above is not done
+
+The first section fixes the following:
+
+You will get an error message when you try and do a `docker image push.` if your registry is not in your DOCKER_OPTS
+
+`docker image push registry.local:32000/album-store:latest;`
+
+The error message looks like this:
+
+```
+The push refers to repository [registry.local:32000/album-store]
+Get https://registry.local:32000/v2/: http: server gave HTTP response to HTTPS client
+```
+
+The Second section on `/etc/hosts` fixes the following error from Rancher-Desktop Docker not resolving the registry
+
+```
+docker push registry.local:32000/album-store:0.2.2;
+The push refers to repository [registry.local:32000/album-store]
+Get "http://registry.local:32000/v2/": dial tcp: lookup registry.local: Try again
+```
+
+## Original Microk8s install for Raspberry Pi instructions
+
 [Ubuntu Microk8s Pi cluster](https://ubuntu.com/tutorials/how-to-kubernetes-cluster-on-raspberry-pi#1-overview)
 
-#### Note
-Follow instructions to add a `--worker` node
+## Post install instructions 
 
-#### Show nodes in cluster
-`microk8s.kubectl get node`
-
-
-# Post install instructions
-
-## Turn on services (Control Plane and all Worker Nodes)
+### Turn on services (Control Plane and all Worker Nodes)
 
 ```bash
   sudo systemctl enable ssh;
   # sudo ufw enable; # disabled until all ports are known 
  ```
 
-## Install Docker & allow running Docker as current user (Control Plane and all Worker Nodes)
+### Install Docker & allow running Docker as current user (Control Plane and all Worker Nodes)
  ```bash
   sudo apt-get install docker.io;
   sudo usermod -aG docker $USER;
@@ -49,18 +86,18 @@ Follow instructions to add a `--worker` node
   newgrp microk8s;
 ```
 
-## Create Docker Registry (Control Plane) 
+### Create Docker Registry (Control Plane) 
 
 ```bash
 sudo bash -c "cat > /etc/docker/daemon.json << EOF 
 {
-  \"insecure-registries\" : [\"localhost:32000\"]
+  \"insecure-registries\" : [\"registry.local:32000\"]
 }
 EOF";
 sudo systemctl restart docker;
 ```
 
-## Enable microk8s services that are needed(Control Plane)
+### Enable microk8s services that are needed to run this cluster (Control Plane)
 
 ```bash
 microk8s.kubectl get nodes;
@@ -70,51 +107,11 @@ microk8s enable dns; # needed for default DNS resolution
 microk8s enable registry # allow saving of local docker images 
  ```
 
-## Apple - Allow Rancher Desktop - Docker to use insecure registry
+### istio fixes (Control Plane and all Worker Nodes)
 
-The following needs to be run each time the computer is restarted or Rancher Desktop is updated.
+One needs to add entries to give a istio some information about the clusterIP so it can work properly.
 
-This allows docker to push to the microk8s registry. 
-
-```bash
-LIMA_HOME="$HOME/Library/Application Support/rancher-desktop/lima" "/Applications/Rancher Desktop.app/Contents/Resources/resources/darwin/lima/bin/limactl" shell 0;
-sudo sed -i 's/DOCKER_OPTS=\"\"/DOCKER_OPTS=\"--insecure-registry=registry.local:32000\"/g' /etc/conf.d/docker;
-sudo service docker restart;
-```
-
-### Error Message if not set
-You will get an error message that states that an http registry is not allowed:
-
-```
-The push refers to repository [registry.local:32000/album-store]
-Get https://registry.local:32000/v2/: http: server gave HTTP response to HTTPS client
-```
-
-## DNS Fix /etc/resolv.conf (Control Plane and all Worker Nodes)
-
-```bash
-sudo sed -i 's/#Domains=/Domains=svc.cluster.local cluster.local/g' /etc/systemd/resolved.conf;
-sudo systemctl restart systemd-resolved;
-```
-
-### DNS issues
-
-This allows the searching of internal domains `svc.cluster.local` and `cluster.local` in the K8s cluster.
-
-The below change will add those 2 entries in your `/etc/resolv.conf` and it will end with the name of your router.
-
-It will try to DNS resolve inside the cluster first before going external.
-
-### Istio DNS issues
-We need this as istio-gateway needs istiod. Gateway should search the cluster to find istiod.
-
-You need to have istiod running before installing istio-gateway.
-
-In skaffold you have to add `wait: true` in the istiod before installing istio-gateway.
-
-## istio-gateway fixes (Control Plane and all Worker Nodes)
-
-One needs to add entries to give a clusterIP to the isto 
+The DNS for each node in the cluster needs some modification this is done in the `/etc/resolve.conf` file as below.
 
 ```bash
 export CLUSTER_DNS=$(kubectl -nkube-system get svc/kube-dns -o jsonpath="{.spec.clusterIP}");
@@ -123,21 +120,74 @@ sudo bash -c "cat >> /var/snap/microk8s/current/args/kubelet << EOF
 --cluster-dns=$CLUSTER_DNS
 EOF";
 sudo snap stop microk8s; sudo snap start microk8s;
+sudo sed -i 's/#Domains=/Domains=svc.cluster.local cluster.local/g' /etc/systemd/resolved.conf;
+sudo systemctl restart systemd-resolved;
 ```
 
-## Install tooling and applications
+## Build Project
+
+```bash
+  make docker-tag-microk8s-album-proxy;
+  cd proxy;
+  make docker-tag-microk8s-registry-proxy;
+  cd ..;
+```
+
+## Install all tooling and run applications. 
 
 Replace XXX.XXX.XX.XX; with your ip address of one of the worker nodes.
 
+If you have multiple worker nodes you will have to modify the skaffold to include all your IPs.
+
 ```bash
   export ISTIO_GATEWAY_EXTERNAL_IP=XXX.XXX.XX.XX;
-  make skaffold-dev;
+  make skaffold-microk8s-dev;
+  cd proxy
 ```
 
+## View Services
 
-## Firewall
+This is reliant upon you having made the /etc/hosts changes at the top.
 
-This is still WIP so not used. 
+Services:
+* [Jaeger to see observability spans](http://jaeger.local)
+* [Prometheus](http://prometheus.local)
+* [Grafana](http://grafana.local)
+* [Kubernetes dashboard for visualising the cluster](http://k-dashboard.local)
+* [Kiali to visualise Istio](http://kiali.local)
+  * generate token `kubectl -n istio-system create token kiali;`
+
+Applications:
+* [Album Store](http://album-store.local)
+* [Proxy Service](http://proxy-service.local)
+
+## (Note) about Istio DNS and application start time.
+
+We need this as istio-gateway needs istiod. Gateway should search the cluster to find istiod.
+
+You need to have istiod running before installing istio-gateway.
+
+In skaffold you have to add `wait: true` in the istiod before installing istio-gateway.
+
+```skaffold
+  - name: istiod
+    remoteChart: istiod
+    version: 1.17.2
+    repo: https://istio-release.storage.googleapis.com/charts
+    namespace: istio-system
+    createNamespace: true
+    wait: true # have to wait so ready when gateway asks for istiod
+    valuesFiles: ["./install/values/microk8s/istio-istiod.values.yaml"]
+```
+
+[Skaffold file example](../install/skaffold-microk8s.yaml)
+
+
+
+
+## (WIP) Firewall
+
+WIP not yet flushed out.  
 
 Istio-Gateway was not finding istiod and failing to launch if ufw rules are set. 
 

@@ -34,14 +34,17 @@ local changes to your `/etc/hosts` to use nginx-ingress with the k3d cluster.
 ## 2. Build the application in Docker and push Docker image to the  K3D Internal Registry
 
 ```bash
-  make docker-tag-k3d-registry-album && make docker-tag-k3d-registry-proxy;
+  make docker-tag-k3d-registry-album;
+  cd proxy;
+  make docker-tag-k3d-registry-proxy;
+  cd ..;
 ```
 
-## 3. Install to cluster: Applications, Observability tooling, Monitoring tooling. 
- 
+## 3. Install to cluster: Applications, Observability tooling, Monitoring tooling.
+
 ```bash
-  export ISTIO_GATEWAY_EXTERNAL_IP=XXX.XXX.XX.XX;
-  make skaffold-dev-k3d;
+  export ISTIO_GATEWAY_EXTERNAL_IP=localhost;
+  make skaffold-k3d-dev;
 ```
 
 **Note:**
@@ -73,19 +76,23 @@ make k3d-test;
 1. Set Environment to `album-store.local`
 1. Open a test in the `Album-Store` collection and run it.
 
-## 5. View the events in the different Services in K3D
+## 5. View the events in the different Services in K3D`
 
-[View Jaeger to see spans](http://jaeger.local:8070/search?limit=20&service=album-store)
+Services:
+* [Jaeger to see Observability spans](http://jaeger.local:8070/search?limit=20&service=album-store)
+* [Prometheus for metrics](http://prometheus.local:8070)
+* [Grafana for dashboards](http://grafana.local:8070)
+* [Kubernetes dashboard for visualising the cluster](http://k-dashboard.local:8070)
+* [Kiali to visualise Istio](http://kiali.local:8070)
+  * generate token `kubectl -n istio-system create token kiali;`
 
-[View Kubernetes environment](http://k-dashboard.local:8070/)
-
-[Grafana](http://grafana.local:8070/)
-
-[Prometheus](http://prometheus.local:8070/)
+Applications:
+* [Album Store](http://album-store.local:8070)
+* [Proxy Service](http://proxy-service.local:8070)
 
 ## 6. Uninstall from cluster: Applications, Observability tooling, Monitoring tooling.  
 
-Ctr + C on the terminal window where you started `make skaffold-dev`
+Ctr + C on the terminal window where you started `make skaffold-k3d-dev`
 
 ## 7. Delete Cluster
 
