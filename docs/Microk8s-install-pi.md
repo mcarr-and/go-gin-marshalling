@@ -1,5 +1,16 @@
 ## Instructions to get Microk8s working on Raspberry-Pi
 
+WIP - cannot get my applications to start in K8s. DNS does not seem to be working.
+
+Things not working:
+1. Kiali cannot find prometheus on home screen prometheus.local
+   2. Is DNS working at all?
+1. K8s can find and pull album-store and proxy-service 
+   2. they get stuck in some crash loop backoff before starting.
+1. Jaeger is not seeing any spans at all.
+
+
+
 These are my notes for creating a Microk8s cluster on Raspberry Pis.
 
 I have included instructions on using Rancher-Desktop Docker and the changes needed for Rancher-Desktop internal tooling.
@@ -107,7 +118,8 @@ microk8s.kubectl get nodes;
 microk8s enable community;
 microk8s enable hostpath-storage; # needed for Jaeger to mount a volume
 microk8s enable dns; # needed for default DNS resolution
-microk8s enable registry # allow saving of local docker images 
+microk8s enable registry # allow saving of local docker images
+microk8s enable metrics-server # see metrics for autoscaling  
  ```
 
 ### istio fixes (Control Plane and all Worker Nodes)
