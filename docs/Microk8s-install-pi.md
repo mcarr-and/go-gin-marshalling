@@ -89,12 +89,12 @@ Get "http://registry.local:32000/v2/": dial tcp: lookup registry.local: Try agai
   newgrp microk8s;
 ```
 
-### Create Docker Registry (Control Plane) 
+### Create Docker Registry (Control Plane and all Worker Nodes) 
 
 ```bash
 sudo bash -c "cat > /etc/docker/daemon.json << EOF 
 {
-  \"insecure-registries\" : [\"registry.local:32000\"]
+  \"insecure-registries\" : [\"localhost:32000\"]
 }
 EOF";
 sudo systemctl restart docker;

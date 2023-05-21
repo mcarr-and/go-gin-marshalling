@@ -77,6 +77,14 @@ istio:
     tlsMode: DISABLE
     serviceName: jaeger-all-in-one
     servicePort: 16686
+  - name: registry
+    namespace: container-registry
+    hosts: "registry.local"
+    gatewayPort: 80
+    protocol: HTTP
+    tlsMode: DISABLE
+    serviceName: registry
+    servicePort: 5000
 
 resources:
   {}

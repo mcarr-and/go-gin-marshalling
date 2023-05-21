@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: registry.local:32000/proxy-service
+  repository: localhost:32000/proxy-service
   pullPolicy: Always #IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "0.2.2"
@@ -81,7 +81,7 @@ resources:
     cpu: "500m"
 
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 90
