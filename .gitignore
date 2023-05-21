@@ -28,6 +28,9 @@ coverage.*
 # vscode file
 __debug_bin
 
+# skaffold solo file
+/install/skaffold-solo.yaml
+
 # project binaries
 /album-store-bin
 /proxy/proxy-service-bin

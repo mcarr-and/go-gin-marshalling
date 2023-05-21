@@ -50,9 +50,14 @@ eval-git-hash:
 	$(eval GIT_HASH:= $(shell git rev-parse --short HEAD))
 	echo $(GIT_HASH)
 
+.PHONY: build-raspberry-pi
+build-raspberry-pi:
+	$(eval BUILD_PLATFORM_RAS_PI:=--platform linux/arm64)
+	echo $(BUILD_PLATFORM_RAS_PI)
+
 .PHONY: docker-build-proxy
 docker-build-proxy: eval-git-hash
-	 DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t proxy-service:0.2.2 -t proxy-service:latest  .
+	 DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) $(BUILD_PLATFORM_RAS_PI) -t proxy-service:0.2.2 -t proxy-service:latest  .
 
 .PHONY: docker-tag-k3d-registry-proxy
 docker-tag-k3d-registry-proxy: docker-build-proxy
@@ -62,7 +67,7 @@ docker-tag-k3d-registry-proxy: docker-build-proxy
 	docker push localhost:54094/proxy-service:0.2.2
 
 .PHONY: docker-tag-microk8s-registry-proxy
-docker-tag-microk8s-registry-proxy: docker-build-proxy
+docker-tag-microk8s-registry-proxy: build-raspberry-pi docker-build-proxy
 	docker tag proxy-service:latest registry.local:32000/proxy-service:latest
 	docker tag proxy-service:0.2.2 registry.local:32000/proxy-service:0.2.2
 	docker push registry.local:32000/proxy-service:latest

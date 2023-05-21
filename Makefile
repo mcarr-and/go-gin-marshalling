@@ -98,9 +98,14 @@ eval-git-hash:
 	$(eval GIT_HASH:= $(shell git rev-parse --short HEAD))
 	echo $(GIT_HASH)
 
+.PHONY: build-raspberry-pi
+build-raspberry-pi:
+	$(eval BUILD_PLATFORM_RAS_PI:=--platform linux/arm64)
+	echo $(BUILD_PLATFORM_RAS_PI)
+
 .PHONY: docker-build-album
 docker-build-album: eval-git-hash
-	DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) -t album-store:0.2.2 -t album-store:latest .
+	DOCKER_BUILDKIT=1 docker build --build-arg GIT_HASH=$(GIT_HASH) $(BUILD_PLATFORM_RAS_PI) -t album-store:0.2.2 -t album-store:latest .
 
 .PHONY: docker-tag-k3d-registry-album
 docker-tag-k3d-registry-album: docker-build-album
@@ -110,7 +115,7 @@ docker-tag-k3d-registry-album: docker-build-album
 	docker push localhost:54094/album-store:0.2.2;
 
 .PHONY: docker-tag-microk8s-registry-album
-docker-tag-microk8s-registry-album: docker-build-album
+docker-tag-microk8s-registry-album: build-raspberry-pi docker-build-album
 	docker tag album-store:latest registry.local:32000/album-store:latest;
 	docker tag album-store:0.2.2 registry.local:32000/album-store:0.2.2;
 	docker push registry.local:32000/album-store:latest;
